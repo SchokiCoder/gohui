@@ -34,7 +34,8 @@
 
 # v0.1.0
 
-- add header
++ add mainloop
++ add header
 - add title
 - add menu draw
 - add keyboard input and close via ctl + 'c' and 'q'

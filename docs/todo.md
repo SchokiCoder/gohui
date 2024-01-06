@@ -36,7 +36,8 @@
 
 + add mainloop
 + add header
-- add title
+- add menu
+- add title draw
 - add menu draw
 - add keyboard input and close via ctl + 'c' and 'q'
 - add cursor hide/show

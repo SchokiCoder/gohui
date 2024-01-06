@@ -11,6 +11,17 @@ import (
 
 // Config temporarily as constants
 const HEADER = "Example config\n"
+
+const MENUS = [
+	Menu {
+		"main",
+		`Main Menu\n
+		 ---------`,
+		 [
+		 	
+		 ],
+	}
+]
 // Config temporarily as constants
 
 const SEQ_CLEAR =      "\033[H\033[2J"

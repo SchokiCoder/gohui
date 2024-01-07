@@ -3,20 +3,26 @@
 
 package main
 
-type EntryContent uint
+type EntryContentType uint
 
 const (
-	menu EntryContent = 0
-	shell EntryContent = 1
+	menu EntryContentType = 0
+	shell EntryContentType = 1
 )
 
-struct Entry {
-	caption: string
-	content: EntryContent
+type EntryContent struct {
+	ectype EntryContentType
+	menu   string
+	shell  string
 }
 
-struct Menu {
-	name: string
-	title: string
-	entries: []Entry
+type Entry struct {
+	caption string
+	content EntryContent
+}
+
+type Menu struct {
+	name string
+	title string
+	entries []Entry
 }

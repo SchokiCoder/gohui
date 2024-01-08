@@ -6,8 +6,8 @@ package main
 type EntryContentType uint
 
 const (
-	menu EntryContentType = 0
-	shell EntryContentType = 1
+	ECT_MENU EntryContentType = 0
+	ECT_SHELL EntryContentType = 1
 )
 
 type EntryContent struct {
@@ -22,7 +22,7 @@ type Entry struct {
 }
 
 type Menu struct {
-	name string
-	title string
+	name    string
+	title   string
 	entries []Entry
 }

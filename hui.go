@@ -9,21 +9,30 @@ import (
 	"os"
 )
 
-// Config temporarily as constants
-const (
-	HEADER = "Example config\n"
+// Config temporarily hacked into
+type Config struct {
+	header string
+	menus  []Menu
+}
 
-	MENUS = [Menu{
+var cfg = Config{
+	header: "Example config\n",
+
+	menus: []Menu {Menu{
 		name: "main",
-		title: `Main Menu\n
-		        ---------`,
-		[Entry{
+		title:
+`Main Menu
+---------`,
+		entries: []Entry {Entry{
 			caption: "Hello...",
-			shell: "echo world",
-		}]Entry,
-	}]Menu
-)
-// Config temporarily as constants
+			content: EntryContent {
+				ectype: ECT_SHELL,
+				shell: "echo world",
+			},
+		}},
+	}},
+}
+// Config temporarily hacked into
 
 const (
 	SEQ_CLEAR      = "\033[H\033[2J"
@@ -39,13 +48,19 @@ func set_cursor(x, y uint) {
 
 func main() {
 	var active = true
+	var cfg = cfg
+	var cur_menu *Menu
 	var scanner_in = bufio.NewScanner(os.Stdin)
 	var writer_err = bufio.NewWriter(os.Stderr)
+	var menu_path = []*Menu {&cfg.menus[len(cfg.menus) - 1]}
 
 	for active {
+		cur_menu = menu_path[len(menu_path) - 1] 
+
 		fmt.Print(SEQ_CLEAR)
 
-		fmt.Print(HEADER)
+		fmt.Print(cfg.header, "\n")
+		fmt.Print(cur_menu.title, "\n")
 
 		if scanner_in.Scan() == false {
 			fmt.Fprint(writer_err, "end of input\n")

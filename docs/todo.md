@@ -39,10 +39,9 @@
 + add menu
 + add title draw
 + add menu draw
-- add keyboard input and close via ctl + 'c' and 'q'
-- add cursor hide/show
-- add terminal clear
 - add raw terminal mode
+- add cursor hide/show
+- add keyboard input and close via ctl + 'c' and 'q'
 - add menu entry cursor (up and down)
 - add basic shell command execution
 - add feedback line

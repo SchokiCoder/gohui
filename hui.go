@@ -4,9 +4,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
+	
+	"golang.org/x/term"
 )
 
 // Config temporarily hacked into
@@ -87,7 +88,6 @@ func handle_key(key byte, active *bool) {
 	switch key {
 	case 'q':
 		*active = false
-		break
 	}
 }
 
@@ -99,9 +99,14 @@ func main() {
 	var active = true
 	var cfg = cfg
 	var cur_menu *Menu
-	var scanner_in = bufio.NewScanner(os.Stdin)
-	var writer_err = bufio.NewWriter(os.Stderr)
+	var input []byte
 	var menu_path = []*Menu {&cfg.menus[len(cfg.menus) - 1]}
+
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		panic(err)
+	}
+	defer term.Restore(int(os.Stdin.Fd()), oldState)
 
 	for active {
 		cur_menu = menu_path[len(menu_path) - 1] 
@@ -111,13 +116,13 @@ func main() {
 		draw_upper(cfg.header, cur_menu.title)
 		draw_menu(cfg, *cur_menu)
 
-		if scanner_in.Scan() == false {
-			fmt.Fprint(writer_err, "end of input\n")
-			active = false
+		_, err := os.Stdin.Read(input)
+		if err != nil {
+			panic(err)
 		}
 
-		for i := 0; i < len(scanner_in.Text()); i++ {
-			handle_key(scanner_in.Text()[i], &active)
+		for i := 0; i < len(input); i++ {
+			handle_key(input[i], &active)
 		}
 	}
 }

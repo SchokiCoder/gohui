@@ -39,7 +39,11 @@
 + add menu
 + add title draw
 + add menu draw
-- add raw terminal mode
++ add raw terminal mode
+	+ fix stdin read and permanent redraw
+	+ fix draw magic tab characters
+
+- can EntryContent be implemented as empty interface and used via RTTI? 
 - add cursor hide/show
 - add keyboard input and close via ctl + 'c' and 'q'
 - add menu entry cursor (up and down)

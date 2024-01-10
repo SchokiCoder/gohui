@@ -20,7 +20,7 @@ type Config struct {
 	menus               []Menu
 }
 
-var cfg = Config{
+var g_cfg = Config{
 	entry_menu_prefix:   "> [",
 	entry_menu_postfix:  "]",
 	entry_shell_prefix:  "> ",
@@ -84,6 +84,19 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
+func handle_input(active *bool) {
+	var input = make([]byte, 1)
+
+	_, err := os.Stdin.Read(input)
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < len(input); i++ {
+		handle_key(input[i], active)
+	}
+}
+
 func handle_key(key byte, active *bool) {
 	switch key {
 	case 'q':
@@ -97,16 +110,9 @@ func set_cursor(x, y uint) {
 
 func main() {
 	var active = true
-	var cfg = cfg
+	var cfg = g_cfg
 	var cur_menu *Menu
-	var input []byte
 	var menu_path = []*Menu {&cfg.menus[len(cfg.menus) - 1]}
-
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-	if err != nil {
-		panic(err)
-	}
-	defer term.Restore(int(os.Stdin.Fd()), oldState)
 
 	for active {
 		cur_menu = menu_path[len(menu_path) - 1] 
@@ -116,13 +122,13 @@ func main() {
 		draw_upper(cfg.header, cur_menu.title)
 		draw_menu(cfg, *cur_menu)
 
-		_, err := os.Stdin.Read(input)
+		canonical_state, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
 			panic(err)
 		}
 
-		for i := 0; i < len(input); i++ {
-			handle_key(input[i], &active)
-		}
+		handle_input(&active)
+
+		term.Restore(int(os.Stdin.Fd()), canonical_state)
 	}
 }

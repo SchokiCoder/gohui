@@ -43,9 +43,29 @@
 	+ fix stdin read and permanent redraw
 	+ fix draw magic tab characters
 
-- can EntryContent be implemented as empty interface and used via RTTI? 
-- add cursor hide/show
-- add keyboard input and close via ctl + 'c' and 'q'
++ can EntryContent be implemented as empty interface and used via RTTI?
+  Yes but it seems more prone to failure due to requiring/having a default case.
+```Go
+type EntryContentMenu string
+type EntryContentShell string
+
+type Entry struct {
+	caption string
+	content interface{}
+}
+
+
+
+switch cur_menu.entries[i].content.(type) {
+		case EntryContentMenu:
+			...
+
+		default:
+			panic("unknown entry content type")
+		
+```
+
++ add keyboard input and close via ctl + 'c' and 'd'
 - add menu entry cursor (up and down)
 - add basic shell command execution
 - add feedback line
@@ -53,6 +73,7 @@
 - add menu navigation (left, right)
 - add entry prefix and postfix for each entry type
 - add command line enter via ':'
+- add cursor hide/show
 - add command line leave via ctl + 'c'
 - add command line typing and display
 - add command interpretation via enter

@@ -51,6 +51,9 @@ var g_cfg = Config{
 // Config temporarily hacked into
 
 const (
+	SIGINT  = 3
+	SIGTSTP = 4
+
 	SEQ_CLEAR      = "\033[H\033[2J"
 	SEQ_FG_DEFAULT = "\033[H\033[39m"
 	SEQ_BG_DEFAULT = "\033[H\033[49m"
@@ -100,6 +103,10 @@ func handle_input(active *bool) {
 func handle_key(key byte, active *bool) {
 	switch key {
 	case 'q':
+		*active = false
+
+	case SIGINT: fallthrough
+	case SIGTSTP:
 		*active = false
 	}
 }

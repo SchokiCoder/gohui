@@ -50,6 +50,12 @@ var g_cfg = Config{
 }
 // Config temporarily hacked into
 
+type MenuStack []*Menu
+
+func (self MenuStack) CurMenu() *Menu {
+	return self[len(self) - 1]
+}
+
 const (
 	SIGINT  = 3
 	SIGTSTP = 4
@@ -61,10 +67,12 @@ const (
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
-func draw_menu(cfg Config, cur_menu Menu) {
+func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 	var prefix, postfix string
+	var fg FgColor
+	var bg BgColor
 	
-	for i := 0; i < len(cur_menu.entries); i++ {
+	for i := uint(0); i < uint(len(cur_menu.entries)); i++ {
 		switch cur_menu.entries[i].content.ectype {
 		case ECT_MENU:
 			prefix = cfg.entry_menu_prefix
@@ -75,11 +83,23 @@ func draw_menu(cfg Config, cur_menu Menu) {
 			postfix = cfg.entry_shell_postfix
 		}
 		
-		fmt.Printf("%v%v%v\n",
+		if i == cursor {
+			fg = FgBlack
+			bg = BgWhite
+		} else {
+			fg = FgWhite
+			bg = BgBlack
+		}
+		
+		fmt.Printf("%v%v%v%v%v\n",
+		           fg,
+		           bg,
 		           prefix,
 		           cur_menu.entries[i].caption,
 		           postfix)
-	} 
+	}
+	
+	fmt.Printf("%v%v", SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
 }
 
 func draw_upper(header, title string) {
@@ -87,7 +107,7 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
-func handle_input(active *bool) {
+func handle_input(active *bool, cursor *uint, mstack *MenuStack) {
 	var input = make([]byte, 1)
 
 	_, err := os.Stdin.Read(input)
@@ -96,14 +116,24 @@ func handle_input(active *bool) {
 	}
 
 	for i := 0; i < len(input); i++ {
-		handle_key(input[i], active)
+		handle_key(input[i], active, cursor, mstack)
 	}
 }
 
-func handle_key(key byte, active *bool) {
+func handle_key(key byte, active *bool, cursor *uint, mstack *MenuStack) {
 	switch key {
 	case 'q':
 		*active = false
+
+	case 'j':
+		if *cursor < uint(len(mstack.CurMenu().entries) - 1) {
+			*cursor++
+		}
+
+	case 'k':
+		if *cursor > 0 {
+			*cursor--
+		}
 
 	case SIGINT: fallthrough
 	case SIGTSTP:
@@ -118,23 +148,23 @@ func set_cursor(x, y uint) {
 func main() {
 	var active = true
 	var cfg = g_cfg
-	var cur_menu *Menu
-	var menu_path = []*Menu {&cfg.menus[len(cfg.menus) - 1]}
+	var cursor uint = 0
+	var mstack MenuStack = make(MenuStack, 1, 5)
+
+	mstack[0] = &cfg.menus[len(cfg.menus) - 1]
 
 	for active {
-		cur_menu = menu_path[len(menu_path) - 1] 
-
 		fmt.Print(SEQ_CLEAR)
 
-		draw_upper(cfg.header, cur_menu.title)
-		draw_menu(cfg, *cur_menu)
+		draw_upper(cfg.header, mstack.CurMenu().title)
+		draw_menu(cfg, *mstack.CurMenu(), cursor)
 
 		canonical_state, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
 			panic(err)
 		}
 
-		handle_input(&active)
+		handle_input(&active, &cursor, &mstack)
 
 		term.Restore(int(os.Stdin.Fd()), canonical_state)
 	}

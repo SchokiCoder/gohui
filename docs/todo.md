@@ -66,7 +66,7 @@ switch cur_menu.entries[i].content.(type) {
 ```
 
 + add keyboard input and close via ctl + 'c' and 'd'
-- add menu entry cursor (up and down)
++ add menu entry cursor (up and down)
 - add basic shell command execution
 - add feedback line
 - add feedback color

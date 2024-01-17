@@ -22,7 +22,6 @@ type Entry struct {
 }
 
 type Menu struct {
-	name    string
 	title   string
 	entries []Entry
 }

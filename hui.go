@@ -10,50 +10,10 @@ import (
 	"golang.org/x/term"
 )
 
-// Config temporarily hacked into
-type Config struct {
-	entry_menu_prefix   string
-	entry_menu_postfix  string
-	entry_shell_prefix  string
-	entry_shell_postfix string
-	header              string
-	menus               []Menu
-}
+type MenuPath []string
 
-var g_cfg = Config{
-	entry_menu_prefix:   "> [",
-	entry_menu_postfix:  "]",
-	entry_shell_prefix:  "> ",
-	entry_shell_postfix: "",
-	
-	header: "Example config\n",
-
-	menus: []Menu {Menu{
-		name: "main",
-		title:
-`Main Menu
----------`,
-		entries: []Entry {Entry{
-			caption: "Hello...",
-			content: EntryContent {
-				ectype: ECT_SHELL,
-				shell: "echo world",
-			}},
-			Entry{
-			caption: "My final message...",
-			content: EntryContent {
-				ectype: ECT_SHELL,
-				shell: "echo goodbye",
-			}},
-		},
-	}},
-}
-// Config temporarily hacked into
-
-type MenuStack []*Menu
-
-func (self MenuStack) CurMenu() *Menu {
-	return self[len(self) - 1]
+func (mp MenuPath) CurMenu() string {
+	return mp[len(mp) - 1]
 }
 
 const (
@@ -107,7 +67,7 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
-func handle_input(active *bool, cursor *uint, mstack *MenuStack) {
+func handle_input(active *bool, cfg Config, cursor *uint, menu_path *MenuPath) {
 	var input = make([]byte, 1)
 
 	_, err := os.Stdin.Read(input)
@@ -116,23 +76,43 @@ func handle_input(active *bool, cursor *uint, mstack *MenuStack) {
 	}
 
 	for i := 0; i < len(input); i++ {
-		handle_key(input[i], active, cursor, mstack)
+		handle_key(input[i], active, cfg, cursor, menu_path)
 	}
 }
 
-func handle_key(key byte, active *bool, cursor *uint, mstack *MenuStack) {
+func handle_key(key       byte,
+                active    *bool,
+                cfg       Config,
+                cursor    *uint,
+                menu_path *MenuPath) {
+	var cur_menu = cfg.menus[menu_path.CurMenu()]
+
 	switch key {
 	case 'q':
 		*active = false
 
+	case 'h':
+		if len(*menu_path) > 1 {
+			*menu_path = (*menu_path)[:len(*menu_path) - 1]
+			*cursor = 0
+		}
+
 	case 'j':
-		if *cursor < uint(len(mstack.CurMenu().entries) - 1) {
+		if *cursor < uint(len(cur_menu.entries) - 1) {
 			*cursor++
 		}
 
 	case 'k':
 		if *cursor > 0 {
 			*cursor--
+		}
+
+	case 'l':
+		if cur_menu.entries[*cursor].content.ectype == ECT_MENU {
+			var cur_entry = cur_menu.entries[*cursor]
+			
+			*menu_path = append(*menu_path, cur_entry.content.menu)
+			*cursor = 0
 		}
 
 	case SIGINT: fallthrough
@@ -149,22 +129,28 @@ func main() {
 	var active = true
 	var cfg = g_cfg
 	var cursor uint = 0
-	var mstack MenuStack = make(MenuStack, 1, 5)
+	var menu_path = make(MenuPath, 1, 8)
 
-	mstack[0] = &cfg.menus[len(cfg.menus) - 1]
+	_, main_menu_exists := cfg.menus["main"]
+
+	if main_menu_exists {
+		menu_path[0] = "main"
+	} else {
+		panic("main menu not found in config")
+	}
 
 	for active {
 		fmt.Print(SEQ_CLEAR)
 
-		draw_upper(cfg.header, mstack.CurMenu().title)
-		draw_menu(cfg, *mstack.CurMenu(), cursor)
+		draw_upper(cfg.header, cfg.menus[menu_path.CurMenu()].title)
+		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
 
 		canonical_state, err := term.MakeRaw(int(os.Stdin.Fd()))
 		if err != nil {
 			panic(err)
 		}
 
-		handle_input(&active, &cursor, &mstack)
+		handle_input(&active, cfg, &cursor, &menu_path)
 
 		term.Restore(int(os.Stdin.Fd()), canonical_state)
 	}

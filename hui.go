@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	
 	"golang.org/x/term"
 )
@@ -70,10 +71,17 @@ func draw_upper(header, title string) {
 func handle_input(active *bool, cfg Config, cursor *uint, menu_path *MenuPath) {
 	var input = make([]byte, 1)
 
-	_, err := os.Stdin.Read(input)
-	if err != nil {
-		panic(err)
+	canonical_state, raw_err := term.MakeRaw(int(os.Stdin.Fd()))
+	if raw_err != nil {
+		panic(raw_err)
 	}
+
+	_, read_err := os.Stdin.Read(input)
+	if read_err != nil {
+		panic(read_err)
+	}
+
+	term.Restore(int(os.Stdin.Fd()), canonical_state)
 
 	for i := 0; i < len(input); i++ {
 		handle_key(input[i], active, cfg, cursor, menu_path)
@@ -86,6 +94,7 @@ func handle_key(key       byte,
                 cursor    *uint,
                 menu_path *MenuPath) {
 	var cur_menu = cfg.menus[menu_path.CurMenu()]
+	var cur_entry = &cur_menu.entries[*cursor]
 
 	switch key {
 	case 'q':
@@ -108,11 +117,25 @@ func handle_key(key       byte,
 		}
 
 	case 'l':
-		if cur_menu.entries[*cursor].content.ectype == ECT_MENU {
-			var cur_entry = cur_menu.entries[*cursor]
-			
+		if cur_entry.content.ectype == ECT_MENU {
 			*menu_path = append(*menu_path, cur_entry.content.menu)
 			*cursor = 0
+		}
+
+	case 'L':
+		if cur_entry.content.ectype == ECT_SHELL {
+			var cmd = exec.Command("sh", "-c", cur_entry.content.shell)
+			var starterr = cmd.Start()
+			if starterr != nil {
+				// TODO no panic, give feedback
+				panic(fmt.Sprintf("Could not start child process: %s", starterr))
+			}
+
+			var waiterr = cmd.Wait()
+			if waiterr != nil {
+				// TODO no panic, give feedback
+				panic(fmt.Sprintf("Child error: %s", waiterr))
+			}
 		}
 
 	case SIGINT: fallthrough
@@ -145,13 +168,6 @@ func main() {
 		draw_upper(cfg.header, cfg.menus[menu_path.CurMenu()].title)
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
 
-		canonical_state, err := term.MakeRaw(int(os.Stdin.Fd()))
-		if err != nil {
-			panic(err)
-		}
-
 		handle_input(&active, cfg, &cursor, &menu_path)
-
-		term.Restore(int(os.Stdin.Fd()), canonical_state)
 	}
 }

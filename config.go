@@ -28,10 +28,10 @@ var g_cfg = Config{
 ---------`,
 			entries: []Entry {
 				Entry {
-					caption: "Hello...",
+					caption: "echo to temp",
 					content: EntryContent {
 						ectype: ECT_SHELL,
-						shell: "echo world",
+						shell: "echo gotest >> ~/temp",
 					},
 				},
 

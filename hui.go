@@ -74,11 +74,27 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
+func handle_command(active *bool, cmdline *string, feedback *string) {
+	switch *cmdline {
+	case "q":
+		fallthrough
+	case "quit":
+		fallthrough
+	case "exit":
+		*active = false
+
+	default:
+		*feedback = fmt.Sprintf("Command \"%v\" not recognised", *cmdline)
+	}
+}
+
 func handle_input(active    *bool,
                   cfg       Config,
-		  cursor    *uint,
-		  feedback  *string,
-		  menu_path *MenuPath) {
+                  cmdline   *string,
+                  cmdmode   *bool,
+                  cursor    *uint,
+                  feedback  *string,
+                  menu_path *MenuPath) {
 	var input = make([]byte, 1)
 
 	canonical_state, raw_err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -94,19 +110,41 @@ func handle_input(active    *bool,
 	term.Restore(int(os.Stdin.Fd()), canonical_state)
 
 	for i := 0; i < len(input); i++ {
-		handle_key(input[i], active, cfg, cursor, feedback, menu_path)
+		handle_key(input[i],
+		           active,
+		           cfg,
+		           cmdline,
+		           cmdmode,
+		           cursor,
+		           feedback,
+		           menu_path)
 	}
 }
 
 func handle_key(key       byte,
                 active    *bool,
                 cfg       Config,
+		cmdline   *string,
+		cmdmode   *bool,
                 cursor    *uint,
                 feedback  *string,
                 menu_path *MenuPath) {
 	var cur_menu = cfg.menus[menu_path.CurMenu()]
 	var cur_entry = &cur_menu.entries[*cursor]
 
+	if *cmdmode {
+		switch key {
+		case '\r':
+			handle_command(active, cmdline, feedback)
+			*cmdmode = false
+		
+		default:
+			*cmdline = fmt.Sprintf("%v%v", *cmdline, string(key))
+		}
+		
+		return
+	}
+	
 	switch key {
 	case 'q':
 		*active = false
@@ -137,6 +175,9 @@ func handle_key(key       byte,
 		if cur_entry.content.ectype == ECT_SHELL {
 			*feedback = handle_shell(cur_entry.content.shell)
 		}
+	
+	case ':':
+		*cmdmode = true
 
 	case SIGINT: fallthrough
 	case SIGTSTP:
@@ -198,6 +239,8 @@ func set_cursor(x, y int) {
 func main() {
 	var active = true
 	var cfg = g_cfg
+	var cmdline string = ""
+	var cmdmode bool = false
 	var cursor uint = 0
 	var err error
 	var feedback string = ""
@@ -223,7 +266,13 @@ func main() {
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
 		draw_lower(feedback, term_h)
 
-		handle_input(&active, cfg, &cursor, &feedback, &menu_path)
+		handle_input(&active,
+		             cfg,
+		             &cmdline,
+		             &cmdmode,
+		             &cursor,
+		             &feedback,
+		             &menu_path)
 	}
 }
 

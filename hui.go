@@ -4,6 +4,7 @@
 package main
 
 import (
+	"io"
 	"fmt"
 	"os"
 	"os/exec"
@@ -27,6 +28,11 @@ const (
 	SEQ_CRSR_HIDE  = "\033[?25l"
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
+
+func draw_lower(feedback string, term_h int) {
+	set_cursor(0, term_h)
+	fmt.Printf(":%v", feedback)
+}
 
 func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 	var prefix, postfix string
@@ -68,7 +74,11 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
-func handle_input(active *bool, cfg Config, cursor *uint, menu_path *MenuPath) {
+func handle_input(active    *bool,
+                  cfg       Config,
+		  cursor    *uint,
+		  feedback  *string,
+		  menu_path *MenuPath) {
 	var input = make([]byte, 1)
 
 	canonical_state, raw_err := term.MakeRaw(int(os.Stdin.Fd()))
@@ -84,7 +94,7 @@ func handle_input(active *bool, cfg Config, cursor *uint, menu_path *MenuPath) {
 	term.Restore(int(os.Stdin.Fd()), canonical_state)
 
 	for i := 0; i < len(input); i++ {
-		handle_key(input[i], active, cfg, cursor, menu_path)
+		handle_key(input[i], active, cfg, cursor, feedback, menu_path)
 	}
 }
 
@@ -92,6 +102,7 @@ func handle_key(key       byte,
                 active    *bool,
                 cfg       Config,
                 cursor    *uint,
+                feedback  *string,
                 menu_path *MenuPath) {
 	var cur_menu = cfg.menus[menu_path.CurMenu()]
 	var cur_entry = &cur_menu.entries[*cursor]
@@ -124,18 +135,7 @@ func handle_key(key       byte,
 
 	case 'L':
 		if cur_entry.content.ectype == ECT_SHELL {
-			var cmd = exec.Command("sh", "-c", cur_entry.content.shell)
-			var starterr = cmd.Start()
-			if starterr != nil {
-				// TODO no panic, give feedback
-				panic(fmt.Sprintf("Could not start child process: %s", starterr))
-			}
-
-			var waiterr = cmd.Wait()
-			if waiterr != nil {
-				// TODO no panic, give feedback
-				panic(fmt.Sprintf("Child error: %s", waiterr))
-			}
+			*feedback = handle_shell(cur_entry.content.shell)
 		}
 
 	case SIGINT: fallthrough
@@ -144,15 +144,65 @@ func handle_key(key       byte,
 	}
 }
 
-func set_cursor(x, y uint) {
-	fmt.Print("\033[", y, ";", x, "H")
+func handle_shell(shell string) string {
+	var cmd *exec.Cmd
+	var cmderr io.ReadCloser
+	var cmdout io.ReadCloser
+	var err error
+	var strerr []byte
+	var strout []byte
+
+	cmd = exec.Command("sh", "-c", shell)
+
+	cmderr, err = cmd.StderrPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stderr: %s", err)
+	}
+
+	cmdout, err = cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stdout: %s", err)
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return fmt.Sprintf("Could not start child process: %s", err)
+	}
+
+	strerr, err = io.ReadAll(cmderr)
+	if err != nil {
+		return fmt.Sprintf("Could not read stderr: %s", err)
+	}
+
+	strout, err = io.ReadAll(cmdout)
+	if err != nil {
+		return fmt.Sprintf("Could not read stdout: %s", err)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Sprintf("Child error: %s", err)
+	}
+
+	if len(strerr) > 0 {
+		return string(strerr)
+	} else {
+		return string(strout)
+	}
+}
+
+func set_cursor(x, y int) {
+	fmt.Printf("\033[%v;%vH", y, x);
 }
 
 func main() {
 	var active = true
 	var cfg = g_cfg
 	var cursor uint = 0
+	var err error
+	var feedback string = ""
 	var menu_path = make(MenuPath, 1, 8)
+	var term_h int
 
 	_, main_menu_exists := cfg.menus["main"]
 
@@ -164,10 +214,16 @@ func main() {
 
 	for active {
 		fmt.Print(SEQ_CLEAR)
+		_, term_h, err = term.GetSize(int(os.Stdin.Fd()))
+		if err != nil {
+			panic(fmt.Sprintf("Could not get term size: %v", err))
+		}
 
 		draw_upper(cfg.header, cfg.menus[menu_path.CurMenu()].title)
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
+		draw_lower(feedback, term_h)
 
-		handle_input(&active, cfg, &cursor, &menu_path)
+		handle_input(&active, cfg, &cursor, &feedback, &menu_path)
 	}
 }
+

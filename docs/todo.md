@@ -71,11 +71,13 @@ switch cur_menu.entries[i].content.(type) {
 + add basic shell command execution
 + add feedback line
 + add command line enter and quit command
-- add command line typing and display
++ add command line display
+- fix command line not getting emptied
 - add command line leave via ctl + 'c'
 - add command line number parsing
 - add entry prefix and postfix for each entry type
 - add cursor hide/show
 - add config sys for text fore- and background
+  Also add color for lower
 - add config values for key binds
 - set version to 0.1.0

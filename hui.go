@@ -29,9 +29,14 @@ const (
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
-func draw_lower(feedback string, term_h int) {
+func draw_lower(cmdline string, cmdmode bool, feedback string, term_h int) {
 	set_cursor(0, term_h)
-	fmt.Printf(":%v", feedback)
+	fmt.Printf(":")
+	if cmdmode {
+		fmt.Printf("%v", cmdline)
+	} else {
+		fmt.Printf("%v", feedback)
+	}
 }
 
 func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
@@ -264,7 +269,7 @@ func main() {
 
 		draw_upper(cfg.header, cfg.menus[menu_path.CurMenu()].title)
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
-		draw_lower(feedback, term_h)
+		draw_lower(cmdline, cmdmode, feedback, term_h)
 
 		handle_input(&active,
 		             cfg,

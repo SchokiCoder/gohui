@@ -5,6 +5,14 @@ package main
 
 // Config temporarily hacked into
 type Config struct {
+	key_left            byte
+	key_down            byte
+	key_up              byte
+	key_right           byte
+	key_execute         byte
+	key_quit            byte
+	key_cmdmode         byte
+	key_cmdenter        byte
 	header_fg           FgColor           
 	header_bg           BgColor
 	title_fg            FgColor
@@ -26,6 +34,15 @@ type Config struct {
 }
 
 var g_cfg = Config{
+	key_left: 'h',
+	key_down: 'j',
+	key_up: 'k',
+	key_right: 'l',
+	key_execute: 'L',
+	key_quit: 'q',
+	key_cmdmode: ':',
+	key_cmdenter: '\r',
+	
 	header_fg: FgColor {
 		active: false,
 		r: 0,

@@ -166,6 +166,7 @@ func handle_key(key       byte,
 	if *cmdmode {
 		handle_key_cmdline(key,
 		                   active,
+		                   cfg,
 		                   cmdline,
 		                   cmdmode,
 		                   cursor,
@@ -175,37 +176,37 @@ func handle_key(key       byte,
 	}
 	
 	switch key {
-	case 'q':
+	case cfg.key_quit:
 		*active = false
 
-	case 'h':
+	case cfg.key_left:
 		if len(*menu_path) > 1 {
 			*menu_path = (*menu_path)[:len(*menu_path) - 1]
 			*cursor = 0
 		}
 
-	case 'j':
+	case cfg.key_down:
 		if *cursor < uint(len(cur_menu.entries) - 1) {
 			*cursor++
 		}
 
-	case 'k':
+	case cfg.key_up:
 		if *cursor > 0 {
 			*cursor--
 		}
 
-	case 'l':
+	case cfg.key_right:
 		if cur_entry.content.ectype == ECT_MENU {
 			*menu_path = append(*menu_path, cur_entry.content.menu)
 			*cursor = 0
 		}
 
-	case 'L':
+	case cfg.key_execute:
 		if cur_entry.content.ectype == ECT_SHELL {
 			*feedback = handle_shell(cur_entry.content.shell)
 		}
 	
-	case ':':
+	case cfg.key_cmdmode:
 		*cmdmode = true
 		fmt.Printf(SEQ_CRSR_SHOW)
 
@@ -217,13 +218,14 @@ func handle_key(key       byte,
 
 func handle_key_cmdline(key       byte,
                         active    *bool,
+		        cfg       Config,
 		        cmdline   *string,
 		        cmdmode   *bool,
                         cursor    *uint,
                         cur_menu  Menu,
                         feedback  *string) {
 	switch key {
-	case '\r':
+	case cfg.key_cmdenter:
 		*feedback = handle_command(active, cmdline, cursor, cur_menu)
 		fallthrough
 	case SIGINT:

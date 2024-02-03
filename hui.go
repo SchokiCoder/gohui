@@ -6,6 +6,7 @@ package main
 import (
 	"io"
 	"fmt"
+	"strconv"
 	"os"
 	"os/exec"
 	
@@ -79,7 +80,11 @@ func draw_upper(header, title string) {
 		fmt.Print(title, "\n")
 }
 
-func handle_command(active *bool, cmdline *string, feedback *string) {
+func handle_command(active   *bool,
+                    cmdline  *string,
+                    cursor   *uint,
+                    cur_menu Menu,
+                    feedback *string) {	
 	switch *cmdline {
 	case "q":
 		fallthrough
@@ -89,7 +94,18 @@ func handle_command(active *bool, cmdline *string, feedback *string) {
 		*active = false
 
 	default:
-		*feedback = fmt.Sprintf("Command \"%v\" not recognised", *cmdline)
+		num, err := strconv.ParseUint(*cmdline, 10, 32)
+		
+		if err != nil {
+			*feedback = fmt.Sprintf("Command \"%v\" not recognised",
+				                *cmdline)
+		} else {		
+			if int(num) < len(cur_menu.entries) - 1 {
+				*cursor = uint(num)
+			} else {
+				*cursor = uint(len(cur_menu.entries) - 1)
+			}
+		}
 	}
 	
 	*cmdline = ""
@@ -140,7 +156,13 @@ func handle_key(key       byte,
 	var cur_entry = &cur_menu.entries[*cursor]
 
 	if *cmdmode {
-		handle_key_cmdline(key, active, cmdline, cmdmode, feedback)		
+		handle_key_cmdline(key,
+		                   active,
+		                   cmdline,
+		                   cmdmode,
+		                   cursor,
+		                   cur_menu,
+		                   feedback)
 		return
 	}
 	
@@ -188,11 +210,12 @@ func handle_key_cmdline(key       byte,
                         active    *bool,
 		        cmdline   *string,
 		        cmdmode   *bool,
-//                        cursor    *uint,
+                        cursor    *uint,
+                        cur_menu  Menu,
                         feedback  *string) {
 	switch key {
 	case '\r':
-		handle_command(active, cmdline, feedback)
+		handle_command(active, cmdline, cursor, cur_menu, feedback)
 		*cmdmode = false
 
 	case SIGINT:

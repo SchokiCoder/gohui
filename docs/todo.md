@@ -75,7 +75,7 @@ switch cur_menu.entries[i].content.(type) {
 + fix command line not getting emptied
 + add command line leave via SIGINT and SIGTSTP
 + add command line number parsing
-- fix successful command not clearing feedback
++ fix successful command not clearing feedback
 - add entry prefix and postfix for each entry type
 - add cursor hide/show
 - add config sys for text fore- and background

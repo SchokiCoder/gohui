@@ -83,8 +83,9 @@ func draw_upper(header, title string) {
 func handle_command(active   *bool,
                     cmdline  *string,
                     cursor   *uint,
-                    cur_menu Menu,
-                    feedback *string) {	
+                    cur_menu Menu) string {	
+	var ret string = ""
+	
 	switch *cmdline {
 	case "q":
 		fallthrough
@@ -97,8 +98,8 @@ func handle_command(active   *bool,
 		num, err := strconv.ParseUint(*cmdline, 10, 32)
 		
 		if err != nil {
-			*feedback = fmt.Sprintf("Command \"%v\" not recognised",
-				                *cmdline)
+			ret = fmt.Sprintf("Command \"%v\" not recognised",
+			                  *cmdline)
 		} else {		
 			if int(num) < len(cur_menu.entries) - 1 {
 				*cursor = uint(num)
@@ -109,6 +110,7 @@ func handle_command(active   *bool,
 	}
 	
 	*cmdline = ""
+	return ret
 }
 
 func handle_input(active    *bool,
@@ -215,7 +217,7 @@ func handle_key_cmdline(key       byte,
                         feedback  *string) {
 	switch key {
 	case '\r':
-		handle_command(active, cmdline, cursor, cur_menu, feedback)
+		*feedback = handle_command(active, cmdline, cursor, cur_menu)
 		*cmdmode = false
 
 	case SIGINT:

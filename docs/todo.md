@@ -77,7 +77,9 @@ switch cur_menu.entries[i].content.(type) {
 + add command line number parsing
 + fix successful command not clearing feedback
 + add cursor hide/show
-- add config sys for text fore- and background
-  Also add color for lower
++ add config sys for text fore- and background
+  
+  Also fix default-color-sequences
+
 - add config values for key binds
 - set version to 0.1.0

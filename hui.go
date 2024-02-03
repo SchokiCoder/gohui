@@ -24,19 +24,24 @@ const (
 	SIGTSTP = 4
 
 	SEQ_CLEAR      = "\033[H\033[2J"
-	SEQ_FG_DEFAULT = "\033[H\033[39m"
-	SEQ_BG_DEFAULT = "\033[H\033[49m"
+	SEQ_FG_DEFAULT = "\033[39m"
+	SEQ_BG_DEFAULT = "\033[49m"
 	SEQ_CRSR_HIDE  = "\033[?25l"
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
-func draw_lower(cmdline string, cmdmode bool, feedback string, term_h int) {
-	set_cursor(0, term_h)
-	fmt.Printf(":")
+func draw_lower(cfg Config,
+                cmdline string,
+                cmdmode bool,
+                feedback string,
+                term_h int) {
+	set_cursor(1, term_h)
+	fmt.Printf("%v%v", SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
+
 	if cmdmode {
-		fmt.Printf("%v", cmdline)
+		fmt.Printf(":%v%v%v", cfg.cmdline_fg, cfg.cmdline_bg, cmdline)
 	} else {
-		fmt.Printf("%v", feedback)
+		fmt.Printf(":%v%v%v", cfg.feedback_fg, cfg.feedback_bg, feedback)
 	}
 }
 
@@ -57,11 +62,11 @@ func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 		}
 		
 		if i == cursor {
-			fg = FgBlack
-			bg = BgWhite
+			fg = cfg.entry_hover_fg
+			bg = cfg.entry_hover_bg
 		} else {
-			fg = FgWhite
-			bg = BgBlack
+			fg = cfg.entry_fg
+			bg = cfg.entry_bg
 		}
 		
 		fmt.Printf("%v%v%v%v%v\n",
@@ -71,13 +76,14 @@ func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 		           cur_menu.entries[i].caption,
 		           postfix)
 	}
-	
-	fmt.Printf("%v%v", SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
 }
 
-func draw_upper(header, title string) {
-		fmt.Print(header, "\n")
-		fmt.Print(title, "\n")
+func draw_upper(cfg Config, cur_menu_name string) {
+	fmt.Printf("%v%v%v\n", cfg.header_fg, cfg.header_bg, cfg.header)
+	fmt.Printf("%v%v%v\n",
+	           cfg.title_fg,
+	           cfg.title_bg,
+	           cfg.menus[cur_menu_name].title)
 }
 
 func handle_command(active   *bool,
@@ -304,6 +310,7 @@ func main() {
 	
 	fmt.Printf(SEQ_CRSR_HIDE)
 	defer fmt.Printf(SEQ_CRSR_SHOW)
+	defer fmt.Printf("%v%v", SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
 
 	for active {
 		fmt.Print(SEQ_CLEAR)
@@ -312,9 +319,9 @@ func main() {
 			panic(fmt.Sprintf("Could not get term size: %v", err))
 		}
 
-		draw_upper(cfg.header, cfg.menus[menu_path.CurMenu()].title)
+		draw_upper(cfg, menu_path.CurMenu())
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
-		draw_lower(cmdline, cmdmode, feedback, term_h)
+		draw_lower(cfg, cmdline, cmdmode, feedback, term_h)
 
 		handle_input(&active,
 		             cfg,

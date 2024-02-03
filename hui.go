@@ -140,15 +140,7 @@ func handle_key(key       byte,
 	var cur_entry = &cur_menu.entries[*cursor]
 
 	if *cmdmode {
-		switch key {
-		case '\r':
-			handle_command(active, cmdline, feedback)
-			*cmdmode = false
-		
-		default:
-			*cmdline = fmt.Sprintf("%v%v", *cmdline, string(key))
-		}
-		
+		handle_key_cmdline(key, active, cmdline, cmdmode, feedback)		
 		return
 	}
 	
@@ -189,6 +181,28 @@ func handle_key(key       byte,
 	case SIGINT: fallthrough
 	case SIGTSTP:
 		*active = false
+	}
+}
+
+func handle_key_cmdline(key       byte,
+                        active    *bool,
+		        cmdline   *string,
+		        cmdmode   *bool,
+//                        cursor    *uint,
+                        feedback  *string) {
+	switch key {
+	case '\r':
+		handle_command(active, cmdline, feedback)
+		*cmdmode = false
+
+	case SIGINT:
+		fallthrough
+	case SIGTSTP:
+		*cmdmode = false
+		*cmdline = ""
+
+	default:
+		*cmdline = fmt.Sprintf("%v%v", *cmdline, string(key))
 	}
 }
 

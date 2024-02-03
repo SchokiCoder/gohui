@@ -73,7 +73,7 @@ switch cur_menu.entries[i].content.(type) {
 + add command line enter and quit command
 + add command line display
 + fix command line not getting emptied
-- add command line leave via ctl + 'c'
++ add command line leave via SIGINT and SIGTSTP
 - add command line number parsing
 - add entry prefix and postfix for each entry type
 - add cursor hide/show

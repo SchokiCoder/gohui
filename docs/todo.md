@@ -72,7 +72,7 @@ switch cur_menu.entries[i].content.(type) {
 + add feedback line
 + add command line enter and quit command
 + add command line display
-- fix command line not getting emptied
++ fix command line not getting emptied
 - add command line leave via ctl + 'c'
 - add command line number parsing
 - add entry prefix and postfix for each entry type

@@ -1,2 +1,2 @@
 hui_d:
-	go build
+	go build -o hui

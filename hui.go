@@ -91,6 +91,8 @@ func handle_command(active *bool, cmdline *string, feedback *string) {
 	default:
 		*feedback = fmt.Sprintf("Command \"%v\" not recognised", *cmdline)
 	}
+	
+	*cmdline = ""
 }
 
 func handle_input(active    *bool,

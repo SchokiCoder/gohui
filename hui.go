@@ -201,6 +201,7 @@ func handle_key(key       byte,
 	
 	case ':':
 		*cmdmode = true
+		fmt.Printf(SEQ_CRSR_SHOW)
 
 	case SIGINT: fallthrough
 	case SIGTSTP:
@@ -218,13 +219,13 @@ func handle_key_cmdline(key       byte,
 	switch key {
 	case '\r':
 		*feedback = handle_command(active, cmdline, cursor, cur_menu)
-		*cmdmode = false
-
+		fallthrough
 	case SIGINT:
 		fallthrough
 	case SIGTSTP:
 		*cmdmode = false
 		*cmdline = ""
+		fmt.Printf(SEQ_CRSR_HIDE)
 
 	default:
 		*cmdline = fmt.Sprintf("%v%v", *cmdline, string(key))
@@ -300,6 +301,9 @@ func main() {
 	} else {
 		panic("main menu not found in config")
 	}
+	
+	fmt.Printf(SEQ_CRSR_HIDE)
+	defer fmt.Printf(SEQ_CRSR_SHOW)
 
 	for active {
 		fmt.Print(SEQ_CLEAR)

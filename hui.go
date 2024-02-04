@@ -7,6 +7,7 @@ import (
 	"io"
 	"fmt"
 	"strconv"
+	"strings"
 	"os"
 	"os/exec"
 	
@@ -41,7 +42,8 @@ func draw_lower(cfg Config,
 	if cmdmode {
 		fmt.Printf(":%v%v%v", cfg.cmdline_fg, cfg.cmdline_bg, cmdline)
 	} else {
-		fmt.Printf(":%v%v%v", cfg.feedback_fg, cfg.feedback_bg, feedback)
+		str := strings.TrimSpace(feedback)
+		fmt.Printf(":%v%v%v", cfg.feedback_fg, cfg.feedback_bg, str)
 	}
 }
 

@@ -82,6 +82,6 @@ switch cur_menu.entries[i].content.(type) {
   Also fix default-color-sequences
 
 + add config values for key binds
-- trim feedback
++ add feedback trim
 - don't print feedback longer than 1 line
 - set version to 0.1.0

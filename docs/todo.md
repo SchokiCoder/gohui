@@ -79,9 +79,15 @@ switch cur_menu.entries[i].content.(type) {
 + add cursor hide/show
 + add config sys for text fore- and background
   
-  Also fix default-color-sequences
+Also fix default-color-sequences
 
 + add config values for key binds
 + add feedback trim
-- don't print feedback longer than 1 line
+- add print prevention for feedback longer than 1 line
+
+Also add configurable cmdline/feedback prefix
+to prevent a temporary hack solution.
+We need the prefix for detecting needed lines
+for feedback print.
+
 - set version to 0.1.0

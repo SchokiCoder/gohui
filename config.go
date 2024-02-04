@@ -25,6 +25,8 @@ type Config struct {
 	feedback_bg         BgColor
 	cmdline_fg          FgColor
 	cmdline_bg          BgColor
+	cmdline_prefix      string
+	feedback_prefix     string
 	entry_menu_prefix   string
 	entry_menu_postfix  string
 	entry_shell_prefix  string
@@ -42,7 +44,7 @@ var g_cfg = Config{
 	key_quit: 'q',
 	key_cmdmode: ':',
 	key_cmdenter: '\r',
-	
+
 	header_fg: FgColor {
 		active: false,
 		r: 0,
@@ -131,7 +133,9 @@ var g_cfg = Config{
 	entry_menu_postfix:  "]",
 	entry_shell_prefix:  "> ",
 	entry_shell_postfix: "",
-	
+	cmdline_prefix: ":",
+	feedback_prefix: "<",
+
 	header: "Example config\n",
 
 	menus: map[string]Menu {
@@ -157,15 +161,30 @@ var g_cfg = Config{
 				},
 			},
 		},
-	
+
 		"submenu": Menu {
 			title: "Submenu",
 			entries: []Entry {
 				Entry {
-					caption: "Welcome to sub",
+					caption: "print short",
 					content: EntryContent {
 						ectype: ECT_SHELL,
-						shell: "echo nothing",
+						shell: "echo short",
+					},
+				},
+				Entry {
+					caption: "print long",
+					content: EntryContent {
+						ectype: ECT_SHELL,
+						shell: "echo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
+					},
+				},
+				
+				Entry {
+					caption: "print too long",
+					content: EntryContent {
+						ectype: ECT_SHELL,
+						shell: "echo looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
 					},
 				},
 			}, 

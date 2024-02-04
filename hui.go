@@ -20,6 +20,26 @@ func (mp MenuPath) CurMenu() string {
 	return mp[len(mp) - 1]
 }
 
+func strNeededLines(s string, term_w int) uint {
+	var ret uint = 0
+	var line int = 0
+
+	for i := 0; i < len(s); i++ {
+		line++
+
+		if line >= term_w {
+			line = 0
+			ret++
+		}
+	}
+
+	if line > 0 {
+		ret++
+	}
+
+	return ret
+}
+
 const (
 	SIGINT  = 3
 	SIGTSTP = 4
@@ -30,22 +50,6 @@ const (
 	SEQ_CRSR_HIDE  = "\033[?25l"
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
-
-func draw_lower(cfg Config,
-                cmdline string,
-                cmdmode bool,
-                feedback string,
-                term_h int) {
-	set_cursor(1, term_h)
-	fmt.Printf("%v%v", SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
-
-	if cmdmode {
-		fmt.Printf(":%v%v%v", cfg.cmdline_fg, cfg.cmdline_bg, cmdline)
-	} else {
-		str := strings.TrimSpace(feedback)
-		fmt.Printf(":%v%v%v", cfg.feedback_fg, cfg.feedback_bg, str)
-	}
-}
 
 func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 	var prefix, postfix string
@@ -86,6 +90,36 @@ func draw_upper(cfg Config, cur_menu_name string) {
 	           cfg.title_fg,
 	           cfg.title_bg,
 	           cfg.menus[cur_menu_name].title)
+}
+
+func generate_lower(cfg Config,
+                    cmdline string,
+                    cmdmode bool,
+                    feedback string,
+                    term_w int) string {
+	var ret string
+	
+	if cmdmode == true {
+		ret = fmt.Sprintf("%v%v%v%v",
+			          cfg.cmdline_fg,
+			          cfg.cmdline_bg,
+			          cfg.cmdline_prefix,
+			          cmdline)
+	} else {
+		feedback = strings.TrimSpace(feedback)
+		ret = fmt.Sprintf("%v%v", cfg.feedback_prefix, feedback)
+		if strNeededLines(ret, term_w) > 1 {
+			// TODO will become a call to courier later
+			ret = cfg.feedback_prefix
+		}
+		
+		ret = fmt.Sprintf("%v%v%v",
+		                  cfg.feedback_fg,
+		                  cfg.feedback_bg,
+		                  ret)
+	}
+	
+	return ret
 }
 
 func handle_command(active   *bool,
@@ -301,8 +335,9 @@ func main() {
 	var cursor uint = 0
 	var err error
 	var feedback string = ""
+	var lower string
 	var menu_path = make(MenuPath, 1, 8)
-	var term_h int
+	var term_h, term_w int
 
 	_, main_menu_exists := cfg.menus["main"]
 
@@ -318,14 +353,17 @@ func main() {
 
 	for active {
 		fmt.Print(SEQ_CLEAR)
-		_, term_h, err = term.GetSize(int(os.Stdin.Fd()))
+		term_w, term_h, err = term.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
 			panic(fmt.Sprintf("Could not get term size: %v", err))
 		}
 
+		lower = generate_lower(cfg, cmdline, cmdmode, feedback, term_w)
+
 		draw_upper(cfg, menu_path.CurMenu())
 		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
-		draw_lower(cfg, cmdline, cmdmode, feedback, term_h)
+		set_cursor(1, term_h)
+		fmt.Printf("%v", lower)
 
 		handle_input(&active,
 		             cfg,

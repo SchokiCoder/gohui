@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
+//go:generate go ./genversion.go
 package main
 
 import (
@@ -16,30 +17,6 @@ import (
 
 type MenuPath []string
 
-func (mp MenuPath) CurMenu() string {
-	return mp[len(mp) - 1]
-}
-
-func strNeededLines(s string, term_w int) uint {
-	var ret uint = 0
-	var line int = 0
-
-	for i := 0; i < len(s); i++ {
-		line++
-
-		if line >= term_w {
-			line = 0
-			ret++
-		}
-	}
-
-	if line > 0 {
-		ret++
-	}
-
-	return ret
-}
-
 const (
 	SIGINT  = 3
 	SIGTSTP = 4
@@ -50,6 +27,12 @@ const (
 	SEQ_CRSR_HIDE  = "\033[?25l"
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
+
+var Version string
+
+func (mp MenuPath) CurMenu() string {
+	return mp[len(mp) - 1]
+}
 
 func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 	var prefix, postfix string
@@ -327,6 +310,26 @@ func set_cursor(x, y int) {
 	fmt.Printf("\033[%v;%vH", y, x);
 }
 
+func strNeededLines(s string, term_w int) uint {
+	var ret uint = 0
+	var line int = 0
+
+	for i := 0; i < len(s); i++ {
+		line++
+
+		if line >= term_w {
+			line = 0
+			ret++
+		}
+	}
+
+	if line > 0 {
+		ret++
+	}
+
+	return ret
+}
+
 func main() {
 	var active = true
 	var cfg = g_cfg
@@ -334,7 +337,7 @@ func main() {
 	var cmdmode bool = false
 	var cursor uint = 0
 	var err error
-	var feedback string = ""
+	var feedback string = fmt.Sprintf("Welcome to hui %v", Version)
 	var lower string
 	var menu_path = make(MenuPath, 1, 8)
 	var term_h, term_w int

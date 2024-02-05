@@ -8,26 +8,26 @@ import (
 )
 
 type FgColor struct {
-	active bool
-	r, g, b uint
+	Active bool
+	R, G, B uint
 }
 
 func (c FgColor) String() string {
-	if c.active {
-		return fmt.Sprintf("\x1b[38;2;%v;%v;%vm", c.r, c.g, c.b)
+	if c.Active {
+		return fmt.Sprintf("\x1b[38;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
 		return SEQ_FG_DEFAULT
 	}
 }
 
 type BgColor struct {
-	active bool
-	r, g, b uint
+	Active bool
+	R, G, B uint
 }
 
 func (c BgColor) String() string {
-	if c.active {
-		return fmt.Sprintf("\x1b[48;2;%v;%v;%vm", c.r, c.g, c.b)
+	if c.Active {
+		return fmt.Sprintf("\x1b[48;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
 		return SEQ_BG_DEFAULT
 	}

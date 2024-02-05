@@ -23,14 +23,18 @@
 
 # v0.2.0
 
-- find config file format
-- add config path priority
-  "/etc" over "~/.config/$FILE" over "~/.$FILE" over "$CWD/$FILE"
-  if no config found, panic
++ add basic toml config file reading
+- config file format:
+	- ectypes are just number, which is weird
+	  maybe just drop the enum all together and just try to use the shell/menu
+	  var, also drop the Entry.Content struct with it...
+	  panic after cfg read when both are given?
+	  just prioritize one?
 
-- use new config structs
-- read config file
-- remove source code config
+- maybe use XDG env vars for config paths
+- set version to 0.2.0
+
+-----
 
 # v0.1.0
 
@@ -90,4 +94,4 @@ to prevent a temporary hack solution.
 We need the prefix for detecting needed lines
 for feedback print.
 
-- set version to 0.1.0
++ set version to 0.1.0

@@ -11,17 +11,17 @@ const (
 )
 
 type EntryContent struct {
-	ectype EntryContentType
-	menu   string
-	shell  string
+	EcType EntryContentType
+	Menu   string
+	Shell  string
 }
 
 type Entry struct {
-	caption string
-	content EntryContent
+	Caption string
+	Content EntryContent
 }
 
 type Menu struct {
-	title   string
-	entries []Entry
+	Title   string
+	Entries []Entry
 }

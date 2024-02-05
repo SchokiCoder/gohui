@@ -39,40 +39,40 @@ func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 	var fg FgColor
 	var bg BgColor
 	
-	for i := uint(0); i < uint(len(cur_menu.entries)); i++ {
-		switch cur_menu.entries[i].content.ectype {
+	for i := uint(0); i < uint(len(cur_menu.Entries)); i++ {
+		switch cur_menu.Entries[i].Content.EcType {
 		case ECT_MENU:
-			prefix = cfg.entry_menu_prefix
-			postfix = cfg.entry_menu_postfix
+			prefix = cfg.EntryMenuPrefix
+			postfix = cfg.EntryMenuPostfix
 		
 		case ECT_SHELL:
-			prefix = cfg.entry_shell_prefix
-			postfix = cfg.entry_shell_postfix
+			prefix = cfg.EntryShellPrefix
+			postfix = cfg.EntryShellPostfix
 		}
 		
 		if i == cursor {
-			fg = cfg.entry_hover_fg
-			bg = cfg.entry_hover_bg
+			fg = cfg.EntryHoverFg
+			bg = cfg.EntryHoverBg
 		} else {
-			fg = cfg.entry_fg
-			bg = cfg.entry_bg
+			fg = cfg.EntryFg
+			bg = cfg.EntryBg
 		}
 		
 		fmt.Printf("%v%v%v%v%v\n",
 		           fg,
 		           bg,
 		           prefix,
-		           cur_menu.entries[i].caption,
+		           cur_menu.Entries[i].Caption,
 		           postfix)
 	}
 }
 
 func draw_upper(cfg Config, cur_menu_name string) {
-	fmt.Printf("%v%v%v\n", cfg.header_fg, cfg.header_bg, cfg.header)
+	fmt.Printf("%v%v%v\n", cfg.HeaderFg, cfg.HeaderBg, cfg.Header)
 	fmt.Printf("%v%v%v\n",
-	           cfg.title_fg,
-	           cfg.title_bg,
-	           cfg.menus[cur_menu_name].title)
+	           cfg.TitleFg,
+	           cfg.TitleBg,
+	           cfg.Menus[cur_menu_name].Title)
 }
 
 func generate_lower(cfg Config,
@@ -84,21 +84,21 @@ func generate_lower(cfg Config,
 	
 	if cmdmode == true {
 		ret = fmt.Sprintf("%v%v%v%v",
-			          cfg.cmdline_fg,
-			          cfg.cmdline_bg,
-			          cfg.cmdline_prefix,
+			          cfg.CmdlineFg,
+			          cfg.CmdlineBg,
+			          cfg.CmdlinePrefix,
 			          cmdline)
 	} else {
 		feedback = strings.TrimSpace(feedback)
-		ret = fmt.Sprintf("%v%v", cfg.feedback_prefix, feedback)
+		ret = fmt.Sprintf("%v%v", cfg.FeedbackPrefix, feedback)
 		if strNeededLines(ret, term_w) > 1 {
 			// TODO will become a call to courier later
-			ret = cfg.feedback_prefix
+			ret = cfg.FeedbackPrefix
 		}
 		
 		ret = fmt.Sprintf("%v%v%v",
-		                  cfg.feedback_fg,
-		                  cfg.feedback_bg,
+		                  cfg.FeedbackFg,
+		                  cfg.FeedbackBg,
 		                  ret)
 	}
 	
@@ -126,10 +126,10 @@ func handle_command(active   *bool,
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
 			                  *cmdline)
 		} else {		
-			if int(num) < len(cur_menu.entries) - 1 {
+			if int(num) < len(cur_menu.Entries) - 1 {
 				*cursor = uint(num)
 			} else {
-				*cursor = uint(len(cur_menu.entries) - 1)
+				*cursor = uint(len(cur_menu.Entries) - 1)
 			}
 		}
 	}
@@ -179,8 +179,8 @@ func handle_key(key       byte,
                 cursor    *uint,
                 feedback  *string,
                 menu_path *MenuPath) {
-	var cur_menu = cfg.menus[menu_path.CurMenu()]
-	var cur_entry = &cur_menu.entries[*cursor]
+	var cur_menu = cfg.Menus[menu_path.CurMenu()]
+	var cur_entry = &cur_menu.Entries[*cursor]
 
 	if *cmdmode {
 		handle_key_cmdline(key,
@@ -195,37 +195,37 @@ func handle_key(key       byte,
 	}
 	
 	switch key {
-	case cfg.key_quit:
+	case cfg.KeyQuit:
 		*active = false
 
-	case cfg.key_left:
+	case cfg.KeyLeft:
 		if len(*menu_path) > 1 {
 			*menu_path = (*menu_path)[:len(*menu_path) - 1]
 			*cursor = 0
 		}
 
-	case cfg.key_down:
-		if *cursor < uint(len(cur_menu.entries) - 1) {
+	case cfg.KeyDown:
+		if *cursor < uint(len(cur_menu.Entries) - 1) {
 			*cursor++
 		}
 
-	case cfg.key_up:
+	case cfg.KeyUp:
 		if *cursor > 0 {
 			*cursor--
 		}
 
-	case cfg.key_right:
-		if cur_entry.content.ectype == ECT_MENU {
-			*menu_path = append(*menu_path, cur_entry.content.menu)
+	case cfg.KeyRight:
+		if cur_entry.Content.EcType == ECT_MENU {
+			*menu_path = append(*menu_path, cur_entry.Content.Menu)
 			*cursor = 0
 		}
 
-	case cfg.key_execute:
-		if cur_entry.content.ectype == ECT_SHELL {
-			*feedback = handle_shell(cur_entry.content.shell)
+	case cfg.KeyExecute:
+		if cur_entry.Content.EcType == ECT_SHELL {
+			*feedback = handle_shell(cur_entry.Content.Shell)
 		}
 	
-	case cfg.key_cmdmode:
+	case cfg.KeyCmdmode:
 		*cmdmode = true
 		fmt.Printf(SEQ_CRSR_SHOW)
 
@@ -244,7 +244,7 @@ func handle_key_cmdline(key       byte,
                         cur_menu  Menu,
                         feedback  *string) {
 	switch key {
-	case cfg.key_cmdenter:
+	case cfg.KeyCmdenter:
 		*feedback = handle_command(active, cmdline, cursor, cur_menu)
 		fallthrough
 	case SIGINT:
@@ -332,7 +332,7 @@ func strNeededLines(s string, term_w int) uint {
 
 func main() {
 	var active = true
-	var cfg = g_cfg
+	var cfg = cfgFromFile()
 	var cmdline string = ""
 	var cmdmode bool = false
 	var cursor uint = 0
@@ -342,7 +342,7 @@ func main() {
 	var menu_path = make(MenuPath, 1, 8)
 	var term_h, term_w int
 
-	_, main_menu_exists := cfg.menus["main"]
+	_, main_menu_exists := cfg.Menus["main"]
 
 	if main_menu_exists {
 		menu_path[0] = "main"
@@ -364,7 +364,7 @@ func main() {
 		lower = generate_lower(cfg, cmdline, cmdmode, feedback, term_w)
 
 		draw_upper(cfg, menu_path.CurMenu())
-		draw_menu(cfg, cfg.menus[menu_path.CurMenu()], cursor)
+		draw_menu(cfg, cfg.Menus[menu_path.CurMenu()], cursor)
 		set_cursor(1, term_h)
 		fmt.Printf("%v", lower)
 

@@ -4,10 +4,11 @@
 package main
 
 import (
+	"io"
 	"fmt"
 	"os"
 
-	"github.com/pelletier/go-toml/v2"
+	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
@@ -50,7 +51,7 @@ func cfgFromFile() Config {
 		"/etc/hui/hui.toml",
 		"~/.config/hui/hui.toml",
 		"~/.hui/hui.toml",
-		"./hui.toml",
+		"hui.toml",
 	}
 	var ret Config
 
@@ -62,23 +63,25 @@ func cfgFromFile() Config {
 			break
 		} else if err != os.ErrNotExist {
 			fmt.Fprintf(os.Stderr,
-			            "Config file could not be read: %v\n",
+			            "Config file could not be opened: %v\n",
 			            paths[i])
 		}
 	}
-	
+
 	if found == false {
 		panic("No config file could be found\n")
 	}
-	
-	dec := toml.NewDecoder(f)
-	dec.DisallowUnknownFields()
-	
-	err = dec.Decode(ret)
+
+	str, err := io.ReadAll(f)
+	if err != nil {
+		panic(fmt.Sprintf("Config file could not be read: %v\n", err))
+	}
+
+	err = toml.Unmarshal(str, ret)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return ret
 }
 

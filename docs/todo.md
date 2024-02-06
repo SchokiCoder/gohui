@@ -24,6 +24,9 @@
 # v0.2.0
 
 + add basic toml config file reading
+- fix toml reading
+  See [my rant](docs/rant.md)
+  
 - config file format:
 	- ectypes are just number, which is weird
 	  maybe just drop the enum all together and just try to use the shell/menu

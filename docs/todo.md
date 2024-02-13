@@ -24,8 +24,9 @@
 # v0.2.0
 
 + add basic toml config file reading
-- fix toml reading
-  See [my rant](docs/rant.md)
++ fix toml reading
+- fix toml parsing
+  The keys are expected to be integers, which is bogus.
   
 - config file format:
 	- ectypes are just number, which is weird

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"fmt"
 	"os"
@@ -12,34 +13,34 @@ import (
 )
 
 type Config struct {
-	KeyLeft            byte
-	KeyDown            byte
-	KeyUp              byte
-	KeyRight           byte
-	KeyExecute         byte
-	KeyQuit            byte
-	KeyCmdmode         byte
-	KeyCmdenter        byte
-	HeaderFg           FgColor
-	HeaderBg           BgColor
-	TitleFg            FgColor
-	TitleBg            BgColor
-	EntryFg            FgColor
-	EntryBg            BgColor
+	KeyLeft           byte
+	KeyDown           byte
+	KeyUp             byte
+	KeyRight          byte
+	KeyExecute        byte
+	KeyQuit           byte
+	KeyCmdmode        byte
+	KeyCmdenter       byte
+	HeaderFg          FgColor
+	HeaderBg          BgColor
+	TitleFg           FgColor
+	TitleBg           BgColor
+	EntryFg           FgColor
+	EntryBg           BgColor
 	EntryHoverFg      FgColor
 	EntryHoverBg      BgColor
-	FeedbackFg         FgColor
-	FeedbackBg         BgColor
-	CmdlineFg          FgColor
-	CmdlineBg          BgColor
-	CmdlinePrefix      string
-	FeedbackPrefix     string
+	FeedbackFg        FgColor
+	FeedbackBg        BgColor
+	CmdlineFg         FgColor
+	CmdlineBg         BgColor
+	CmdlinePrefix     string
+	FeedbackPrefix    string
 	EntryMenuPrefix   string
 	EntryMenuPostfix  string
 	EntryShellPrefix  string
 	EntryShellPostfix string
-	Header              string
-	Menus               map[string]Menu
+	Header            string
+	Menus             map[string]Menu
 }
 
 func cfgFromFile() Config {
@@ -57,14 +58,16 @@ func cfgFromFile() Config {
 
 	for i = 0; i < len(paths); i++ {
 		f, err = os.Open(paths[i])
-		
-		if err != nil {
+
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		} else if err != nil {
+			fmt.Fprintf(os.Stderr,
+			            "Config file could not be opened: \"%v\", \"%v\"\n",
+			            paths[i], err)
+		} else {
 			found = true
 			break
-		} else if err != os.ErrNotExist {
-			fmt.Fprintf(os.Stderr,
-			            "Config file could not be opened: %v\n",
-			            paths[i])
 		}
 	}
 
@@ -74,10 +77,11 @@ func cfgFromFile() Config {
 
 	str, err := io.ReadAll(f)
 	if err != nil {
-		panic(fmt.Sprintf("Config file could not be read: %v\n", err))
+		panic(fmt.Sprintf("Config file could not be read: \"%v\", \"%v\"\n",
+		                  paths[i], err))
 	}
 
-	err = toml.Unmarshal(str, ret)
+	err = toml.Unmarshal(str, &ret)
 	if err != nil {
 		panic(err)
 	}

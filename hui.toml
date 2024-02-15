@@ -6,6 +6,7 @@ KeyExecute = "L"
 KeyQuit = "q"
 KeyCmdmode = ":"
 KeyCmdenter = "\r"
+
 CmdlinePrefix = ":"
 FeedbackPrefix = "<"
 EntryMenuPrefix = "> ["

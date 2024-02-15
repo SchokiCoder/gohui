@@ -32,4 +32,3 @@ func (c BgColor) String() string {
 		return SEQ_BG_DEFAULT
 	}
 }
-

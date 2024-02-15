@@ -30,17 +30,17 @@ const (
 
 var Version string
 
-func (mp MenuPath) CurMenu() string {
+func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
 }
 
-func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
+func drawMenu(cfg Config, curMenu Menu, cursor uint) {
 	var prefix, postfix string
 	var fg FgColor
 	var bg BgColor
 	
-	for i := uint(0); i < uint(len(cur_menu.Entries)); i++ {
-		switch cur_menu.Entries[i].Content.EcType {
+	for i := uint(0); i < uint(len(curMenu.Entries)); i++ {
+		switch curMenu.Entries[i].Content.EcType {
 		case ECT_MENU:
 			prefix = cfg.EntryMenuPrefix
 			postfix = cfg.EntryMenuPostfix
@@ -62,24 +62,24 @@ func draw_menu(cfg Config, cur_menu Menu, cursor uint) {
 		           fg,
 		           bg,
 		           prefix,
-		           cur_menu.Entries[i].Caption,
+		           curMenu.Entries[i].Caption,
 		           postfix)
 	}
 }
 
-func draw_upper(cfg Config, cur_menu_name string) {
+func drawUpper(cfg Config, curMenuName string) {
 	fmt.Printf("%v%v%v\n", cfg.HeaderFg, cfg.HeaderBg, cfg.Header)
 	fmt.Printf("%v%v%v\n",
 	           cfg.TitleFg,
 	           cfg.TitleBg,
-	           cfg.Menus[cur_menu_name].Title)
+	           cfg.Menus[curMenuName].Title)
 }
 
-func generate_lower(cfg Config,
-                    cmdline string,
-                    cmdmode bool,
-                    feedback string,
-                    term_w int) string {
+func generateLower(cfg      Config,
+                   cmdline  string,
+                   cmdmode  bool,
+                   feedback string,
+                   termW    int)    string {
 	var ret string
 	
 	if cmdmode == true {
@@ -91,7 +91,7 @@ func generate_lower(cfg Config,
 	} else {
 		feedback = strings.TrimSpace(feedback)
 		ret = fmt.Sprintf("%v%v", cfg.FeedbackPrefix, feedback)
-		if strNeededLines(ret, term_w) > 1 {
+		if strNeededLines(ret, termW) > 1 {
 			// TODO will become a call to courier later
 			ret = cfg.FeedbackPrefix
 		}
@@ -105,10 +105,12 @@ func generate_lower(cfg Config,
 	return ret
 }
 
-func handle_command(active   *bool,
-                    cmdline  *string,
-                    cursor   *uint,
-                    cur_menu Menu) string {	
+func handleCommand(active   *bool,
+                   cmdline  *string,
+                   cursor   *uint,
+                   curMenu  Menu)    string {	
+	var err error
+	var num uint64
 	var ret string = ""
 	
 	switch *cmdline {
@@ -120,16 +122,16 @@ func handle_command(active   *bool,
 		*active = false
 
 	default:
-		num, err := strconv.ParseUint(*cmdline, 10, 32)
+		num, err = strconv.ParseUint(*cmdline, 10, 32)
 		
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
 			                  *cmdline)
 		} else {		
-			if int(num) < len(cur_menu.Entries) - 1 {
+			if int(num) < len(curMenu.Entries) - 1 {
 				*cursor = uint(num)
 			} else {
-				*cursor = uint(len(cur_menu.Entries) - 1)
+				*cursor = uint(len(curMenu.Entries) - 1)
 			}
 		}
 	}
@@ -138,26 +140,28 @@ func handle_command(active   *bool,
 	return ret
 }
 
-func handle_input(active    *bool,
-                  cfg       Config,
-                  cmdline   *string,
-                  cmdmode   *bool,
-                  cursor    *uint,
-                  feedback  *string,
-                  menu_path *MenuPath) {
+func handleInput(active   *bool,
+                 cfg      Config,
+                 cmdline  *string,
+                 cmdmode  *bool,
+                 cursor   *uint,
+                 feedback *string,
+                 menuPath *MenuPath) {
+	var canonicalState *term.State
+	var err error
 	var input = make([]byte, 1)
 
-	canonical_state, raw_err := term.MakeRaw(int(os.Stdin.Fd()))
-	if raw_err != nil {
-		panic(raw_err)
+	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		panic(err)
 	}
 
-	_, read_err := os.Stdin.Read(input)
-	if read_err != nil {
-		panic(read_err)
+	_, err = os.Stdin.Read(input)
+	if err != nil {
+		panic(err)
 	}
 
-	term.Restore(int(os.Stdin.Fd()), canonical_state)
+	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
 	for i := 0; i < len(input); i++ {
 		handle_key(string(input),
@@ -167,30 +171,30 @@ func handle_input(active    *bool,
 		           cmdmode,
 		           cursor,
 		           feedback,
-		           menu_path)
+		           menuPath)
 	}
 }
 
-func handle_key(key       string,
-                active    *bool,
-                cfg       Config,
-		cmdline   *string,
-		cmdmode   *bool,
-                cursor    *uint,
-                feedback  *string,
-                menu_path *MenuPath) {
-	var cur_menu = cfg.Menus[menu_path.CurMenu()]
-	var cur_entry = &cur_menu.Entries[*cursor]
+func handle_key(key      string,
+                active   *bool,
+                cfg      Config,
+		cmdline  *string,
+		cmdmode  *bool,
+                cursor   *uint,
+                feedback *string,
+                menuPath *MenuPath) {
+	var curMenu = cfg.Menus[menuPath.curMenu()]
+	var curEntry = &curMenu.Entries[*cursor]
 
 	if *cmdmode {
-		handle_key_cmdline(key,
-		                   active,
-		                   cfg,
-		                   cmdline,
-		                   cmdmode,
-		                   cursor,
-		                   cur_menu,
-		                   feedback)
+		handleKeyCmdline(key,
+		                 active,
+		                 cfg,
+		                 cmdline,
+		                 cmdmode,
+		                 cursor,
+		                 curMenu,
+		                 feedback)
 		return
 	}
 	
@@ -199,13 +203,13 @@ func handle_key(key       string,
 		*active = false
 
 	case cfg.KeyLeft:
-		if len(*menu_path) > 1 {
-			*menu_path = (*menu_path)[:len(*menu_path) - 1]
+		if len(*menuPath) > 1 {
+			*menuPath = (*menuPath)[:len(*menuPath) - 1]
 			*cursor = 0
 		}
 
 	case cfg.KeyDown:
-		if *cursor < uint(len(cur_menu.Entries) - 1) {
+		if *cursor < uint(len(curMenu.Entries) - 1) {
 			*cursor++
 		}
 
@@ -215,14 +219,14 @@ func handle_key(key       string,
 		}
 
 	case cfg.KeyRight:
-		if cur_entry.Content.EcType == ECT_MENU {
-			*menu_path = append(*menu_path, cur_entry.Content.Menu)
+		if curEntry.Content.EcType == ECT_MENU {
+			*menuPath = append(*menuPath, curEntry.Content.Menu)
 			*cursor = 0
 		}
 
 	case cfg.KeyExecute:
-		if cur_entry.Content.EcType == ECT_SHELL {
-			*feedback = handle_shell(cur_entry.Content.Shell)
+		if curEntry.Content.EcType == ECT_SHELL {
+			*feedback = handleShell(curEntry.Content.Shell)
 		}
 	
 	case cfg.KeyCmdmode:
@@ -235,17 +239,17 @@ func handle_key(key       string,
 	}
 }
 
-func handle_key_cmdline(key       string,
-                        active    *bool,
-		        cfg       Config,
-		        cmdline   *string,
-		        cmdmode   *bool,
-                        cursor    *uint,
-                        cur_menu  Menu,
-                        feedback  *string) {
+func handleKeyCmdline(key      string,
+                      active   *bool,
+		      cfg      Config,
+		      cmdline  *string,
+		      cmdmode  *bool,
+                      cursor   *uint,
+                      curMenu  Menu,
+                      feedback *string) {
 	switch key {
 	case cfg.KeyCmdenter:
-		*feedback = handle_command(active, cmdline, cursor, cur_menu)
+		*feedback = handleCommand(active, cmdline, cursor, curMenu)
 		fallthrough
 	case SIGINT:
 		fallthrough
@@ -259,7 +263,7 @@ func handle_key_cmdline(key       string,
 	}
 }
 
-func handle_shell(shell string) string {
+func handleShell(shell string) string {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser
 	var cmdout io.ReadCloser
@@ -306,18 +310,18 @@ func handle_shell(shell string) string {
 	}
 }
 
-func set_cursor(x, y int) {
+func setCursor(x, y int) {
 	fmt.Printf("\033[%v;%vH", y, x);
 }
 
-func strNeededLines(s string, term_w int) uint {
+func strNeededLines(s string, termW int) uint {
 	var ret uint = 0
 	var line int = 0
 
 	for i := 0; i < len(s); i++ {
 		line++
 
-		if line >= term_w {
+		if line >= termW {
 			line = 0
 			ret++
 		}
@@ -339,13 +343,13 @@ func main() {
 	var err error
 	var feedback string = fmt.Sprintf("Welcome to hui %v", Version)
 	var lower string
-	var menu_path = make(MenuPath, 1, 8)
-	var term_h, term_w int
+	var menuPath = make(MenuPath, 1, 8)
+	var termH, termW int
 
-	_, main_menu_exists := cfg.Menus["main"]
+	_, mainMenuExists := cfg.Menus["main"]
 
-	if main_menu_exists {
-		menu_path[0] = "main"
+	if mainMenuExists {
+		menuPath[0] = "main"
 	} else {
 		panic("main menu not found in config")
 	}
@@ -356,25 +360,24 @@ func main() {
 
 	for active {
 		fmt.Print(SEQ_CLEAR)
-		term_w, term_h, err = term.GetSize(int(os.Stdin.Fd()))
+		termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
 			panic(fmt.Sprintf("Could not get term size: %v", err))
 		}
 
-		lower = generate_lower(cfg, cmdline, cmdmode, feedback, term_w)
+		lower = generateLower(cfg, cmdline, cmdmode, feedback, termW)
 
-		draw_upper(cfg, menu_path.CurMenu())
-		draw_menu(cfg, cfg.Menus[menu_path.CurMenu()], cursor)
-		set_cursor(1, term_h)
+		drawUpper(cfg, menuPath.curMenu())
+		drawMenu(cfg, cfg.Menus[menuPath.curMenu()], cursor)
+		setCursor(1, termH)
 		fmt.Printf("%v", lower)
 
-		handle_input(&active,
-		             cfg,
-		             &cmdline,
-		             &cmdmode,
-		             &cursor,
-		             &feedback,
-		             &menu_path)
+		handleInput(&active,
+		            cfg,
+		            &cmdline,
+		            &cmdmode,
+		            &cursor,
+		            &feedback,
+		            &menuPath)
 	}
 }
-

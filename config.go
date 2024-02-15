@@ -44,27 +44,47 @@ type Config struct {
 }
 
 func cfgFromFile() Config {
+	type path struct {
+		EnvVar string
+		Core   string
+	}
+
+	var curPath string
 	var i int
 	var err error
 	var f *os.File
 	var found bool = false
-	var paths = []string {
-		"/etc/hui/hui.toml",
-		"~/.config/hui/hui.toml",
-		"~/.hui/hui.toml",
-		"hui.toml",
+	var paths = []path {
+		path {"",                "/etc/hui/hui.toml"},
+		path {"XDG_CONFIG_HOME", "/hui/hui.toml"},
+		path {"HOME",            "/.config/hui/hui.toml"},
+		path {"HOME",            "/.hui/hui.toml"},
+		path {"",                "hui.toml"},
 	}
+	var prefix string
 	var ret Config
 
-	for i = 0; i < len(paths); i++ {
-		f, err = os.Open(paths[i])
+	for _, v := range paths {
+		if v.EnvVar != "" {
+			prefix = os.Getenv(v.EnvVar)
+
+			if prefix == "" {
+				continue
+			}
+
+			curPath = fmt.Sprintf("%v%v", prefix, v.Core)
+		} else {
+			curPath = v.Core
+		}
+
+		f, err = os.Open(curPath)
 
 		if errors.Is(err, os.ErrNotExist) {
 			continue
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr,
 			            "Config file could not be opened: \"%v\", \"%v\"\n",
-			            paths[i], err)
+			            paths, err)
 		} else {
 			found = true
 			break

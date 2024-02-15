@@ -28,6 +28,8 @@
 + config: change keys to be strings
 
 Otherwise the toml umarshal would expect literal integers in the toml file.
+
++ add XDG config env var to config paths
   
 - config file format:
 	- ectypes are just number, which is weird
@@ -36,7 +38,6 @@ Otherwise the toml umarshal would expect literal integers in the toml file.
 	  panic after cfg read when both are given?
 	  just prioritize one?
 
-- maybe use XDG env vars for config paths
 - set version to 0.2.0
 
 -----

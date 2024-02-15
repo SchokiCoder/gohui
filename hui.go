@@ -18,8 +18,8 @@ import (
 type MenuPath []string
 
 const (
-	SIGINT  = 3
-	SIGTSTP = 4
+	SIGINT  = "\003"
+	SIGTSTP = "\004"
 
 	SEQ_CLEAR      = "\033[H\033[2J"
 	SEQ_FG_DEFAULT = "\033[39m"
@@ -160,7 +160,7 @@ func handle_input(active    *bool,
 	term.Restore(int(os.Stdin.Fd()), canonical_state)
 
 	for i := 0; i < len(input); i++ {
-		handle_key(input[i],
+		handle_key(string(input),
 		           active,
 		           cfg,
 		           cmdline,
@@ -171,7 +171,7 @@ func handle_input(active    *bool,
 	}
 }
 
-func handle_key(key       byte,
+func handle_key(key       string,
                 active    *bool,
                 cfg       Config,
 		cmdline   *string,
@@ -235,7 +235,7 @@ func handle_key(key       byte,
 	}
 }
 
-func handle_key_cmdline(key       byte,
+func handle_key_cmdline(key       string,
                         active    *bool,
 		        cfg       Config,
 		        cmdline   *string,

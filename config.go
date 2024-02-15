@@ -13,14 +13,14 @@ import (
 )
 
 type Config struct {
-	KeyLeft           byte
-	KeyDown           byte
-	KeyUp             byte
-	KeyRight          byte
-	KeyExecute        byte
-	KeyQuit           byte
-	KeyCmdmode        byte
-	KeyCmdenter       byte
+	KeyLeft           string
+	KeyDown           string
+	KeyUp             string
+	KeyRight          string
+	KeyExecute        string
+	KeyQuit           string
+	KeyCmdmode        string
+	KeyCmdenter       string
 	HeaderFg          FgColor
 	HeaderBg          BgColor
 	TitleFg           FgColor

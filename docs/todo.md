@@ -25,8 +25,9 @@
 
 + add basic toml config file reading
 + fix toml reading
-- fix toml parsing
-  The keys are expected to be integers, which is bogus.
++ config: change keys to be strings
+
+Otherwise the toml umarshal would expect literal integers in the toml file.
   
 - config file format:
 	- ectypes are just number, which is weird

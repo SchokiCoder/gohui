@@ -93,16 +93,10 @@ Title = "Main Menu\n---------"
 
 [[Menus.main.Entries]]
 Caption = 'echo to temp'
-
-[Menus.main.Entries.Content]
-EcType = 1
 Shell = 'echo gotest >> ~/temp'
 
 [[Menus.main.Entries]]
 Caption = 'Submenu'
-
-[Menus.main.Entries.Content]
-EcType = 0
 Menu = 'submenu'
 
 [Menus.submenu]
@@ -110,22 +104,12 @@ Title = 'Submenu'
 
 [[Menus.submenu.Entries]]
 Caption = 'print short'
-
-[Menus.submenu.Entries.Content]
-EcType = 1
 Shell = 'echo short'
 
 [[Menus.submenu.Entries]]
 Caption = 'print long'
-
-[Menus.submenu.Entries.Content]
-EcType = 1
 Shell = 'echo loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong'
 
 [[Menus.submenu.Entries]]
 Caption = 'print too long'
-
-[Menus.submenu.Entries.Content]
-EcType = 1
 Shell = 'echo looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong'
-

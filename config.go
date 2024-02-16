@@ -106,6 +106,27 @@ func cfgFromFile() Config {
 		panic(err)
 	}
 
+	ret.validate()
+
 	return ret
 }
 
+func (c Config) validate() {
+	for _, m := range c.Menus {
+		for _, e := range m.Entries {
+			if e.Shell == "" && e.Menu == "" {
+				panic(fmt.Sprintf(
+`Entry "%v" has no content.
+Add a "Shell" value or a "Menu" value.`,
+				                  e.Caption))
+			}
+			
+			if e.Shell != "" && e.Menu != "" {
+				panic(fmt.Sprintf(
+`Entry "%v" has too much content.
+Use only a "Shell" or a "Menu" value.`,
+				                  e.Caption))
+			} 
+		}
+	}
+}

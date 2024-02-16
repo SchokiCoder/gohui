@@ -21,6 +21,8 @@
 - add courier
 - give hui multiline feedback to courier
 
+-----
+
 # v0.2.0
 
 + add basic toml config file reading
@@ -30,17 +32,13 @@
 Otherwise the toml umarshal would expect literal integers in the toml file.
 
 + add XDG config env var to config paths
-  
-- config file format:
-	- ectypes are just number, which is weird
-	  maybe just drop the enum all together and just try to use the shell/menu
-	  var, also drop the Entry.Content struct with it...
-	  panic after cfg read when both are given?
-	  just prioritize one?
 
-- set version to 0.2.0
++ remove EntryContent from Entry
 
------
+This is then replaced with the values itself.
+Sanity checks are implemented right after the config unmarshal.
+Thanks to this the config doesn't need to contain arbitrary integers anymore.
+Also set version to 0.2.0.
 
 # v0.1.0
 

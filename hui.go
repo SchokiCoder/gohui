@@ -40,12 +40,10 @@ func drawMenu(cfg Config, curMenu Menu, cursor uint) {
 	var bg BgColor
 	
 	for i := uint(0); i < uint(len(curMenu.Entries)); i++ {
-		switch curMenu.Entries[i].Content.EcType {
-		case ECT_MENU:
+		if curMenu.Entries[i].Shell == "" {
 			prefix = cfg.EntryMenuPrefix
 			postfix = cfg.EntryMenuPostfix
-		
-		case ECT_SHELL:
+		} else {
 			prefix = cfg.EntryShellPrefix
 			postfix = cfg.EntryShellPostfix
 		}
@@ -219,14 +217,14 @@ func handle_key(key      string,
 		}
 
 	case cfg.KeyRight:
-		if curEntry.Content.EcType == ECT_MENU {
-			*menuPath = append(*menuPath, curEntry.Content.Menu)
+		if curEntry.Menu != "" {
+			*menuPath = append(*menuPath, curEntry.Menu)
 			*cursor = 0
 		}
 
 	case cfg.KeyExecute:
-		if curEntry.Content.EcType == ECT_SHELL {
-			*feedback = handleShell(curEntry.Content.Shell)
+		if curEntry.Shell != "" {
+			*feedback = handleShell(curEntry.Shell)
 		}
 	
 	case cfg.KeyCmdmode:

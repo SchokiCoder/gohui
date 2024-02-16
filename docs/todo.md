@@ -17,7 +17,18 @@
 
 # v0.3.0
 
-- child process execution test vim (maybe it already works)
++ add shell session execution
+
+Aka add support for child processes with their own mainloop.
+
+- maybe unify shell and shellsession
+	- use handleShellSession as base
+	  (we hand our own stdout to child)
+	- record record our own stdout
+	  (while child runs)
+	- once child is done, do the normal decision making of return feedback
+	  from stdout (recorded) vs stderr as in handleShell
+
 - add courier
 - give hui multiline feedback to courier
 

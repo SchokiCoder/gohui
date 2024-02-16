@@ -40,12 +40,15 @@ func drawMenu(cfg Config, curMenu Menu, cursor uint) {
 	var bg BgColor
 	
 	for i := uint(0); i < uint(len(curMenu.Entries)); i++ {
-		if curMenu.Entries[i].Shell == "" {
-			prefix = cfg.EntryMenuPrefix
-			postfix = cfg.EntryMenuPostfix
-		} else {
+		if curMenu.Entries[i].Shell != "" {
 			prefix = cfg.EntryShellPrefix
 			postfix = cfg.EntryShellPostfix
+		} else if curMenu.Entries[i].ShellSession != "" {
+			prefix = cfg.EntryShellSessionPrefix
+			postfix = cfg.EntryShellSessionPostfix
+		} else {
+			prefix = cfg.EntryMenuPrefix
+			postfix = cfg.EntryMenuPostfix
 		}
 		
 		if i == cursor {
@@ -162,25 +165,25 @@ func handleInput(active   *bool,
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
 	for i := 0; i < len(input); i++ {
-		handle_key(string(input),
-		           active,
-		           cfg,
-		           cmdline,
-		           cmdmode,
-		           cursor,
-		           feedback,
-		           menuPath)
+		handleKey(string(input),
+		          active,
+		          cfg,
+		          cmdline,
+		          cmdmode,
+		          cursor,
+		          feedback,
+		          menuPath)
 	}
 }
 
-func handle_key(key      string,
-                active   *bool,
-                cfg      Config,
-		cmdline  *string,
-		cmdmode  *bool,
-                cursor   *uint,
-                feedback *string,
-                menuPath *MenuPath) {
+func handleKey(key      string,
+               active   *bool,
+               cfg      Config,
+               cmdline  *string,
+               cmdmode  *bool,
+               cursor   *uint,
+               feedback *string,
+               menuPath *MenuPath) {
 	var curMenu = cfg.Menus[menuPath.curMenu()]
 	var curEntry = &curMenu.Entries[*cursor]
 
@@ -225,6 +228,8 @@ func handle_key(key      string,
 	case cfg.KeyExecute:
 		if curEntry.Shell != "" {
 			*feedback = handleShell(curEntry.Shell)
+		} else if curEntry.ShellSession != "" {
+			*feedback = handleShellSession(curEntry.ShellSession)
 		}
 	
 	case cfg.KeyCmdmode:
@@ -306,6 +311,43 @@ func handleShell(shell string) string {
 	} else {
 		return string(strout)
 	}
+}
+
+func handleShellSession(shell string) string {
+	var cmd *exec.Cmd
+	var cmderr io.ReadCloser
+	var err error
+	var strerr []byte
+
+	cmd = exec.Command("sh", "-c", shell)
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+
+	cmderr, err = cmd.StderrPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stderr: %s", err)
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return fmt.Sprintf("Could not start child process: %s", err)
+	}
+
+	strerr, err = io.ReadAll(cmderr)
+	if err != nil {
+		return fmt.Sprintf("Could not read stderr: %s", err)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Sprintf("Child error: %s", err)
+	}
+
+	if len(strerr) > 0 {
+		return string(strerr)
+	}
+	
+	return ""
 }
 
 func setCursor(x, y int) {

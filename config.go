@@ -13,34 +13,36 @@ import (
 )
 
 type Config struct {
-	KeyLeft           string
-	KeyDown           string
-	KeyUp             string
-	KeyRight          string
-	KeyExecute        string
-	KeyQuit           string
-	KeyCmdmode        string
-	KeyCmdenter       string
-	HeaderFg          FgColor
-	HeaderBg          BgColor
-	TitleFg           FgColor
-	TitleBg           BgColor
-	EntryFg           FgColor
-	EntryBg           BgColor
-	EntryHoverFg      FgColor
-	EntryHoverBg      BgColor
-	FeedbackFg        FgColor
-	FeedbackBg        BgColor
-	CmdlineFg         FgColor
-	CmdlineBg         BgColor
-	CmdlinePrefix     string
-	FeedbackPrefix    string
-	EntryMenuPrefix   string
-	EntryMenuPostfix  string
-	EntryShellPrefix  string
-	EntryShellPostfix string
-	Header            string
-	Menus             map[string]Menu
+	KeyLeft                  string
+	KeyDown                  string
+	KeyUp                    string
+	KeyRight                 string
+	KeyExecute               string
+	KeyQuit                  string
+	KeyCmdmode               string
+	KeyCmdenter              string
+	HeaderFg                 FgColor
+	HeaderBg                 BgColor
+	TitleFg                  FgColor
+	TitleBg                  BgColor
+	EntryFg                  FgColor
+	EntryBg                  BgColor
+	EntryHoverFg             FgColor
+	EntryHoverBg             BgColor
+	FeedbackFg               FgColor
+	FeedbackBg               BgColor
+	CmdlineFg                FgColor
+	CmdlineBg                BgColor
+	CmdlinePrefix            string
+	FeedbackPrefix           string
+	EntryMenuPrefix          string
+	EntryMenuPostfix         string
+	EntryShellPrefix         string
+	EntryShellPostfix        string
+	EntryShellSessionPrefix  string
+	EntryShellSessionPostfix string
+	Header                   string
+	Menus                    map[string]Menu
 }
 
 func cfgFromFile() Config {
@@ -112,19 +114,33 @@ func cfgFromFile() Config {
 }
 
 func (c Config) validate() {
-	for _, m := range c.Menus {
+	var numContent uint
+
+	for _, m := range c.Menus {		
 		for _, e := range m.Entries {
-			if e.Shell == "" && e.Menu == "" {
-				panic(fmt.Sprintf(
-`Entry "%v" has no content.
-Add a "Shell" value or a "Menu" value.`,
-				                  e.Caption))
+			numContent = 0
+
+			if e.Shell != "" {
+				numContent++
 			}
 			
-			if e.Shell != "" && e.Menu != "" {
+			if e.ShellSession != "" {
+				numContent++
+			}
+			
+			if e.Menu != "" {
+				numContent++
+			}
+		
+			if numContent < 1 {
+				panic(fmt.Sprintf(
+`Entry "%v" has no content.
+Add a "Shell" value, "ShellSession" value or a "Menu" value.`,
+				                  e.Caption))
+			} else if numContent > 1 {
 				panic(fmt.Sprintf(
 `Entry "%v" has too much content.
-Use only a "Shell" or a "Menu" value.`,
+Use only a "Shell" or a "ShellSession" value or a "Menu" value.`,
 				                  e.Caption))
 			} 
 		}

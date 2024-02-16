@@ -13,6 +13,8 @@ EntryMenuPrefix = "> ["
 EntryMenuPostfix = "]"
 EntryShellPrefix = "> "
 EntryShellPostfix = ""
+EntryShellSessionPrefix = "> <"
+EntryShellSessionPostfix = ">"
 Header = "Example config\n"
 
 [HeaderFg]
@@ -101,6 +103,10 @@ Menu = 'submenu'
 
 [Menus.submenu]
 Title = 'Submenu'
+
+[[Menus.submenu.Entries]]
+Caption = 'vi ~/temp.md'
+ShellSession = 'vi ~/temp.md'
 
 [[Menus.submenu.Entries]]
 Caption = 'print short'

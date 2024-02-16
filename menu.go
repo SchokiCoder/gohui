@@ -4,9 +4,10 @@
 package main
 
 type Entry struct {
-	Caption string
-	Menu  string
-	Shell string
+	Caption      string
+	Menu         string
+	Shell        string
+	ShellSession string
 }
 
 type Menu struct {

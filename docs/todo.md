@@ -21,13 +21,23 @@
 
 Aka add support for child processes with their own mainloop.
 
-- maybe unify shell and shellsession
++ FAILED: maybe unify shell and shellsession
 	- use handleShellSession as base
 	  (we hand our own stdout to child)
 	- record record our own stdout
 	  (while child runs)
 	- once child is done, do the normal decision making of return feedback
 	  from stdout (recorded) vs stderr as in handleShell
+	- could handing over our own stdin mess with piping?
+	  "cat myfile | idklol"
+	  maybe not since it's encapsulated by "sh -c %v"
+	- remove ShellSession value
+	- discard feedback that came from a session's Stdout...
+	  (withoput explicit knowledge gained from the cfg, this is impossible,
+	   i am afrad)
+	- how do you determine if a shell command runs a binary with a mainloop?
+	  You don't.
+	  Execution time is not reliable.
 
 - add courier
 - give hui multiline feedback to courier

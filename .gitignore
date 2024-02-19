@@ -5,3 +5,4 @@ courier
 courier_d
 genversion.go
 go.sum
+go.work.sum

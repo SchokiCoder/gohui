@@ -1,4 +1,4 @@
-module github.com/SchokiCoder/gohui
+module github.com/SchokiCoder/gohui/common
 
 go 1.21
 

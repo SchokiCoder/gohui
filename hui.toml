@@ -1,14 +1,5 @@
-KeyLeft = "h"
-KeyDown = "j"
-KeyUp = "k"
-KeyRight = "l"
 KeyExecute = "L"
-KeyQuit = "q"
-KeyCmdmode = ":"
-KeyCmdenter = "\r"
 
-CmdlinePrefix = ":"
-FeedbackPrefix = "<"
 EntryMenuPrefix = "> ["
 EntryMenuPostfix = "]"
 EntryShellPrefix = "> "
@@ -16,30 +7,6 @@ EntryShellPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
 Header = "Example config\n"
-
-[HeaderFg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[HeaderBg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[TitleFg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[TitleBg]
-Active = false
-R = 0
-G = 0
-B = 0
 
 [EntryFg]
 Active = false
@@ -64,30 +31,6 @@ Active = true
 R = 255
 G = 255
 B = 255
-
-[FeedbackFg]
-Active = true
-R = 175
-G = 175
-B = 175
-
-[FeedbackBg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[CmdlineFg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[CmdlineBg]
-Active = false
-R = 0
-G = 0
-B = 0
 
 [Menus]
 [Menus.main]

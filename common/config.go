@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package main
+package common
 
 import (
 	"errors"
 	"io"
 	"fmt"
-	"os"
-
 	"github.com/BurntSushi/toml"
+	"os"
 )
 
-type Config struct {
+type ComCfg struct {
 	KeyLeft                  string
 	KeyDown                  string
 	KeyUp                    string
 	KeyRight                 string
-	KeyExecute               string
 	KeyQuit                  string
 	KeyCmdmode               string
 	KeyCmdenter              string
@@ -25,27 +23,15 @@ type Config struct {
 	HeaderBg                 BgColor
 	TitleFg                  FgColor
 	TitleBg                  BgColor
-	EntryFg                  FgColor
-	EntryBg                  BgColor
-	EntryHoverFg             FgColor
-	EntryHoverBg             BgColor
 	FeedbackFg               FgColor
 	FeedbackBg               BgColor
 	CmdlineFg                FgColor
 	CmdlineBg                BgColor
 	CmdlinePrefix            string
 	FeedbackPrefix           string
-	EntryMenuPrefix          string
-	EntryMenuPostfix         string
-	EntryShellPrefix         string
-	EntryShellPostfix        string
-	EntryShellSessionPrefix  string
-	EntryShellSessionPostfix string
-	Header                   string
-	Menus                    map[string]Menu
 }
 
-func cfgFromFile() Config {
+func AnyCfgFromFile(cfg interface{}, cfgFileName string) {
 	type path struct {
 		EnvVar string
 		Core   string
@@ -57,14 +43,13 @@ func cfgFromFile() Config {
 	var f *os.File
 	var found bool = false
 	var paths = []path {
-		path {"",                "/etc/hui/hui.toml"},
-		path {"XDG_CONFIG_HOME", "/hui/hui.toml"},
-		path {"HOME",            "/.config/hui/hui.toml"},
-		path {"HOME",            "/.hui/hui.toml"},
-		path {"",                "hui.toml"},
+		path {"",                "/etc/hui/"},
+		path {"XDG_CONFIG_HOME", "/hui/"},
+		path {"HOME",            "/.config/hui/"},
+		path {"HOME",            "/.hui/"},
+		path {"",                ""},
 	}
 	var prefix string
-	var ret Config
 
 	for _, v := range paths {
 		if v.EnvVar != "" {
@@ -74,9 +59,9 @@ func cfgFromFile() Config {
 				continue
 			}
 
-			curPath = fmt.Sprintf("%v%v", prefix, v.Core)
+			curPath = fmt.Sprintf("%v%v%v", prefix, v.Core, cfgFileName)
 		} else {
-			curPath = v.Core
+			curPath = fmt.Sprintf("%v%v", v.Core, cfgFileName)
 		}
 
 		f, err = os.Open(curPath)
@@ -103,46 +88,16 @@ func cfgFromFile() Config {
 		                  paths[i], err))
 	}
 
-	err = toml.Unmarshal(str, &ret)
+	err = toml.Unmarshal(str, cfg)
 	if err != nil {
 		panic(err)
 	}
-
-	ret.validate()
-
-	return ret
 }
 
-func (c Config) validate() {
-	var numContent uint
+func CfgFromFile() ComCfg {
+	var ret ComCfg
 
-	for _, m := range c.Menus {		
-		for _, e := range m.Entries {
-			numContent = 0
+	AnyCfgFromFile(&ret, "common.toml")
 
-			if e.Shell != "" {
-				numContent++
-			}
-			
-			if e.ShellSession != "" {
-				numContent++
-			}
-			
-			if e.Menu != "" {
-				numContent++
-			}
-		
-			if numContent < 1 {
-				panic(fmt.Sprintf(
-`Entry "%v" has no content.
-Add a "Shell" value, "ShellSession" value or a "Menu" value.`,
-				                  e.Caption))
-			} else if numContent > 1 {
-				panic(fmt.Sprintf(
-`Entry "%v" has too much content.
-Use only a "Shell" or a "ShellSession" value or a "Menu" value.`,
-				                  e.Caption))
-			} 
-		}
-	}
+	return ret
 }

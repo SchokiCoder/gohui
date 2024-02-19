@@ -39,6 +39,7 @@ Aka add support for child processes with their own mainloop.
 	  You don't.
 	  Execution time is not reliable.
 
++ seperate common code from hui
 - add courier
 - give hui multiline feedback to courier
 

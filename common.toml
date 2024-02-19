@@ -1,0 +1,58 @@
+KeyLeft = "h"
+KeyDown = "j"
+KeyUp = "k"
+KeyRight = "l"
+KeyQuit = "q"
+KeyCmdmode = ":"
+KeyCmdenter = "\r"
+
+CmdlinePrefix = ":"
+FeedbackPrefix = "<"
+
+[HeaderFg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[HeaderBg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[TitleFg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[TitleBg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[FeedbackFg]
+Active = true
+R = 175
+G = 175
+B = 175
+
+[FeedbackBg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[CmdlineFg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[CmdlineBg]
+Active = false
+R = 0
+G = 0
+B = 0

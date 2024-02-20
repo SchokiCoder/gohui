@@ -6,7 +6,7 @@ EntryShellPrefix = "> "
 EntryShellPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
-Header = "Example config\n"
+Header = "Example hui\n"
 
 [EntryFg]
 Active = false

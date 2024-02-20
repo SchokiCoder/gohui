@@ -1,0 +1,13 @@
+Header = "Example courier\n"
+
+[ContentFg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[ContentBg]
+Active = false
+R = 0
+G = 0
+B = 0

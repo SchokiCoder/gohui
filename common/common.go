@@ -40,7 +40,7 @@ func GenerateLower(cmdline  string,
 	} else {
 		feedback = strings.TrimSpace(feedback)
 		ret = fmt.Sprintf("%v%v", comcfg.FeedbackPrefix, feedback)
-		if strNeededLines(ret, termW) > 1 {
+		if len(SplitByLines(termW, ret)) > 1 {
 			// TODO will become a call to the pager later
 			ret = comcfg.FeedbackPrefix
 		}
@@ -58,21 +58,31 @@ func SetCursor(x, y int) {
 	fmt.Printf("\033[%v;%vH", y, x);
 }
 
-func strNeededLines(s string, termW int) uint {
-	var ret uint = 0
-	var line int = 0
+func SplitByLines(maxLineLen int, str string) []string {
+	var lastCut int = 0
+	var lineLen int = 0
+	var ret []string
 
-	for i := 0; i < len(s); i++ {
-		line++
-
-		if line >= termW {
-			line = 0
-			ret++
+	for i, v := range str {
+		switch v {
+		case '\n': fallthrough
+		case '\r':
+			ret = append(ret, str[lastCut:i])
+			lineLen = 0
+			lastCut = i
 		}
+
+		if lineLen >= maxLineLen {
+			ret = append(ret, str[lastCut:i])
+			lineLen = 0
+			lastCut = i
+		}
+
+		lineLen++
 	}
 
-	if line > 0 {
-		ret++
+	for i, v := range ret {
+		ret[i] = strings.TrimSpace(v)
 	}
 
 	return ret

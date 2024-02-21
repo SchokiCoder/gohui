@@ -40,8 +40,16 @@ Aka add support for child processes with their own mainloop.
 	  Execution time is not reliable.
 
 + seperate common code from hui
-- add courier
++ add courier base
++ courier: add file read from arg
+
+Also add a missing file close when config reading.
+
+- courier: add scroll
+- courier: add title arg
+
 - give hui multiline feedback to courier
+  try temp files first this time
 
 -----
 

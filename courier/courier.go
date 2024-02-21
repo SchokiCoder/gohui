@@ -7,8 +7,10 @@ package main
 import (
 	"github.com/SchokiCoder/gohui/common"
 
+	"errors"
 	"fmt"
 	"golang.org/x/term"
+	"io"
 	"os"
 )
 
@@ -18,6 +20,41 @@ func drawContent(contentLines []string, coucfg CouCfg) {
 	for _, v := range contentLines {
 		fmt.Printf("%v%v%v\n", coucfg.ContentFg, coucfg.ContentBg, v)
 	}
+}
+
+func handleArgs() string {
+	var err error
+	var f *os.File
+	var path string
+
+	if len(os.Args) < 2 {
+		panic("No filepath argument given.\n")
+	}
+
+	path = os.Args[1]
+
+	f, err = os.Open(path)
+	defer f.Close()
+
+	if errors.Is(err, os.ErrNotExist) {
+		panic(fmt.Sprintf("File could not be found: \"%v\", \"%v\"\n",
+		                  path,
+		                  err))
+	} else if err != nil {
+		panic(fmt.Sprintf("File could not be opened: \"%v\", \"%v\"\n",
+		                  path,
+		                  err))
+	}
+
+	ret, err := io.ReadAll(f)
+
+	if err != nil {
+		panic(fmt.Sprintf("File could not be read: \"%v\", \"%v\"\n",
+		                  path,
+		                  err))
+	}
+
+	return string(ret)
 }
 
 func handleCommand(active *bool, cmdline *string) string {	
@@ -132,6 +169,13 @@ func main() {
 	var feedback string = fmt.Sprintf("Welcome to courier %v", Version)
 	var lower string
 	var termH, termW int
+
+	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		panic(fmt.Sprintf("Could not get term size: %v", err))
+	}
+
+	contentLines = common.SplitByLines(termW, handleArgs())
 
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)

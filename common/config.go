@@ -65,6 +65,7 @@ func AnyCfgFromFile(cfg interface{}, cfgFileName string) {
 		}
 
 		f, err = os.Open(curPath)
+		defer f.Close()
 
 		if errors.Is(err, os.ErrNotExist) {
 			continue

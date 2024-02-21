@@ -45,7 +45,12 @@ Aka add support for child processes with their own mainloop.
 
 Also add a missing file close when config reading.
 
-- courier: add scroll
++ courier: add scroll
+
+Also fix last line being omitted by common.SplitByLines.
+
+- hui: add termH awareness for drawMenu
+- try rune for keys in configs
 - courier: add title arg
 
 - give hui multiline feedback to courier

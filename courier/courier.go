@@ -16,8 +16,17 @@ import (
 
 var Version string
 
-func drawContent(contentLines []string, coucfg CouCfg) {
-	for _, v := range contentLines {
+func drawContent(contentLines  []string,
+                 contentHeight int,
+                 coucfg        CouCfg,
+                 scroll        int) {
+	var drawRange int = scroll + contentHeight
+
+	if drawRange > len(contentLines) {
+		drawRange = len(contentLines)
+	}
+
+	for _, v := range contentLines[scroll:drawRange] {
 		fmt.Printf("%v%v%v\n", coucfg.ContentFg, coucfg.ContentBg, v)
 	}
 }
@@ -76,11 +85,13 @@ func handleCommand(active *bool, cmdline *string) string {
 	return ret
 }
 
-func handleInput(active   *bool,
-                 cmdline  *string,
-                 cmdmode  *bool,
-                 comcfg   common.ComCfg,
-                 feedback *string) {
+func handleInput(active           *bool,
+                 cmdline          *string,
+                 cmdmode          *bool,
+                 comcfg           common.ComCfg,
+                 contentLineCount int,
+                 feedback         *string,
+                 scroll           *int) {
 	var canonicalState *term.State
 	var err error
 	var input = make([]byte, 1)
@@ -103,16 +114,20 @@ func handleInput(active   *bool,
 		          cmdline,
 		          cmdmode,
 		          comcfg,
-		          feedback)
+		          contentLineCount,
+		          feedback,
+		          scroll)
 	}
 }
 
-func handleKey(key      string,
-               active   *bool,
-               cmdline  *string,
-               cmdmode  *bool,
-               comcfg   common.ComCfg,
-               feedback *string) {
+func handleKey(key              string,
+               active           *bool,
+               cmdline          *string,
+               cmdmode          *bool,
+               comcfg           common.ComCfg,
+               contentLineCount int,
+               feedback         *string,
+               scroll           *int) {
 	if *cmdmode {
 		handleKeyCmdline(key,
 		                 active,
@@ -124,6 +139,17 @@ func handleKey(key      string,
 	}
 	
 	switch key {
+	case comcfg.KeyUp:
+		if *scroll > 0 {
+			*scroll--
+		}
+
+	case comcfg.KeyDown:
+		if *scroll < contentLineCount {
+			*scroll++
+		}
+
+
 	case comcfg.KeyCmdmode:
 		*cmdmode = true
 		fmt.Printf(common.SEQ_CRSR_SHOW)
@@ -164,11 +190,14 @@ func main() {
 	var cmdmode bool = false
 	var comcfg = common.CfgFromFile()
 	var contentLines []string
+	var contentHeight int
 	var coucfg = cfgFromFile()
 	var err error
 	var feedback string = fmt.Sprintf("Welcome to courier %v", Version)
 	var lower string
+	var scroll int = 0
 	var termH, termW int
+	var title string = "magic title\n-----------"
 
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
@@ -194,9 +223,16 @@ func main() {
 		                             feedback,
 		                             termW)
 
-		// TODO add title var
-		common.DrawUpper(comcfg, coucfg.Header, "magic title")
-		drawContent(contentLines, coucfg)
+		common.DrawUpper(comcfg, coucfg.Header, title)
+
+		contentHeight = termH -
+		                len(common.SplitByLines(termW, coucfg.Header)) -
+		                1 -
+				len(common.SplitByLines(termW, title)) -
+				1
+
+		drawContent(contentLines, contentHeight, coucfg, scroll)
+
 		common.SetCursor(1, termH)
 		fmt.Printf("%v", lower)
 
@@ -204,6 +240,8 @@ func main() {
 		            &cmdline,
 		            &cmdmode,
 		            comcfg,
-		            &feedback)
+		            len(contentLines),
+		            &feedback,
+		            &scroll)
 	}
 }

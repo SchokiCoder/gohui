@@ -59,11 +59,13 @@ func SetCursor(x, y int) {
 }
 
 func SplitByLines(maxLineLen int, str string) []string {
+	var i int
 	var lastCut int = 0
 	var lineLen int = 0
 	var ret []string
+	var v rune
 
-	for i, v := range str {
+	for i, v = range str {
 		switch v {
 		case '\n': fallthrough
 		case '\r':
@@ -80,6 +82,9 @@ func SplitByLines(maxLineLen int, str string) []string {
 
 		lineLen++
 	}
+
+	ret = append(ret, str[lastCut:i])
+	lineLen = 0
 
 	for i, v := range ret {
 		ret[i] = strings.TrimSpace(v)

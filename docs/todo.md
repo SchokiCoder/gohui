@@ -71,8 +71,8 @@ Also fix last line being omitted by common.SplitByLines.
 + fix colored prints not resetting themselves
 + courier: add scroll via cmdline number
 
++ courier: add optional title arg
 - hui: add termH awareness for drawMenu
-- courier: add title arg
 
 - give hui multiline feedback to courier
   try temp files first this time

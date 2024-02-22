@@ -32,16 +32,31 @@ func drawContent(contentLines  []string,
 	}
 }
 
-func handleArgs() string {
+func handleArgs(title *string) string {
 	var err error
 	var f *os.File
+	var nextIsTitle = false
 	var path string
 
 	if len(os.Args) < 2 {
 		panic("No filepath argument given.\n")
 	}
 
-	path = os.Args[1]
+	for _, v := range os.Args[1:] {
+		switch v {
+		case "-t":      fallthrough
+		case "--title":
+			nextIsTitle = true
+
+		default:
+			if nextIsTitle {
+				*title = v
+				nextIsTitle = false
+			} else {
+				path = v
+			}
+		}
+	}
 
 	f, err = os.Open(path)
 	defer f.Close()
@@ -221,14 +236,14 @@ func main() {
 	var lower string
 	var scroll int = 0
 	var termH, termW int
-	var title string = "magic title\n-----------"
+	var title string
 
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
 
-	contentLines = common.SplitByLines(termW, handleArgs())
+	contentLines = common.SplitByLines(termW, handleArgs(&title))
 
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)

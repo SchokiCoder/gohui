@@ -1,3 +1,20 @@
+# v1.1.0
+
+- add specific feedback color for errors
+- add feedback for when hitting "right" on a shell entry or "execute" on a menu
+  entry
+  "Entry type is \"menu\", cannot execute."
+  "Entry type is \"shell\", cannot enter."
+- handle return key in cmdline
+- add cursor for each menu in menu_path
+  Thus a "left" key press would send you to the menu entry that you entered.
+- set version
+
+# 0.4.0
+
+- Lua scripting interface
+- set version
+
 # v1.0.0
 
 - the license into binary at compile time thing can be easily done with include
@@ -14,6 +31,7 @@
 - generalist standard configuration which says so itself via main menu title
 - install scripts
 - update README.md#Install
+- set version
 
 # v0.3.0
 
@@ -51,13 +69,14 @@ Also fix last line being omitted by common.SplitByLines.
 
 + FAILED: try rune for keys in configs
 + fix colored prints not resetting themselves
++ courier: add scroll via cmdline number
 
 - hui: add termH awareness for drawMenu
 - courier: add title arg
 
 - give hui multiline feedback to courier
   try temp files first this time
-- set version 0.3.0
+- set version to 0.3.0
 
 -----
 

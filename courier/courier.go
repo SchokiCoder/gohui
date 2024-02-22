@@ -12,6 +12,7 @@ import (
 	"golang.org/x/term"
 	"io"
 	"os"
+	"strconv"
 )
 
 var Version string
@@ -66,8 +67,13 @@ func handleArgs() string {
 	return string(ret)
 }
 
-func handleCommand(active *bool, cmdline *string) string {	
+func handleCommand(active           *bool,
+                   cmdline          *string,
+                   contentLineCount int,
+                   scroll           *int)    string {
+	var err error
 	var ret string = ""
+	var num uint64
 	
 	switch *cmdline {
 	case "q":
@@ -78,7 +84,18 @@ func handleCommand(active *bool, cmdline *string) string {
 		*active = false
 
 	default:
-		ret = fmt.Sprintf("Command \"%v\" not recognised", *cmdline)
+		num, err = strconv.ParseUint(*cmdline, 10, 32)
+
+		if err != nil {
+			ret = fmt.Sprintf("Command \"%v\" not recognised",
+			                  *cmdline)
+		} else {
+			if int(num) < contentLineCount {
+				*scroll = int(num)
+			} else {
+				*scroll = contentLineCount
+			}
+		}
 	}
 	
 	*cmdline = ""
@@ -134,7 +151,9 @@ func handleKey(key              string,
 		                 cmdline,
 		                 cmdmode,
 		                 comcfg,
-		                 feedback)
+		                 contentLineCount,
+		                 feedback,
+		                 scroll)
 		return
 	}
 	
@@ -162,15 +181,20 @@ func handleKey(key              string,
 	}
 }
 
-func handleKeyCmdline(key      string,
-                      active   *bool,
-		      cmdline  *string,
-		      cmdmode  *bool,
-		      comcfg   common.ComCfg,
-                      feedback *string) {
+func handleKeyCmdline(key              string,
+                      active           *bool,
+		      cmdline          *string,
+		      cmdmode          *bool,
+		      comcfg           common.ComCfg,
+		      contentLineCount int,
+                      feedback         *string,
+                      scroll           *int) {
 	switch key {
 	case comcfg.KeyCmdenter:
-		*feedback = handleCommand(active, cmdline)
+		*feedback = handleCommand(active,
+		                          cmdline,
+		                          contentLineCount,
+		                          scroll)
 		fallthrough
 	case common.SIGINT:
 		fallthrough

@@ -11,27 +11,27 @@ FeedbackPrefix = "<"
 
 [HeaderFg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 230
+G = 230
+B = 230
 
 [HeaderBg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 20
+G = 50
+B = 20
 
 [TitleFg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 230
+G = 230
+B = 230
 
 [TitleBg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 20
+G = 50
+B = 50
 
 [FeedbackFg]
 Active = true
@@ -47,12 +47,12 @@ B = 0
 
 [CmdlineFg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 200
+G = 255
+B = 200
 
 [CmdlineBg]
 Active = false
-R = 0
-G = 0
-B = 0
+R = 20
+G = 20
+B = 20

@@ -20,8 +20,8 @@ const (
 )
 
 func DrawUpper(cfg ComCfg, header string, title string) {
-	fmt.Printf("%v%v%v\n", cfg.HeaderFg, cfg.HeaderBg, header)
-	fmt.Printf("%v%v%v\n", cfg.TitleFg, cfg.TitleBg, title)
+	Cprintf(cfg.HeaderFg, cfg.HeaderBg, "%v\n", header)
+	Cprintf(cfg.TitleFg, cfg.TitleBg, "%v\n", title)
 }
 
 func GenerateLower(cmdline  string,
@@ -32,11 +32,11 @@ func GenerateLower(cmdline  string,
 	var ret string
 	
 	if cmdmode == true {
-		ret = fmt.Sprintf("%v%v%v%v",
-			          comcfg.CmdlineFg,
-			          comcfg.CmdlineBg,
-			          comcfg.CmdlinePrefix,
-			          cmdline)
+		ret = Csprintf(comcfg.CmdlineFg,
+			       comcfg.CmdlineBg,
+			       "%v%v",
+			       comcfg.CmdlinePrefix,
+			       cmdline)
 	} else {
 		feedback = strings.TrimSpace(feedback)
 		ret = fmt.Sprintf("%v%v", comcfg.FeedbackPrefix, feedback)
@@ -45,12 +45,9 @@ func GenerateLower(cmdline  string,
 			ret = comcfg.FeedbackPrefix
 		}
 		
-		ret = fmt.Sprintf("%v%v%v",
-		                  comcfg.FeedbackFg,
-		                  comcfg.FeedbackBg,
-		                  ret)
+		ret = Csprintf(comcfg.FeedbackFg, comcfg.FeedbackBg, "%v", ret)
 	}
-	
+
 	return ret
 }
 

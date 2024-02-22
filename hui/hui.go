@@ -48,12 +48,12 @@ func drawMenu(curMenu Menu, cursor uint, huicfg HuiCfg) {
 			bg = huicfg.EntryBg
 		}
 		
-		fmt.Printf("%v%v%v%v%v\n",
-		           fg,
-		           bg,
-		           prefix,
-		           curMenu.Entries[i].Caption,
-		           postfix)
+		common.Cprintf(fg,
+		               bg,
+		               "%v%v%v\n",
+		               prefix,
+		               curMenu.Entries[i].Caption,
+		               postfix)
 	}
 }
 

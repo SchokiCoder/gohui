@@ -45,7 +45,7 @@ Caption = 'Submenu'
 Menu = 'submenu'
 
 [Menus.submenu]
-Title = 'Submenu'
+Title = "Submenu\n-------"
 
 [[Menus.submenu.Entries]]
 Caption = 'vi ~/temp.md'

@@ -27,7 +27,7 @@ func drawContent(contentLines  []string,
 	}
 
 	for _, v := range contentLines[scroll:drawRange] {
-		fmt.Printf("%v%v%v\n", coucfg.ContentFg, coucfg.ContentBg, v)
+		common.Cprintf(coucfg.ContentFg, coucfg.ContentBg, "%v\n", v)
 	}
 }
 

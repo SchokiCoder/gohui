@@ -49,12 +49,15 @@ Also add a missing file close when config reading.
 
 Also fix last line being omitted by common.SplitByLines.
 
++ FAILED: try rune for keys in configs
++ fix colored prints not resetting themselves
+
 - hui: add termH awareness for drawMenu
-- try rune for keys in configs
 - courier: add title arg
 
 - give hui multiline feedback to courier
   try temp files first this time
+- set version 0.3.0
 
 -----
 

@@ -194,7 +194,7 @@ func handleKey(key      string,
 		if curEntry.Shell != "" {
 			*feedback = handleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
-			*feedback = handleShellSession(curEntry.ShellSession)
+			*feedback = common.HandleShellSession(curEntry.ShellSession)
 		}
 	
 	case comcfg.KeyCmdmode:
@@ -276,43 +276,6 @@ func handleShell(shell string) string {
 	} else {
 		return string(strout)
 	}
-}
-
-func handleShellSession(shell string) string {
-	var cmd *exec.Cmd
-	var cmderr io.ReadCloser
-	var err error
-	var strerr []byte
-
-	cmd = exec.Command("sh", "-c", shell)
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-
-	cmderr, err = cmd.StderrPipe()
-	if err != nil {
-		return fmt.Sprintf("Could not get stderr: %s", err)
-	}
-
-	err = cmd.Start()
-	if err != nil {
-		return fmt.Sprintf("Could not start child process: %s", err)
-	}
-
-	strerr, err = io.ReadAll(cmderr)
-	if err != nil {
-		return fmt.Sprintf("Could not read stderr: %s", err)
-	}
-
-	err = cmd.Wait()
-	if err != nil {
-		return fmt.Sprintf("Child error: %s", err)
-	}
-
-	if len(strerr) > 0 {
-		return string(strerr)
-	}
-	
-	return ""
 }
 
 func main() {

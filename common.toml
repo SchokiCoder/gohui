@@ -1,3 +1,5 @@
+AppPager = "./courier_d"
+
 KeyLeft = "h"
 KeyDown = "j"
 KeyUp = "k"

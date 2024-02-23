@@ -198,10 +198,10 @@ func handleKey(key              string,
 
 func handleKeyCmdline(key              string,
                       active           *bool,
-		      cmdline          *string,
-		      cmdmode          *bool,
-		      comcfg           common.ComCfg,
-		      contentLineCount int,
+                      cmdline          *string,
+                      cmdmode          *bool,
+                      comcfg           common.ComCfg,
+                      contentLineCount int,
                       feedback         *string,
                       scroll           *int) {
 	switch key {

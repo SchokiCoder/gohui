@@ -4,7 +4,10 @@
 package common
 
 import (
+	"os/exec"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 )
 
@@ -19,6 +22,41 @@ const (
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
+func callPager(feedback string, pager string) string {
+	var err error
+	var shCall string
+	var tempFile *os.File
+	var tempFileContent string
+	var tempFilePath string
+
+	tempFile, err = os.CreateTemp("", "huiFeedback")
+	if err != nil {
+		panic("Could not create a temp file for feedback.")
+	}
+	defer os.Remove(tempFile.Name())
+	tempFilePath = tempFile.Name()
+
+	tempFileContent = feedback
+	if tempFileContent[len(tempFileContent) - 1] != '\n' {
+		tempFileContent = fmt.Sprintf("%v%v", tempFileContent, '\n')
+	}
+
+	_, err = io.WriteString(tempFile, tempFileContent)
+	if err != nil {
+		panic("Could not write feedback to temp file.")
+	}
+
+	if pager == "./courier_d" || pager == "courier" {
+		shCall = fmt.Sprintf("%v %v -t \"HUI Feedback\"",
+		                     pager,
+		                     tempFilePath)
+	} else {
+		shCall = fmt.Sprintf("%v %v", pager, tempFilePath)
+	}
+
+	return HandleShellSession(shCall)
+}
+
 func DrawUpper(cfg ComCfg, header string, title string) {
 	Cprintf(cfg.HeaderFg, cfg.HeaderBg, "%v\n", header)
 	Cprintf(cfg.TitleFg, cfg.TitleBg, "%v\n", title)
@@ -29,6 +67,7 @@ func GenerateLower(cmdline  string,
                    comcfg   ComCfg,
                    feedback string,
                    termW    int)    string {
+	var fits bool
 	var ret string
 	
 	if cmdmode == true {
@@ -38,17 +77,53 @@ func GenerateLower(cmdline  string,
 			       comcfg.CmdlinePrefix,
 			       cmdline)
 	} else {
-		feedback = strings.TrimSpace(feedback)
-		ret = fmt.Sprintf("%v%v", comcfg.FeedbackPrefix, feedback)
-		if len(SplitByLines(termW, ret)) > 1 {
-			// TODO will become a call to the pager later
-			ret = comcfg.FeedbackPrefix
+		ret, fits = tryFitFeedback(feedback, comcfg.FeedbackPrefix, termW)
+		if fits == false {
+			ret = callPager(ret, comcfg.AppPager)
+			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
 		}
-		
+
 		ret = Csprintf(comcfg.FeedbackFg, comcfg.FeedbackBg, "%v", ret)
 	}
 
 	return ret
+}
+
+func HandleShellSession(shell string) string {
+	var cmd *exec.Cmd
+	var cmderr io.ReadCloser
+	var err error
+	var strerr []byte
+
+	cmd = exec.Command("sh", "-c", shell)
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+
+	cmderr, err = cmd.StderrPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stderr: %s", err)
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return fmt.Sprintf("Could not start child process: %s", err)
+	}
+
+	strerr, err = io.ReadAll(cmderr)
+	if err != nil {
+		return fmt.Sprintf("Could not read stderr: %s", err)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Sprintf("Child error: %s", err)
+	}
+
+	if len(strerr) > 0 {
+		return string(strerr)
+	}
+
+	return ""
 }
 
 func SetCursor(x, y int) {
@@ -88,4 +163,23 @@ func SplitByLines(maxLineLen int, str string) []string {
 	}
 
 	return ret
+}
+
+func tryFitFeedback(feedback       string,
+                    feedbackPrefix string,
+                    termW          int)    (string, bool) {
+	var retStr string
+	var retFits bool
+
+	retStr = strings.TrimSpace(feedback)
+	retStr = fmt.Sprintf("%v%v", feedbackPrefix, retStr)
+
+	if len(SplitByLines(termW, retStr)) > 1 {
+		retStr = feedbackPrefix
+		retFits = false
+	} else {
+		retFits = true
+	}
+
+	return retStr, retFits
 }

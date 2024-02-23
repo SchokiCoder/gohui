@@ -74,8 +74,12 @@ Also fix last line being omitted by common.SplitByLines.
 + courier: add optional title arg
 + hui: add termH awareness for drawMenu
 
-- give hui multiline feedback to courier
+- add hui giving big feedback to courier
   try temp files first this time
+	-pager shows not the expected content
+	-feedback does not get reset
+	 (once called, pager gets called every time)
+
 - set version to 0.3.0
 
 -----

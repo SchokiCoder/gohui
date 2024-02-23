@@ -12,6 +12,7 @@ import (
 )
 
 type ComCfg struct {
+	AppPager                 string
 	KeyLeft                  string
 	KeyDown                  string
 	KeyUp                    string

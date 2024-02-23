@@ -72,7 +72,7 @@ Also fix last line being omitted by common.SplitByLines.
 + courier: add scroll via cmdline number
 
 + courier: add optional title arg
-- hui: add termH awareness for drawMenu
++ hui: add termH awareness for drawMenu
 
 - give hui multiline feedback to courier
   try temp files first this time

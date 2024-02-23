@@ -267,8 +267,8 @@ func main() {
 		contentHeight = termH -
 		                len(common.SplitByLines(termW, coucfg.Header)) -
 		                1 -
-				len(common.SplitByLines(termW, title)) -
-				1
+		                len(common.SplitByLines(termW, title)) -
+		                1
 
 		drawContent(contentLines, contentHeight, coucfg, scroll)
 

@@ -23,12 +23,25 @@ func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
 }
 
-func drawMenu(curMenu Menu, cursor uint, huicfg HuiCfg) {
+func drawMenu(contentHeight int, curMenu Menu, cursor int, huicfg HuiCfg) {
+	var drawBegin int
+	var drawEnd int
 	var prefix, postfix string
 	var fg common.FgColor
 	var bg common.BgColor
+
+	if len(curMenu.Entries) > contentHeight {
+		drawBegin = cursor
+		drawEnd = cursor + contentHeight
+		if drawEnd > len(curMenu.Entries) {
+			drawEnd = len(curMenu.Entries)
+		}
+	} else {
+		drawBegin = 0
+		drawEnd = len(curMenu.Entries)
+	}
 	
-	for i := uint(0); i < uint(len(curMenu.Entries)); i++ {
+	for i := drawBegin; i < len(curMenu.Entries) && i < drawEnd; i++ {
 		if curMenu.Entries[i].Shell != "" {
 			prefix = huicfg.EntryShellPrefix
 			postfix = huicfg.EntryShellPostfix
@@ -51,15 +64,13 @@ func drawMenu(curMenu Menu, cursor uint, huicfg HuiCfg) {
 		common.Cprintf(fg,
 		               bg,
 		               "%v%v%v\n",
-		               prefix,
-		               curMenu.Entries[i].Caption,
-		               postfix)
+		               prefix, curMenu.Entries[i].Caption, postfix)
 	}
 }
 
 func handleCommand(active   *bool,
                    cmdline  *string,
-                   cursor   *uint,
+                   cursor   *int,
                    curMenu  Menu)    string {	
 	var err error
 	var num uint64
@@ -81,9 +92,9 @@ func handleCommand(active   *bool,
 			                  *cmdline)
 		} else {		
 			if int(num) < len(curMenu.Entries) - 1 {
-				*cursor = uint(num)
+				*cursor = int(num)
 			} else {
-				*cursor = uint(len(curMenu.Entries) - 1)
+				*cursor = int(len(curMenu.Entries) - 1)
 			}
 		}
 	}
@@ -96,7 +107,7 @@ func handleInput(active   *bool,
                  cmdline  *string,
                  cmdmode  *bool,
                  comcfg   common.ComCfg,
-                 cursor   *uint,
+                 cursor   *int,
                  feedback *string,
                  huicfg   HuiCfg,
                  menuPath *MenuPath) {
@@ -134,7 +145,7 @@ func handleKey(key      string,
                cmdline  *string,
                cmdmode  *bool,
                comcfg   common.ComCfg,
-               cursor   *uint,
+               cursor   *int,
                feedback *string,
                huicfg   HuiCfg,
                menuPath *MenuPath) {
@@ -164,7 +175,7 @@ func handleKey(key      string,
 		}
 
 	case comcfg.KeyDown:
-		if *cursor < uint(len(curMenu.Entries) - 1) {
+		if *cursor < len(curMenu.Entries) - 1 {
 			*cursor++
 		}
 
@@ -201,7 +212,7 @@ func handleKeyCmdline(key      string,
 		      cmdline  *string,
 		      cmdmode  *bool,
 		      comcfg   common.ComCfg,
-                      cursor   *uint,
+                      cursor   *int,
                       curMenu  Menu,
                       feedback *string) {
 	switch key {
@@ -309,7 +320,9 @@ func main() {
 	var cmdline string = ""
 	var cmdmode bool = false
 	var comcfg = common.CfgFromFile()
-	var cursor uint = 0
+	var contentHeight int
+	var cursor int = 0
+	var curMenu Menu
 	var err error
 	var feedback string = fmt.Sprintf("Welcome to hui %v", Version)
 	var huicfg = cfgFromFile()
@@ -335,12 +348,19 @@ func main() {
 		if err != nil {
 			panic(fmt.Sprintf("Could not get term size: %v", err))
 		}
+		curMenu = huicfg.Menus[menuPath.curMenu()]
 
 		lower = common.GenerateLower(cmdline, cmdmode, comcfg, feedback, termW)
 
-		common.DrawUpper(comcfg, huicfg.Header,
-		                 huicfg.Menus[menuPath.curMenu()].Title)
-		drawMenu(huicfg.Menus[menuPath.curMenu()], cursor, huicfg)
+		common.DrawUpper(comcfg, huicfg.Header, curMenu.Title)
+
+		contentHeight = termH -
+		                len(common.SplitByLines(termW, huicfg.Header)) -
+		                1 -
+		                len(common.SplitByLines(termW, curMenu.Title)) -
+		                1
+		drawMenu(contentHeight, curMenu, cursor, huicfg)
+
 		common.SetCursor(1, termH)
 		fmt.Printf("%v", lower)
 

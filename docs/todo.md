@@ -33,6 +33,8 @@
 - update README.md#Install
 - set version
 
+-----
+
 # v0.3.0
 
 + add shell session execution
@@ -80,9 +82,11 @@ Also fix last line being omitted by common.SplitByLines.
 	+ fix: add feedback reset after pager call
 	+ test compat with other pager
 
-- set version to 0.3.0
++ remove compile flags for gdb because it's cumbersome af
 
------
+Use delve from now on for debugging.
+Also improve build scripts a bit.
+Also set version to 0.3.0.
 
 # v0.2.0
 

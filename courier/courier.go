@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-//go:generate go ./genversion.go
+//go:generate go ./geninfo.go
 package main
 
 import (
@@ -15,7 +15,12 @@ import (
 	"strconv"
 )
 
-var Version string
+var AppLicense    string
+var AppLicenseUrl string
+var AppName       string
+var AppNameFormal string
+var AppRepo       string
+var AppVersion    string
 
 func drawContent(contentLines  []string,
                  contentHeight int,
@@ -32,18 +37,33 @@ func drawContent(contentLines  []string,
 	}
 }
 
-func handleArgs(title *string) string {
+func handleArgs(title *string) (string, bool) {
 	var err error
 	var f *os.File
 	var nextIsTitle = false
 	var path string
 
 	if len(os.Args) < 2 {
-		panic("No filepath argument given.\n")
+		panic("Not enough arguments given.\n")
 	}
 
 	for _, v := range os.Args[1:] {
 		switch v {
+		case "-v":        fallthrough
+		case "--version":
+			common.PrintVersion(AppName, AppVersion)
+			return "", false
+
+		case "-a":      fallthrough
+		case "--about":
+			common.PrintAbout(AppLicense,
+			                  AppLicenseUrl,
+			                  AppName,
+			                  AppNameFormal,
+			                  AppRepo,
+			                  AppVersion)
+			return "", false
+
 		case "-t":      fallthrough
 		case "--title":
 			nextIsTitle = true
@@ -79,7 +99,7 @@ func handleArgs(title *string) string {
 		                  err))
 	}
 
-	return string(ret)
+	return string(ret), true
 }
 
 func handleCommand(active           *bool,
@@ -228,11 +248,12 @@ func main() {
 	var cmdline string = ""
 	var cmdmode bool = false
 	var comcfg = common.CfgFromFile()
+	var content string
 	var contentLines []string
 	var contentHeight int
 	var coucfg = cfgFromFile()
 	var err error
-	var feedback string = fmt.Sprintf("Welcome to courier %v", Version)
+	var feedback string = fmt.Sprintf("Welcome to %v %v", AppName, AppVersion)
 	var lower string
 	var scroll int = 0
 	var termH, termW int
@@ -243,7 +264,8 @@ func main() {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
 
-	contentLines = common.SplitByLines(termW, handleArgs(&title))
+	content, active = handleArgs(&title)
+	contentLines = common.SplitByLines(termW, content)
 
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)

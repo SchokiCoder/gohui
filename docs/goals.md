@@ -103,7 +103,6 @@ title.
 - Cmdline
 - Multiline feedback
 
-## v1.2.0rc Scripting interface (Experimental)
+## v1.2.0 Scripting interface
 
-Maybe Lua?
-Lua in Rust didn't work too well last time i tried.
+In Lua.  

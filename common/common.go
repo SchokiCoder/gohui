@@ -127,6 +127,28 @@ func HandleShellSession(shell string) string {
 	return ""
 }
 
+func PrintAbout(appLicense,
+                appLicenseUrl,
+                appName,
+                appNameFormal,
+                appRepo,
+                appVersion string) {
+	fmt.Printf(
+`The source code of "%v" aka %v %v is available, licensed under the %v at:
+%v
+
+If you did not receive a copy of the license, see below:
+%v
+`,
+	           appNameFormal, appName, appVersion, appLicense,
+	           appRepo,
+	           appLicenseUrl);
+}
+
+func PrintVersion(appName, appVersion string) {
+	fmt.Printf("%v: version %v\n", appName, appVersion)
+}
+
 func SetCursor(x, y int) {
 	fmt.Printf("\033[%v;%vH", y, x);
 }

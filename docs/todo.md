@@ -1,5 +1,11 @@
+# 1.2.0
+
+- Lua scripting interface
+- set version
+
 # v1.1.0
 
+- look at goals
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
   entry
@@ -10,12 +16,10 @@
   Thus a "left" key press would send you to the menu entry that you entered.
 - set version
 
-# 0.4.0
-
-- Lua scripting interface
-- set version
-
 # v1.0.0
+
++ courier: add info args
+- hui: add info args
 
 - the license into binary at compile time thing can be easily done with include
   macro?
@@ -25,7 +29,6 @@
 - config file manpage
 - hui manpage
 - courier manpage
-- POSIX call options
 - return values
 - print messages (consistency, version information, license information)
 - generalist standard configuration which says so itself via main menu title

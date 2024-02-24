@@ -65,7 +65,7 @@ func DrawUpper(cfg ComCfg, header string, title string) {
 func GenerateLower(cmdline  string,
                    cmdmode  bool,
                    comcfg   ComCfg,
-                   feedback string,
+                   feedback *string,
                    termW    int)    string {
 	var fits bool
 	var ret string
@@ -77,9 +77,10 @@ func GenerateLower(cmdline  string,
 			       comcfg.CmdlinePrefix,
 			       cmdline)
 	} else {
-		ret, fits = tryFitFeedback(feedback, comcfg.FeedbackPrefix, termW)
+		ret, fits = tryFitFeedback(*feedback, comcfg.FeedbackPrefix, termW)
 		if fits == false {
-			ret = callPager(feedback, comcfg.AppPager)
+			ret = callPager(*feedback, comcfg.AppPager)
+			*feedback = ""
 			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
 		}
 

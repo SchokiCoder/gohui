@@ -313,7 +313,11 @@ func main() {
 		}
 		curMenu = huicfg.Menus[menuPath.curMenu()]
 
-		lower = common.GenerateLower(cmdline, cmdmode, comcfg, feedback, termW)
+		lower = common.GenerateLower(cmdline,
+		                             cmdmode,
+		                             comcfg,
+		                             &feedback,
+		                             termW)
 
 		common.DrawUpper(comcfg, huicfg.Header, curMenu.Title)
 

@@ -259,7 +259,7 @@ func main() {
 		lower = common.GenerateLower(cmdline,
 		                             cmdmode,
 		                             comcfg,
-		                             feedback,
+		                             &feedback,
 		                             termW)
 
 		common.DrawUpper(comcfg, coucfg.Header, title)

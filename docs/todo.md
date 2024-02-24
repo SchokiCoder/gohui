@@ -74,12 +74,11 @@ Also fix last line being omitted by common.SplitByLines.
 + courier: add optional title arg
 + hui: add termH awareness for drawMenu
 
-- add hui giving big feedback to courier
++ add hui giving big feedback to courier
   try temp files first this time
 	+ hui: fix not passing correct string as feedback to pager
-	- feedback does not get reset
-	  (once called, pager gets called every time)
-	- test compat with other pager
+	+ fix: add feedback reset after pager call
+	+ test compat with other pager
 
 - set version to 0.3.0
 

@@ -76,9 +76,10 @@ Also fix last line being omitted by common.SplitByLines.
 
 - add hui giving big feedback to courier
   try temp files first this time
-	-pager shows not the expected content
-	-feedback does not get reset
-	 (once called, pager gets called every time)
+	+ hui: fix not passing correct string as feedback to pager
+	- feedback does not get reset
+	  (once called, pager gets called every time)
+	- test compat with other pager
 
 - set version to 0.3.0
 

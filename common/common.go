@@ -38,7 +38,7 @@ func callPager(feedback string, pager string) string {
 
 	tempFileContent = feedback
 	if tempFileContent[len(tempFileContent) - 1] != '\n' {
-		tempFileContent = fmt.Sprintf("%v%v", tempFileContent, '\n')
+		tempFileContent = fmt.Sprintf("%v\n", tempFileContent)
 	}
 
 	_, err = io.WriteString(tempFile, tempFileContent)
@@ -79,7 +79,7 @@ func GenerateLower(cmdline  string,
 	} else {
 		ret, fits = tryFitFeedback(feedback, comcfg.FeedbackPrefix, termW)
 		if fits == false {
-			ret = callPager(ret, comcfg.AppPager)
+			ret = callPager(feedback, comcfg.AppPager)
 			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
 		}
 

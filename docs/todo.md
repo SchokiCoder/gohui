@@ -25,7 +25,7 @@
 + hui: add info args
 
 + add demo configuration
-- hui: add config sanity check calling out empty menus
++ hui: add config validity check to call out empty menus
 - hui: Shell entries can't handle `cat` or `neofetch` (child returns 127)
 - fix hui Demo cfg (Device info)
 

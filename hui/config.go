@@ -38,7 +38,11 @@ func cfgFromFile() HuiCfg {
 func (c HuiCfg) validate() {
 	var numContent uint
 
-	for _, m := range c.Menus {		
+	for i, m := range c.Menus {
+		if len(m.Entries) <= 0 {
+			panic(fmt.Sprintf(`Menu "%v" has no entries.`, i))
+		}
+
 		for _, e := range m.Entries {
 			numContent = 0
 

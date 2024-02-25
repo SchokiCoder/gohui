@@ -1,3 +1,9 @@
+# niche bugs
+
+- courier: issues with neofetch
+  it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
+  Also neofetch does something weird with lines in general; try scrolling down
+
 # 1.2.0
 
 - Lua scripting interface
@@ -26,8 +32,10 @@
 
 + add demo configuration
 + hui: add config validity check to call out empty menus
-- hui: Shell entries can't handle `cat` or `neofetch` (child returns 127)
-- fix hui Demo cfg (Device info)
++ fix my skill issue
+  hui: Shell entries can't handle `cat` or `neofetch` (child returns 127)
+  (cfg just didn't point towards an existing pager (forgot "./" for local test))
++ fix handle shell session: some apps messing up first draw after return
 
 - mangen?
 - config file manpage

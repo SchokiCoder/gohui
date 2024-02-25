@@ -92,7 +92,6 @@ func handleArgs(title *string) (string, bool) {
 	}
 
 	ret, err := io.ReadAll(f)
-
 	if err != nil {
 		panic(fmt.Sprintf("File could not be read: \"%v\", \"%v\"\n",
 		                  path,

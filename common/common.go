@@ -120,6 +120,8 @@ func HandleShellSession(shell string) string {
 		return fmt.Sprintf("Child error: %s", err)
 	}
 
+	fmt.Printf("%v", SEQ_CLEAR)
+
 	if len(strerr) > 0 {
 		return string(strerr)
 	}

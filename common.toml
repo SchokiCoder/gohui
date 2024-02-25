@@ -1,6 +1,6 @@
 # Dev test config
 
-AppPager = "./courier"
+AppPager = "./pkg/courier"
 
 KeyLeft = "h"
 KeyDown = "j"

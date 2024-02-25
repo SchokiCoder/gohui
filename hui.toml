@@ -54,6 +54,14 @@ Caption = 'vi ~/temp.md'
 ShellSession = 'vi ~/temp.md'
 
 [[Menus.submenu.Entries]]
+Caption = 'neofetch (glitchy)'
+Shell = 'neofetch'
+
+[[Menus.submenu.Entries]]
+Caption = 'neofetch without icon or col blocks'
+Shell = 'neofetch --off --color_blocks off'
+
+[[Menus.submenu.Entries]]
 Caption = 'print short'
 Shell = 'echo short'
 

@@ -51,10 +51,9 @@ Menu = 'device'
 [Menus.device]
 Title = "Device\n------"
 
-#[[Menus.device.Entries]]
-#Caption = 'Show device info'
-#Shell = 'neofetch'
-#Shell = 'TMPFILE=$(mktemp huidevinfoXXXXX); neofetch --off --color_blocks off > TMPFILE; cat TMPFILE'
+[[Menus.device.Entries]]
+Caption = 'Show device info'
+Shell = 'neofetch --off --color_blocks off'
 
 [[Menus.device.Entries]]
 Caption = 'Show hostname'

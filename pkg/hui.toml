@@ -1,0 +1,73 @@
+KeyExecute = "L"
+
+EntryMenuPrefix = "> ["
+EntryMenuPostfix = "]"
+EntryShellPrefix = "> "
+EntryShellPostfix = ""
+EntryShellSessionPrefix = "> <"
+EntryShellSessionPostfix = ">"
+Header = "House User Interface - Demo Config\n"
+
+[EntryFg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[EntryBg]
+Active = false
+R = 0
+G = 0
+B = 0
+
+[EntryHoverFg]
+Active = true
+R = 0
+G = 0
+B = 0
+
+[EntryHoverBg]
+Active = true
+R = 255
+G = 255
+B = 255
+
+[Menus]
+[Menus.main]
+Title = "Main Menu\n---------"
+
+[[Menus.main.Entries]]
+Caption = 'whoami'
+Shell = 'echo "$USER"'
+
+[[Menus.main.Entries]]
+Caption = 'Take notes in "~/temp"'
+ShellSession = 'vi "$HOME/temp"'
+
+[[Menus.main.Entries]]
+Caption = 'Device'
+Menu = 'device'
+
+[Menus.device]
+Title = "Device\n------"
+
+#[[Menus.device.Entries]]
+#Caption = 'Show device info'
+#Shell = 'neofetch'
+#Shell = 'TMPFILE=$(mktemp huidevinfoXXXXX); neofetch --off --color_blocks off > TMPFILE; cat TMPFILE'
+
+[[Menus.device.Entries]]
+Caption = 'Show hostname'
+Shell = 'hostname'
+
+[[Menus.device.Entries]]
+Caption = 'Suspend'
+Shell = 'suspend'
+
+[[Menus.device.Entries]]
+Caption = 'Poweroff'
+Shell = 'poweroff'
+
+[[Menus.device.Entries]]
+Caption = 'Reboot'
+Shell = 'reboot'

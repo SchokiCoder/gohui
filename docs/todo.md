@@ -18,20 +18,22 @@
 
 # v1.0.0
 
++ UNNECESSARY: return values
+  (no shell scripting with those lol)
+
 + courier: add info args
 + hui: add info args
 
-- the license into binary at compile time thing can be easily done with include
-  macro?
-  Do i even still need that with GPL2?
++ add demo configuration
+- hui: add config sanity check calling out empty menus
+- hui: Shell entries can't handle `cat` or `neofetch` (child returns 127)
+- fix hui Demo cfg (Device info)
 
 - mangen?
 - config file manpage
 - hui manpage
 - courier manpage
-- return values
 - print messages (consistency, version information, license information)
-- generalist standard configuration which says so itself via main menu title
 - install scripts
 - update README.md#Install
 - set version

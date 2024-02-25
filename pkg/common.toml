@@ -1,6 +1,4 @@
-# Dev test config
-
-AppPager = "./courier"
+AppPager = "courier"
 
 KeyLeft = "h"
 KeyDown = "j"
@@ -14,28 +12,28 @@ CmdlinePrefix = ":"
 FeedbackPrefix = "<"
 
 [HeaderFg]
-Active = false
-R = 230
-G = 230
-B = 230
+Active = true
+R = 100
+G = 255
+B = 100
 
 [HeaderBg]
 Active = false
-R = 20
-G = 50
-B = 20
+R = 0
+G = 0
+B = 0
 
 [TitleFg]
-Active = false
-R = 230
-G = 230
-B = 230
+Active = true
+R = 200
+G = 255
+B = 200
 
 [TitleBg]
 Active = false
-R = 20
-G = 50
-B = 50
+R = 0
+G = 0
+B = 0
 
 [FeedbackFg]
 Active = true
@@ -50,13 +48,13 @@ G = 0
 B = 0
 
 [CmdlineFg]
-Active = false
-R = 200
-G = 255
-B = 200
+Active = true
+R = 175
+G = 175
+B = 255
 
 [CmdlineBg]
 Active = false
-R = 20
-G = 20
-B = 20
+R = 0
+G = 0
+B = 0

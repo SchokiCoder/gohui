@@ -1,6 +1,4 @@
-# Dev test config
-
-Header = "Example courier\n"
+Header = "Courier - Demo Config\n"
 
 [ContentFg]
 Active = false

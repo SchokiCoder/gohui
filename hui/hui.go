@@ -17,7 +17,12 @@ import (
 
 type MenuPath []string
 
-var Version string
+var AppLicense    string
+var AppLicenseUrl string
+var AppName       string
+var AppNameFormal string
+var AppRepo       string
+var AppVersion    string
 
 func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
@@ -66,6 +71,33 @@ func drawMenu(contentHeight int, curMenu Menu, cursor int, huicfg HuiCfg) {
 		               "%v%v%v\n",
 		               prefix, curMenu.Entries[i].Caption, postfix)
 	}
+}
+
+func handleArgs() bool {
+	for _, v := range os.Args[1:] {
+		switch v {
+		case "-v":        fallthrough
+		case "--version":
+			common.PrintVersion(AppName, AppVersion)
+			return false
+
+		case "-a":      fallthrough
+		case "--about":
+			common.PrintAbout(AppLicense,
+			                  AppLicenseUrl,
+			                  AppName,
+			                  AppNameFormal,
+			                  AppRepo,
+			                  AppVersion)
+			return false
+
+
+		default:
+			fmt.Fprintf(os.Stderr, "Unknown argument: %v", v)
+		}
+	}
+
+	return true
 }
 
 func handleCommand(active   *bool,
@@ -287,7 +319,7 @@ func main() {
 	var cursor int = 0
 	var curMenu Menu
 	var err error
-	var feedback string = fmt.Sprintf("Welcome to hui %v", Version)
+	var feedback string = fmt.Sprintf("Welcome to %v %v", AppName, AppVersion)
 	var huicfg = cfgFromFile()
 	var lower string
 	var menuPath = make(MenuPath, 1, 8)
@@ -298,8 +330,10 @@ func main() {
 	if mainMenuExists {
 		menuPath[0] = "main"
 	} else {
-		panic("main menu not found in config")
+		panic("\"main\" menu not found in config.")
 	}
+
+	active = handleArgs()
 	
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)

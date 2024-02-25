@@ -19,7 +19,7 @@
 # v1.0.0
 
 + courier: add info args
-- hui: add info args
++ hui: add info args
 
 - the license into binary at compile time thing can be easily done with include
   macro?

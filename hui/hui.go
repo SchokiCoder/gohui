@@ -203,12 +203,12 @@ func handleInput(active   *bool,
 
 	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(err)
+		panic("Switching to raw mode failed: %v", err)
 	}
 
 	_, err = os.Stdin.Read(input)
 	if err != nil {
-		panic(err)
+		panic("Reading from stdin failed: %v", err)
 	}
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)

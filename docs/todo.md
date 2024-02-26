@@ -45,7 +45,7 @@
 + add help args
 + add docs/goals_omissions.md
 
-- print messages (consistency, version information, license information)
++ fix panic message consistency
 - install scripts
 - update README.md#Install
 - settle on a version scheme

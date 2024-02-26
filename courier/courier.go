@@ -85,7 +85,7 @@ func handleArgs(title *string) (string, bool) {
 	var path string
 
 	if len(os.Args) < 2 {
-		panic("Not enough arguments given.\n")
+		panic("Not enough arguments given.")
 	}
 
 	for _, v := range os.Args[1:] {
@@ -132,18 +132,18 @@ func handleArgs(title *string) (string, bool) {
 	defer f.Close()
 
 	if errors.Is(err, os.ErrNotExist) {
-		panic(fmt.Sprintf("File could not be found: \"%v\", \"%v\"\n",
+		panic(fmt.Sprintf("File \"%v\" could not be found: %v",
 		                  path,
 		                  err))
 	} else if err != nil {
-		panic(fmt.Sprintf("File could not be opened: \"%v\", \"%v\"\n",
+		panic(fmt.Sprintf("File \"%v\" could not be opened: %v",
 		                  path,
 		                  err))
 	}
 
 	ret, err := io.ReadAll(f)
 	if err != nil {
-		panic(fmt.Sprintf("File could not be read: \"%v\", \"%v\"\n",
+		panic(fmt.Sprintf("File \"%v\" could not be read: %v",
 		                  path,
 		                  err))
 	}
@@ -199,12 +199,12 @@ func handleInput(active           *bool,
 
 	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(err)
+		panic("Switching to raw mode failed: %v", err)
 	}
 
 	_, err = os.Stdin.Read(input)
 	if err != nil {
-		panic(err)
+		panic("Reading from stdin failed: %v", err)
 	}
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)

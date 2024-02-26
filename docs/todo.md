@@ -46,7 +46,7 @@
 + add docs/goals_omissions.md
 
 + fix panic message consistency
-- install scripts
++ add install scripts
 - update README.md#Install
 - settle on a version scheme
 - set version

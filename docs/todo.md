@@ -42,12 +42,13 @@
   (cfg just didn't point towards an existing pager (forgot "./" for local test))
 + fix handle shell session: some apps messing up first draw after return
 
-+ add help arg
-- add docs/goals_omission for manpages (see docs/rants)
++ add help args
++ add docs/goals_omissions.md
 
 - print messages (consistency, version information, license information)
 - install scripts
 - update README.md#Install
+- settle on a version scheme
 - set version
 
 -----

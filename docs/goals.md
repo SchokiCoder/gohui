@@ -83,7 +83,6 @@ commands:
 This task is for creating/polishing the end-user cmd-line interface.  
 That includes:  
 
-- mangen?
 - config file manpage
 - hui manpage
 - courier manpage

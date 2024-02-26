@@ -22,6 +22,47 @@ var AppNameFormal string
 var AppRepo       string
 var AppVersion    string
 
+const HELP = `Usage: courier [OPTIONS] FILE
+
+Small customizable pager, written for and usually distributed with hui.
+
+Options:
+
+	-a --about
+		prints program name, version, license and repository information then exits
+
+	-h --help
+		prints this message then exits
+
+	-t --title TITLE
+		takes an argument and prints given string as title below the header
+
+	-v --version
+		prints version information then exits
+
+Default keybinds:
+
+	q, h
+		quit the program
+
+	j
+		go down
+
+	k
+		go up
+
+	:
+		enter the internal command line
+
+Internal commands:
+
+	q quit exit
+		quit the program
+
+	*number*
+		when given a positive number, it is used as a line number to scroll to
+`
+
 func drawContent(contentLines  []string,
                  contentHeight int,
                  coucfg        CouCfg,
@@ -49,12 +90,14 @@ func handleArgs(title *string) (string, bool) {
 
 	for _, v := range os.Args[1:] {
 		switch v {
-		case "-v":        fallthrough
+		case "-v":
+			fallthrough
 		case "--version":
 			common.PrintVersion(AppName, AppVersion)
 			return "", false
 
-		case "-a":      fallthrough
+		case "-a":
+			fallthrough
 		case "--about":
 			common.PrintAbout(AppLicense,
 			                  AppLicenseUrl,
@@ -64,7 +107,14 @@ func handleArgs(title *string) (string, bool) {
 			                  AppVersion)
 			return "", false
 
-		case "-t":      fallthrough
+		case "-h":
+			fallthrough
+		case "--help":
+			fmt.Printf(HELP)
+			return "", false
+
+		case "-t":
+			fallthrough
 		case "--title":
 			nextIsTitle = true
 
@@ -207,9 +257,12 @@ func handleKey(key              string,
 		*cmdmode = true
 		fmt.Printf(common.SEQ_CRSR_SHOW)
 
-	case comcfg.KeyQuit: fallthrough
-	case comcfg.KeyLeft: fallthrough
-	case common.SIGINT:  fallthrough
+	case comcfg.KeyQuit:
+		fallthrough
+	case comcfg.KeyLeft:
+		fallthrough
+	case common.SIGINT:
+		fallthrough
 	case common.SIGTSTP:
 		*active = false
 	}

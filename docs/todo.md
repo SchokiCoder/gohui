@@ -4,6 +4,11 @@
   it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
   Also neofetch does something weird with lines in general; try scrolling down
 
+# niceties
+
+- arrow key support
+- pgup and pgdown support
+
 # 1.2.0
 
 - Lua scripting interface
@@ -37,10 +42,9 @@
   (cfg just didn't point towards an existing pager (forgot "./" for local test))
 + fix handle shell session: some apps messing up first draw after return
 
-- mangen?
-- config file manpage
-- hui manpage
-- courier manpage
++ add help arg
+- add docs/goals_omission for manpages (see docs/rants)
+
 - print messages (consistency, version information, license information)
 - install scripts
 - update README.md#Install

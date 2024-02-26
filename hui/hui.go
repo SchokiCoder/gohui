@@ -24,6 +24,53 @@ var AppNameFormal string
 var AppRepo       string
 var AppVersion    string
 
+const HELP = `Usage: hui [OPTIONS]
+
+Customizable terminal based user-interface for common tasks and personal tastes.
+
+Options:
+
+	-a --about
+		prints program name, version, license and repository information then exits
+
+	-h --help
+		prints this message then exits
+
+	-v --version
+		prints version information then exits
+
+Default keybinds:
+
+	q
+		quit the program
+
+	h
+		go back
+
+	j
+		go down
+
+	k
+		go up
+
+	l
+		go into
+
+	L
+		execute
+
+	:
+		enter the internal command line
+
+Internal commands:
+
+	q quit exit
+		quit the program
+
+	*number*
+		when given a positive number, it is used as a line number to scroll to
+`
+
 func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
 }
@@ -76,12 +123,14 @@ func drawMenu(contentHeight int, curMenu Menu, cursor int, huicfg HuiCfg) {
 func handleArgs() bool {
 	for _, v := range os.Args[1:] {
 		switch v {
-		case "-v":        fallthrough
+		case "-v":
+			fallthrough
 		case "--version":
 			common.PrintVersion(AppName, AppVersion)
 			return false
 
-		case "-a":      fallthrough
+		case "-a":
+			fallthrough
 		case "--about":
 			common.PrintAbout(AppLicense,
 			                  AppLicenseUrl,
@@ -91,6 +140,11 @@ func handleArgs() bool {
 			                  AppVersion)
 			return false
 
+		case "-h":
+			fallthrough
+		case "--help":
+			fmt.Printf(HELP)
+			return false
 
 		default:
 			fmt.Fprintf(os.Stderr, "Unknown argument: %v", v)
@@ -233,7 +287,8 @@ func handleKey(key      string,
 		*cmdmode = true
 		fmt.Printf(common.SEQ_CRSR_SHOW)
 
-	case common.SIGINT: fallthrough
+	case common.SIGINT:
+		fallthrough
 	case common.SIGTSTP:
 		*active = false
 	}

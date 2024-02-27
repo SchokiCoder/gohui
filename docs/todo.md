@@ -47,6 +47,8 @@
 
 + fix panic message consistency
 + add install scripts
++ enable install scripts to do user local installs
+- common cfg: add validity check if Pager can be found in $PATH
 - update README.md#Install
 - settle on a version scheme
 - set version

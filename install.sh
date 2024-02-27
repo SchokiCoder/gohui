@@ -6,14 +6,14 @@
 . "./cfg_build.sh"
 . "./cfg_install.sh"
 
-mkdir "/etc/hui"
+mkdir "$CFG_DESTDIR"
 
 for BINARY in $BINARIES; do
 	./"build_$BINARY.sh"
-	cp "$PKG_DIR/$BINARY" "$DESTDIR$PREFIX/bin"
-	chmod 755 "$DESTDIR$PREFIX/bin/$BINARY"
+	cp "$PKG_DIR/$BINARY" "$BIN_DESTDIR/$BINARY"
+	chmod 755 "$BIN_DESTDIR/$BINARY"
 
-	cp "$PKG_DIR/$BINARY.toml" "/etc/hui/"
+	cp "$PKG_DIR/$BINARY.toml" "$CFG_DESTDIR/$BINARY.toml"
 done
 
-cp "$PKG_DIR/common.toml" "/etc/hui/"
+cp "$PKG_DIR/common.toml" "$CFG_DESTDIR"

@@ -5,6 +5,10 @@
 
 . "./cfg_install.sh"
 
-rm "$DESTDIR$PREFIX/bin/hui" "$DESTDIR$PREFIX/bin/courier"
-rm /etc/hui/*
-rmdir /etc/hui
+for BINARY in $BINARIES; do
+	rm "$BIN_DESTDIR/$BINARY"
+	rm "$CFG_DESTDIR/$BINARY.toml"
+done
+
+rm "$CFG_DESTDIR/common.toml"
+rmdir "$CFG_DESTDIR"

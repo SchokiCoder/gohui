@@ -27,6 +27,8 @@
   Thus a "left" key press would send you to the menu entry that you entered.
 - set version
 
+-----
+
 # v1.0.0
 
 + UNNECESSARY: return values
@@ -48,12 +50,10 @@
 + fix panic message consistency
 + add install scripts
 + enable install scripts to do user local installs
-+ common cfg: add validity check if Pager can be found
-- update README.md#Install
-- settle on a version scheme
-- set version
++ common cfg: add validity check for if Pager can be found
++ update README.md
 
------
+Also set version to 1.0.
 
 # v0.3.0
 

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"os"
+	"strings"
 )
 
 type ComCfg struct {
@@ -100,6 +101,30 @@ func CfgFromFile() ComCfg {
 	var ret ComCfg
 
 	AnyCfgFromFile(&ret, "common.toml")
+	ret.validate()
 
 	return ret
+}
+
+func (c ComCfg) validate() {
+	var pagerExists = false
+	var path = os.Getenv("PATH")
+
+	_, err := os.Stat(c.AppPager)
+	if errors.Is(err, os.ErrNotExist) == false {
+		return
+	}
+
+	for _, v := range strings.Split(path, ":") {
+		_, err := os.Stat(fmt.Sprintf("%v/%v", v, c.AppPager))
+		if errors.Is(err, os.ErrNotExist) == false {
+			pagerExists = true
+			break
+		} 
+	}
+
+	if pagerExists == false {
+		panic(fmt.Sprintf(`The configured pager "%v" can not be found.`,
+		                  c.AppPager))
+	}
 }

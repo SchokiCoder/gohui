@@ -57,9 +57,22 @@ func callPager(feedback string, pager string) string {
 	return HandleShellSession(shCall)
 }
 
-func DrawUpper(cfg ComCfg, header string, title string) {
-	Cprintf(cfg.HeaderFg, cfg.HeaderBg, "%v\n", header)
-	Cprintf(cfg.TitleFg, cfg.TitleBg, "%v\n", title)
+func DrawUpper(cfg ComCfg, header []string, termW int, title []string) {
+	for _, v := range header {
+		Cprinta(cfg.HeaderAlignment,
+		        cfg.HeaderFg,
+		        cfg.HeaderBg,
+		        termW,
+		        v)
+	}
+
+	for _, v := range title {
+		Cprinta(cfg.TitleAlignment,
+		        cfg.TitleFg,
+		        cfg.TitleBg,
+		        termW,
+		        v)
+	}
 }
 
 func GenerateLower(cmdline  string,

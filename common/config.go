@@ -21,6 +21,10 @@ type ComCfg struct {
 	KeyQuit                  string
 	KeyCmdmode               string
 	KeyCmdenter              string
+	CmdlinePrefix            string
+	FeedbackPrefix           string
+	HeaderAlignment          string
+	TitleAlignment           string
 	HeaderFg                 FgColor
 	HeaderBg                 BgColor
 	TitleFg                  FgColor
@@ -29,8 +33,6 @@ type ComCfg struct {
 	FeedbackBg               BgColor
 	CmdlineFg                FgColor
 	CmdlineBg                BgColor
-	CmdlinePrefix            string
-	FeedbackPrefix           string
 }
 
 func AnyCfgFromFile(cfg interface{}, cfgFileName string) {
@@ -101,12 +103,30 @@ func CfgFromFile() ComCfg {
 	var ret ComCfg
 
 	AnyCfgFromFile(&ret, "common.toml")
-	ret.validate()
+	ret.validateAlignments()
+	ret.validatePager()
 
 	return ret
 }
 
-func (c ComCfg) validate() {
+func ValidateAlignment(alignment string) {
+	switch alignment {
+	case "left":
+	case "center":
+	case "centered":
+	case "right":
+
+	default:
+		panic(fmt.Sprintf(`Unknown alignment "%v" in config.`, alignment))
+	}
+}
+
+func (c ComCfg) validateAlignments() {
+	ValidateAlignment(c.HeaderAlignment)
+	ValidateAlignment(c.TitleAlignment)
+}
+
+func (c ComCfg) validatePager() {
 	var pagerExists = false
 	var path = os.Getenv("PATH")
 

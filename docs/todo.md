@@ -4,32 +4,57 @@
   it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
   Also neofetch does something weird with lines in general; try scrolling down
 
-# niceties
+# v1.3 niceties
 
-- arrow key support
+- add arrow key support for navigation
+- add arrow key support for cmdline
+- add del key support for cmdline
+- add return key support for cmdline
 - pgup and pgdown support
-
-# 1.2.0
-
-- Lua scripting interface
-- set version
-
-# v1.1.0
-
-- look at goals
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
   entry
   "Entry type is \"menu\", cannot execute."
   "Entry type is \"shell\", cannot enter."
-- handle return key in cmdline
 - add cursor for each menu in menu_path
   Thus a "left" key press would send you to the menu entry that you entered.
+- set version to 1.3
+
+# v1.2
+
+- Lua scripting interface
+- set version
+
+# v1.1
+
++ add configurable aligns for Header and Title
+
+Also change shell scripts to encourage devs to use the new build.sh rather than
+the single-target build scripts.
+This is to prevent forgetfulness about checking wether common code compiles for
+all targets.
+
+- common.SplitByLines may truncate the last character?
+
+- add configurable aligns for Entries
+- add configurable aligns for Feedback
+- add configurable aligns for Cmdline
+- add configurable aligns for courier: content
+
+- add configurable margins
+	- Header
+	- Title
+	- Entries
+	- Feedback
+	- Cmdline
+	- courier: content
+
+- update demo config
 - set version
 
 -----
 
-# v1.0.0
+# v1.0
 
 + UNNECESSARY: return values
   (no shell scripting with those lol)

@@ -306,10 +306,12 @@ func main() {
 	var coucfg = cfgFromFile()
 	var err error
 	var feedback string = fmt.Sprintf("Welcome to %v %v", AppName, AppVersion)
+	var headerLines []string
 	var lower string
 	var scroll int = 0
 	var termH, termW int
 	var title string
+	var titleLines []string
 
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
@@ -330,13 +332,15 @@ func main() {
 			panic(fmt.Sprintf("Could not get term size: %v", err))
 		}
 
+		headerLines = common.SplitByLines(termW, coucfg.Header)
+		titleLines = common.SplitByLines(termW, title)
 		lower = common.GenerateLower(cmdline,
 		                             cmdmode,
 		                             comcfg,
 		                             &feedback,
 		                             termW)
 
-		common.DrawUpper(comcfg, coucfg.Header, title)
+		common.DrawUpper(comcfg, headerLines, termW, titleLines)
 
 		contentHeight = termH -
 		                len(common.SplitByLines(termW, coucfg.Header)) -

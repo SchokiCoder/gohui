@@ -9,7 +9,7 @@
 mkdir "$CFG_DESTDIR"
 
 for BINARY in $BINARIES; do
-	./"build_$BINARY.sh"
+	./"_build_$BINARY.sh"
 	cp "$PKG_DIR/$BINARY" "$BIN_DESTDIR/$BINARY"
 	chmod 755 "$BIN_DESTDIR/$BINARY"
 

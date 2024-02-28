@@ -375,10 +375,12 @@ func main() {
 	var curMenu Menu
 	var err error
 	var feedback string = fmt.Sprintf("Welcome to %v %v", AppName, AppVersion)
+	var headerLines []string
 	var huicfg = cfgFromFile()
 	var lower string
 	var menuPath = make(MenuPath, 1, 8)
 	var termH, termW int
+	var titleLines []string
 
 	_, mainMenuExists := huicfg.Menus["main"]
 
@@ -402,13 +404,15 @@ func main() {
 		}
 		curMenu = huicfg.Menus[menuPath.curMenu()]
 
+		headerLines = common.SplitByLines(termW, huicfg.Header)
+		titleLines = common.SplitByLines(termW, curMenu.Title)
 		lower = common.GenerateLower(cmdline,
 		                             cmdmode,
 		                             comcfg,
 		                             &feedback,
 		                             termW)
 
-		common.DrawUpper(comcfg, huicfg.Header, curMenu.Title)
+		common.DrawUpper(comcfg, headerLines, termW, titleLines)
 
 		contentHeight = termH -
 		                len(common.SplitByLines(termW, huicfg.Header)) -

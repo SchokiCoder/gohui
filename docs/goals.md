@@ -78,7 +78,7 @@ commands:
 - just like hui 1.4
 - add courier and let it handle multiline feedback
 
-## v1.0.0 Final polish
+## v1.0 Final polish
 
 This task is for creating/polishing the end-user cmd-line interface.  
 That includes:  
@@ -93,7 +93,7 @@ That includes:
 Provide generalist standard configuration which says so itself via main menu
 title.
 
-## v1.1.0 configurable aligns and margins
+## v1.1 configurable aligns and margins
 
 - Header
 - Title
@@ -102,6 +102,6 @@ title.
 - Cmdline
 - Multiline feedback
 
-## v1.2.0 Scripting interface
+## v1.2 Scripting interface
 
 In Lua.  

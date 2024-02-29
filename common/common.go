@@ -169,38 +169,29 @@ func SetCursor(x, y int) {
 }
 
 func SplitByLines(maxLineLen int, str string) []string {
-	var i int
-	var lastCut int = 0
-	var lineLen int = 0
-	var ret []string
-	var v rune
+	var step1 []string
+	var step2 []string
+	var lastCut int
 
-	for i, v = range str {
-		switch v {
-		case '\n': fallthrough
-		case '\r':
-			ret = append(ret, str[lastCut:i])
-			lineLen = 0
-			lastCut = i
+	step1 = strings.Split(str, "\n")
+
+
+
+	for _, v := range step1 {
+		if len(v) <= maxLineLen {
+			step2 = append(step2, v)
+			continue
 		}
 
-		if lineLen >= maxLineLen {
-			ret = append(ret, str[lastCut:i])
-			lineLen = 0
-			lastCut = i
+		lastCut = 0
+		for len(v[lastCut:]) > maxLineLen {
+			step2 = append(step2, v[lastCut:lastCut + maxLineLen])
+			lastCut += maxLineLen
 		}
-
-		lineLen++
+		step2 = append(step2, v[lastCut:])
 	}
 
-	ret = append(ret, str[lastCut:i])
-	lineLen = 0
-
-	for i, v := range ret {
-		ret[i] = strings.TrimSpace(v)
-	}
-
-	return ret
+	return step2
 }
 
 func tryFitFeedback(feedback       string,

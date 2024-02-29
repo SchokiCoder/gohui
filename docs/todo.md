@@ -34,7 +34,9 @@ the single-target build scripts.
 This is to prevent forgetfulness about checking wether common code compiles for
 all targets.
 
-- common.SplitByLines may truncate the last character?
++ rework common.SplitByLines to be simpler and more reliable
+  May the merciful lord allow this function to just work without ever being
+  touched again.
 
 - add configurable aligns for Entries
 - add configurable aligns for Feedback

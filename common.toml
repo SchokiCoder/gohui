@@ -13,8 +13,8 @@ KeyCmdenter = "\r"
 CmdlinePrefix = ":"
 FeedbackPrefix = "<"
 
-HeaderAlignment = "center"
-TitleAlignment = "right"
+HeaderAlignment = "right"
+TitleAlignment = "center"
 
 [HeaderFg]
 Active = false

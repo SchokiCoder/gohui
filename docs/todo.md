@@ -38,6 +38,8 @@ all targets.
   May the merciful lord allow this function to just work without ever being
   touched again.
 
++ courier: fix content not adjusting to term width changes
+
 - add configurable aligns for Entries
 - add configurable aligns for Feedback
 - add configurable aligns for Cmdline

@@ -319,7 +319,6 @@ func main() {
 	}
 
 	content, active = handleArgs(&title)
-	contentLines = common.SplitByLines(termW, content)
 
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)
@@ -334,6 +333,7 @@ func main() {
 
 		headerLines = common.SplitByLines(termW, coucfg.Header)
 		titleLines = common.SplitByLines(termW, title)
+		contentLines = common.SplitByLines(termW, content)
 		lower = common.GenerateLower(cmdline,
 		                             cmdmode,
 		                             comcfg,

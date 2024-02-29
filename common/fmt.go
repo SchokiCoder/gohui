@@ -21,25 +21,25 @@ func Cprinta(alignment string,
              bg BgColor,
              termW int,
              str string) (n int, err error) {
+	var strlen = len(str)
+
+	str = Csprintf(fg, bg, "%v", str)
+
 	switch alignment {
 	case "left":
-		return Cprintf(fg, bg, "%v\n", str)
+		return fmt.Printf("%v\n", str)
 
 	case "center":
 		fallthrough
 	case "centered":
-		return Cprintf(fg,
-		               bg,
-		               "%v%v\n",
-		               strings.Repeat(" ", (termW - len(str)) / 2),
-		               str)
+		return fmt.Printf("%v%v\n",
+		                  strings.Repeat(" ", (termW - strlen) / 2),
+		                  str)
 
 	case "right":
-		return Cprintf(fg,
-		               bg,
-		               "%v%v",
-		               strings.Repeat(" ", termW - len(str)),
-		               str)
+		return fmt.Printf("%v%v",
+		                  strings.Repeat(" ", termW - strlen),
+		                  str)
 
 	default:
 		panic(fmt.Sprintf(`Unknown alignment "%v".`, alignment))

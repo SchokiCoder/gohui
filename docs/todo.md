@@ -42,7 +42,7 @@ all targets.
 
 + hui: add configurable aligns for Entries
 
-- fix alignment stretching background color along the entire padding
++ fix alignment stretching background color along the entire left padding
 
 - add configurable aligns for Feedback
 - add configurable aligns for Cmdline

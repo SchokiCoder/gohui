@@ -11,17 +11,18 @@ import (
 
 type HuiCfg struct {
 	KeyExecute               string
-	EntryFg                  common.FgColor
-	EntryBg                  common.BgColor
-	EntryHoverFg             common.FgColor
-	EntryHoverBg             common.BgColor
 	EntryMenuPrefix          string
 	EntryMenuPostfix         string
 	EntryShellPrefix         string
 	EntryShellPostfix        string
 	EntryShellSessionPrefix  string
 	EntryShellSessionPostfix string
+	EntryAlignment           string
 	Header                   string
+	EntryFg                  common.FgColor
+	EntryBg                  common.BgColor
+	EntryHoverFg             common.FgColor
+	EntryHoverBg             common.BgColor
 	Menus                    map[string]Menu
 }
 

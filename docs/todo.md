@@ -40,10 +40,13 @@ all targets.
 
 + courier: fix content not adjusting to term width changes
 
-- add configurable aligns for Entries
++ hui: add configurable aligns for Entries
+
+- fix alignment stretching background color along the entire padding
+
 - add configurable aligns for Feedback
 - add configurable aligns for Cmdline
-- add configurable aligns for courier: content
+- courier: add configurable aligns for content
 
 - add configurable margins
 	- Header

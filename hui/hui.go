@@ -75,7 +75,11 @@ func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
 }
 
-func drawMenu(contentHeight int, curMenu Menu, cursor int, huicfg HuiCfg) {
+func drawMenu(contentHeight int,
+              curMenu Menu,
+              cursor int,
+              huicfg HuiCfg,
+              termW int) {
 	var drawBegin int
 	var drawEnd int
 	var prefix, postfix string
@@ -113,10 +117,14 @@ func drawMenu(contentHeight int, curMenu Menu, cursor int, huicfg HuiCfg) {
 			bg = huicfg.EntryBg
 		}
 		
-		common.Cprintf(fg,
+		common.Cprinta(huicfg.EntryAlignment,
+		               fg,
 		               bg,
-		               "%v%v%v\n",
-		               prefix, curMenu.Entries[i].Caption, postfix)
+		               termW,
+		               fmt.Sprintf("%v%v%v",
+		                           prefix,
+		                           curMenu.Entries[i].Caption,
+		                           postfix))
 	}
 }
 
@@ -419,7 +427,7 @@ func main() {
 		                1 -
 		                len(common.SplitByLines(termW, curMenu.Title)) -
 		                1
-		drawMenu(contentHeight, curMenu, cursor, huicfg)
+		drawMenu(contentHeight, curMenu, cursor, huicfg, termW)
 
 		common.SetCursor(1, termH)
 		fmt.Printf("%v", lower)

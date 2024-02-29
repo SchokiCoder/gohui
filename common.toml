@@ -14,7 +14,7 @@ CmdlinePrefix = ":"
 FeedbackPrefix = "<"
 
 HeaderAlignment = "right"
-TitleAlignment = "center"
+TitleAlignment = "left"
 
 [HeaderFg]
 Active = false

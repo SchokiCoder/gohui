@@ -8,6 +8,9 @@ EntryShellPrefix = "> "
 EntryShellPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
+
+EntryAlignment = "center"
+
 Header = "Example hui\n"
 
 [EntryFg]

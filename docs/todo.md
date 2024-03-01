@@ -44,8 +44,10 @@ all targets.
 
 + fix alignment stretching background color along the entire left padding
 
-- add configurable aligns for Feedback
-- add configurable aligns for Cmdline
++ add configurable aligns for Feedback and Cmdline
+
+Also add missing cfg validity check for EntryAlignment.
+
 - courier: add configurable aligns for content
 
 - add configurable margins

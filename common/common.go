@@ -84,11 +84,13 @@ func GenerateLower(cmdline  string,
 	var ret string
 	
 	if cmdmode == true {
-		ret = Csprintf(comcfg.CmdlineFg,
-			       comcfg.CmdlineBg,
-			       "%v%v",
-			       comcfg.CmdlinePrefix,
-			       cmdline)
+		ret = Csprintfa(comcfg.CmdlineAlignment,
+		                comcfg.CmdlineFg,
+			        comcfg.CmdlineBg,
+			        termW,
+			        "%v%v",
+			        comcfg.CmdlinePrefix,
+			        cmdline)
 	} else {
 		ret, fits = tryFitFeedback(*feedback, comcfg.FeedbackPrefix, termW)
 		if fits == false {
@@ -97,7 +99,12 @@ func GenerateLower(cmdline  string,
 			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
 		}
 
-		ret = Csprintf(comcfg.FeedbackFg, comcfg.FeedbackBg, "%v", ret)
+		ret = Csprintfa(comcfg.FeedbackAlignment,
+		                comcfg.FeedbackFg,
+		                comcfg.FeedbackBg,
+		                termW,
+		                "%v",
+		                ret)
 	}
 
 	return ret

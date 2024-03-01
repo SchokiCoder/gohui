@@ -31,12 +31,17 @@ func cfgFromFile() HuiCfg {
 
 	common.AnyCfgFromFile(&ret, "hui.toml")
 
-	ret.validate()
+	ret.validateAlignments()
+	ret.validateMenus()
 
 	return ret
 }
 
-func (c HuiCfg) validate() {
+func (c HuiCfg) validateAlignments() {
+	common.ValidateAlignment(c.EntryAlignment)
+}
+
+func (c HuiCfg) validateMenus() {
 	var numContent uint
 
 	for i, m := range c.Menus {

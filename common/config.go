@@ -25,6 +25,8 @@ type ComCfg struct {
 	FeedbackPrefix           string
 	HeaderAlignment          string
 	TitleAlignment           string
+	CmdlineAlignment         string
+	FeedbackAlignment        string
 	HeaderFg                 FgColor
 	HeaderBg                 BgColor
 	TitleFg                  FgColor
@@ -124,6 +126,8 @@ func ValidateAlignment(alignment string) {
 func (c ComCfg) validateAlignments() {
 	ValidateAlignment(c.HeaderAlignment)
 	ValidateAlignment(c.TitleAlignment)
+	ValidateAlignment(c.CmdlineAlignment)
+	ValidateAlignment(c.FeedbackAlignment)
 }
 
 func (c ComCfg) validatePager() {

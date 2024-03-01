@@ -66,7 +66,8 @@ Internal commands:
 func drawContent(contentLines  []string,
                  contentHeight int,
                  coucfg        CouCfg,
-                 scroll        int) {
+                 scroll        int,
+                 termW         int) {
 	var drawRange int = scroll + contentHeight
 
 	if drawRange > len(contentLines) {
@@ -74,7 +75,11 @@ func drawContent(contentLines  []string,
 	}
 
 	for _, v := range contentLines[scroll:drawRange] {
-		common.Cprintf(coucfg.ContentFg, coucfg.ContentBg, "%v\n", v)
+		common.Cprinta(coucfg.ContentAlignment,
+		               coucfg.ContentFg,
+		               coucfg.ContentBg,
+		               termW,
+		               v)
 	}
 }
 
@@ -348,7 +353,7 @@ func main() {
 		                len(common.SplitByLines(termW, title)) -
 		                1
 
-		drawContent(contentLines, contentHeight, coucfg, scroll)
+		drawContent(contentLines, contentHeight, coucfg, scroll, termW)
 
 		common.SetCursor(1, termH)
 		fmt.Printf("%v", lower)

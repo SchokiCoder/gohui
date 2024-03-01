@@ -48,7 +48,7 @@ all targets.
 
 Also add missing cfg validity check for EntryAlignment.
 
-- courier: add configurable aligns for content
++ courier: add configurable aligns for content
 
 - add configurable margins
 	- Header

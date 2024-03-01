@@ -8,15 +8,21 @@ import (
 )
 
 type CouCfg struct {
-	ContentFg common.FgColor
-	ContentBg common.BgColor
-	Header    string
+	Header           string
+	ContentAlignment string
+	ContentFg        common.FgColor
+	ContentBg        common.BgColor
 }
 
 func cfgFromFile() CouCfg {
 	var ret CouCfg
 
 	common.AnyCfgFromFile(&ret, "courier.toml")
+	ret.validateAlignments()
 
 	return ret
+}
+
+func (c CouCfg) validateAlignments() {
+	common.ValidateAlignment(c.ContentAlignment)
 }

@@ -2,6 +2,8 @@
 
 Header = "Example courier\n"
 
+ContentAlignment = "center"
+
 [ContentFg]
 Active = false
 R = 0

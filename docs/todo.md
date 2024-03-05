@@ -4,6 +4,23 @@
   it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
   Also neofetch does something weird with lines in general; try scrolling down
 
+  `less` seems to filter (some) CSI Sequences out, maybe try that
+
+# later
+
+- add configurable padding
+  (lPadding and rPadding)
+	- how does padding interact with alignment?
+	- Header
+	- Title
+	- Entries
+	- Feedback
+	- Cmdline
+	- courier: content
+
+- update demo config
+- set version
+
 # v1.3 niceties
 
 - add arrow key support for navigation
@@ -20,10 +37,19 @@
   Thus a "left" key press would send you to the menu entry that you entered.
 - set version to 1.3
 
+# bleh
+
+- look for original features that need to be implemented before implementing
+  next
+
 # v1.2
 
+- drop toml
 - Lua scripting interface
+- update demo configs
 - set version
+
+-----
 
 # v1.1
 
@@ -50,18 +76,12 @@ Also add missing cfg validity check for EntryAlignment.
 
 + courier: add configurable aligns for content
 
-- add configurable margins
-	- Header
-	- Title
-	- Entries
-	- Feedback
-	- Cmdline
-	- courier: content
+_Padding postponed because it would be a limitation violation...
+just like alignments._ 
 
-- update demo config
-- set version
++ update demo config
 
------
+Also set version to 1.1.
 
 # v1.0
 

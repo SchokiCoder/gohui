@@ -1,3 +1,5 @@
+Header = "House User Interface - Demo Config\n"
+
 KeyExecute = "L"
 
 EntryMenuPrefix = "> ["
@@ -6,7 +8,8 @@ EntryShellPrefix = "> "
 EntryShellPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
-Header = "House User Interface - Demo Config\n"
+
+EntryAlignment = "left"
 
 [EntryFg]
 Active = false

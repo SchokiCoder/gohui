@@ -1,5 +1,7 @@
 Header = "Courier - Demo Config\n"
 
+ContentAlignment = "left"
+
 [ContentFg]
 Active = false
 R = 0

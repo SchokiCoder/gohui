@@ -11,6 +11,11 @@ KeyCmdenter = "\r"
 CmdlinePrefix = ":"
 FeedbackPrefix = "<"
 
+HeaderAlignment = "center"
+TitleAlignment = "left"
+CmdlineAlignment = "left"
+FeedbackAlignment = "left"
+
 [HeaderFg]
 Active = true
 R = 100

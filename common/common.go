@@ -219,3 +219,21 @@ func tryFitFeedback(feedback       string,
 
 	return retStr, retFits
 }
+
+type HuiRuntime struct {
+	Active bool
+	CmdLine string
+	CmdMode bool
+	Cursor int
+	Feedback string
+}
+
+func NewHuiRuntime() HuiRuntime {
+	return HuiRuntime {
+		Active: true,
+		CmdLine: "",
+		CmdMode: false,
+		Cursor: 0,
+		Feedback: "",
+	}
+}

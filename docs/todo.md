@@ -44,8 +44,19 @@
 
 # v1.2
 
-- drop toml
-- Lua scripting interface
++ hui: add go scripting interface for entries
+
+For that, runtime variables have been moved from local main function variables
+to a struct defined in common.
+I first wanted to make it global variables in hui but... eh,
+plus I would have had to import hui in scripts, which means circular inclusion.
+
+- hui: add go-entry config-values
+
+- hui: add scripting interface for start and quit
+- courier: add scripting interface for start and quit
+
+- add config validation for if a script function actually exists in func map
 - update demo configs
 - set version
 

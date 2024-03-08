@@ -63,6 +63,10 @@ func (c HuiCfg) validateMenus() {
 			if e.Menu != "" {
 				numContent++
 			}
+
+			if e.Go != "" {
+				numContent++
+			}
 		
 			if numContent < 1 {
 				panic(fmt.Sprintf(

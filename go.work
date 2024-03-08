@@ -3,4 +3,4 @@ go 1.21
 use common
 use courier
 use hui
-
+use scripts

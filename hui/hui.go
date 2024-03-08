@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/SchokiCoder/gohui/common"
+	"github.com/SchokiCoder/gohui/scripts"
 
 	"io"
 	"fmt"
@@ -16,13 +17,6 @@ import (
 )
 
 type MenuPath []string
-
-var AppLicense    string
-var AppLicenseUrl string
-var AppName       string
-var AppNameFormal string
-var AppRepo       string
-var AppVersion    string
 
 const HELP = `Usage: hui [OPTIONS]
 
@@ -70,6 +64,13 @@ Internal commands:
 	*number*
 		when given a positive number, it is used as a line number to scroll to
 `
+
+var AppLicense    string
+var AppLicenseUrl string
+var AppName       string
+var AppNameFormal string
+var AppRepo       string
+var AppVersion    string
 
 func (mp MenuPath) curMenu() string {
 	return mp[len(mp) - 1]
@@ -162,49 +163,42 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(active   *bool,
-                   cmdline  *string,
-                   cursor   *int,
-                   curMenu  Menu)    string {	
+func handleCommand(curMenu Menu, runtime *common.HuiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
 	
-	switch *cmdline {
+	switch runtime.CmdLine {
 	case "q":
 		fallthrough
 	case "quit":
 		fallthrough
 	case "exit":
-		*active = false
+		runtime.Active = false
 
 	default:
-		num, err = strconv.ParseUint(*cmdline, 10, 32)
+		num, err = strconv.ParseUint(runtime.CmdLine, 10, 32)
 		
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-			                  *cmdline)
+			                  runtime.CmdLine)
 		} else {		
 			if int(num) < len(curMenu.Entries) - 1 {
-				*cursor = int(num)
+				runtime.Cursor = int(num)
 			} else {
-				*cursor = int(len(curMenu.Entries) - 1)
+				runtime.Cursor = int(len(curMenu.Entries) - 1)
 			}
 		}
 	}
 	
-	*cmdline = ""
+	runtime.CmdLine = ""
 	return ret
 }
 
-func handleInput(active   *bool,
-                 cmdline  *string,
-                 cmdmode  *bool,
-                 comcfg   common.ComCfg,
-                 cursor   *int,
-                 feedback *string,
+func handleInput(comcfg   common.ComCfg,
                  huicfg   HuiCfg,
-                 menuPath *MenuPath) {
+                 menuPath *MenuPath,
+                 runtime  *common.HuiRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input = make([]byte, 1)
@@ -222,107 +216,88 @@ func handleInput(active   *bool,
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
 	for i := 0; i < len(input); i++ {
-		handleKey(string(input),
-		          active,
-		          cmdline,
-		          cmdmode,
-		          comcfg,
-		          cursor,
-		          feedback,
-		          huicfg,
-		          menuPath)
+		handleKey(string(input), comcfg, huicfg, menuPath, runtime)
 	}
 }
 
 func handleKey(key      string,
-               active   *bool,
-               cmdline  *string,
-               cmdmode  *bool,
                comcfg   common.ComCfg,
-               cursor   *int,
-               feedback *string,
                huicfg   HuiCfg,
-               menuPath *MenuPath) {
+               menuPath *MenuPath,
+               runtime  *common.HuiRuntime) {
 	var curMenu = huicfg.Menus[menuPath.curMenu()]
-	var curEntry = &curMenu.Entries[*cursor]
+	var curEntry = &curMenu.Entries[runtime.Cursor]
 
-	if *cmdmode {
-		handleKeyCmdline(key,
-		                 active,
-		                 cmdline,
-		                 cmdmode,
-		                 comcfg,
-		                 cursor,
-		                 curMenu,
-		                 feedback)
+	if runtime.CmdMode {
+		handleKeyCmdline(key, comcfg, curMenu, runtime)
 		return
 	}
 	
 	switch key {
 	case comcfg.KeyQuit:
-		*active = false
+		runtime.Active = false
 
 	case comcfg.KeyLeft:
 		if len(*menuPath) > 1 {
 			*menuPath = (*menuPath)[:len(*menuPath) - 1]
-			*cursor = 0
+			runtime.Cursor = 0
 		}
 
 	case comcfg.KeyDown:
-		if *cursor < len(curMenu.Entries) - 1 {
-			*cursor++
+		if runtime.Cursor < len(curMenu.Entries) - 1 {
+			runtime.Cursor++
 		}
 
 	case comcfg.KeyUp:
-		if *cursor > 0 {
-			*cursor--
+		if runtime.Cursor > 0 {
+			runtime.Cursor--
 		}
 
 	case comcfg.KeyRight:
 		if curEntry.Menu != "" {
 			*menuPath = append(*menuPath, curEntry.Menu)
-			*cursor = 0
+			runtime.Cursor = 0
 		}
 
 	case huicfg.KeyExecute:
 		if curEntry.Shell != "" {
-			*feedback = handleShell(curEntry.Shell)
+			runtime.Feedback = handleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
-			*feedback = common.HandleShellSession(curEntry.ShellSession)
+			runtime.Feedback = common.HandleShellSession(curEntry.ShellSession)
+		} else if curEntry.Go != "" {
+			scripts.FuncMap[curEntry.Go](runtime)
 		}
 	
 	case comcfg.KeyCmdmode:
-		*cmdmode = true
+		runtime.CmdMode = true
 		fmt.Printf(common.SEQ_CRSR_SHOW)
 
 	case common.SIGINT:
 		fallthrough
 	case common.SIGTSTP:
-		*active = false
+		runtime.Active = false
 	}
 }
 
-func handleKeyCmdline(key      string,
-                      active   *bool,
-		      cmdline  *string,
-		      cmdmode  *bool,
-		      comcfg   common.ComCfg,
-                      cursor   *int,
-                      curMenu  Menu,
-                      feedback *string) {
+func handleKeyCmdline(key     string,
+		      comcfg  common.ComCfg,
+                      curMenu Menu,
+                      runtime *common.HuiRuntime) {
 	switch key {
 	case comcfg.KeyCmdenter:
-		*feedback = handleCommand(active, cmdline, cursor, curMenu)
+		runtime.Feedback = handleCommand(curMenu, runtime)
 		fallthrough
 	case common.SIGINT:
 		fallthrough
 	case common.SIGTSTP:
-		*cmdmode = false
-		*cmdline = ""
+		runtime.CmdMode = false
+		runtime.CmdLine = ""
 		fmt.Printf(common.SEQ_CRSR_HIDE)
 
 	default:
-		*cmdline = fmt.Sprintf("%v%v", *cmdline, string(key))
+		runtime.CmdLine = fmt.Sprintf("%v%v",
+		                              runtime.CmdLine,
+		                              string(key))
 	}
 }
 
@@ -374,19 +349,15 @@ func handleShell(shell string) string {
 }
 
 func main() {
-	var active = true
-	var cmdline string = ""
-	var cmdmode bool = false
 	var comcfg = common.CfgFromFile()
 	var contentHeight int
-	var cursor int = 0
 	var curMenu Menu
 	var err error
-	var feedback string = fmt.Sprintf("Welcome to %v %v", AppName, AppVersion)
 	var headerLines []string
 	var huicfg = cfgFromFile()
 	var lower string
 	var menuPath = make(MenuPath, 1, 8)
+	var runtime = common.NewHuiRuntime()
 	var termH, termW int
 	var titleLines []string
 
@@ -398,13 +369,13 @@ func main() {
 		panic("\"main\" menu not found in config.")
 	}
 
-	active = handleArgs()
+	runtime.Active = handleArgs()
 	
 	fmt.Printf(common.SEQ_CRSR_HIDE)
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)
 	defer fmt.Printf("%v%v", common.SEQ_FG_DEFAULT, common.SEQ_BG_DEFAULT)
 
-	for active {
+	for runtime.Active {
 		fmt.Print(common.SEQ_CLEAR)
 		termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 		if err != nil {
@@ -414,10 +385,10 @@ func main() {
 
 		headerLines = common.SplitByLines(termW, huicfg.Header)
 		titleLines = common.SplitByLines(termW, curMenu.Title)
-		lower = common.GenerateLower(cmdline,
-		                             cmdmode,
+		lower = common.GenerateLower(runtime.CmdLine,
+		                             runtime.CmdMode,
 		                             comcfg,
-		                             &feedback,
+		                             &runtime.Feedback,
 		                             termW)
 
 		common.DrawUpper(comcfg, headerLines, termW, titleLines)
@@ -427,18 +398,11 @@ func main() {
 		                1 -
 		                len(common.SplitByLines(termW, curMenu.Title)) -
 		                1
-		drawMenu(contentHeight, curMenu, cursor, huicfg, termW)
+		drawMenu(contentHeight, curMenu, runtime.Cursor, huicfg, termW)
 
 		common.SetCursor(1, termH)
 		fmt.Printf("%v", lower)
 
-		handleInput(&active,
-		            &cmdline,
-		            &cmdmode,
-		            comcfg,
-		            &cursor,
-		            &feedback,
-		            huicfg,
-		            &menuPath)
+		handleInput(comcfg, huicfg, &menuPath, &runtime)
 	}
 }

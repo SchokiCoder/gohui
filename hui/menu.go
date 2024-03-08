@@ -8,6 +8,7 @@ type Entry struct {
 	Menu         string
 	Shell        string
 	ShellSession string
+	Go           string
 }
 
 type Menu struct {

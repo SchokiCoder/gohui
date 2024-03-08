@@ -63,6 +63,10 @@ Caption = 'Show hostname'
 Shell = 'hostname'
 
 [[Menus.device.Entries]]
+Caption = 'Logout'
+Go = 'Quit'
+
+[[Menus.device.Entries]]
 Caption = 'Suspend'
 Shell = 'suspend'
 

@@ -11,7 +11,7 @@ EntryShellSessionPostfix = ">"
 
 EntryAlignment = "center"
 
-Header = "Example hui\n"
+Header = "Dev hui test\n"
 
 [EntryFg]
 Active = false
@@ -75,3 +75,11 @@ Shell = 'echo looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 [[Menus.submenu.Entries]]
 Caption = 'print too long'
 Shell = 'echo looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong'
+
+[[Menus.submenu.Entries]]
+Caption = 'Quit'
+Go = 'Quit'
+
+[[Menus.submenu.Entries]]
+Caption = 'I feel lucky'
+Go = 'PutWordsIntoMyMouth'

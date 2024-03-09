@@ -1,6 +1,7 @@
 # Dev test config
 
 Header = "Dev courier test\n"
+PagerTitle = 'Courier - Feedback'
 
 ContentAlignment = "center"
 

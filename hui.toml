@@ -1,17 +1,20 @@
 # Dev test config
 
+Header = "Dev hui test\n"
+PagerTitle = 'HUI - Feedback'
+
 KeyExecute = "L"
 
 EntryMenuPrefix = "> ["
 EntryMenuPostfix = "]"
 EntryShellPrefix = "> "
 EntryShellPostfix = ""
+EntryGoPrefix = "> !"
+EntryGoPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
 
 EntryAlignment = "center"
-
-Header = "Dev hui test\n"
 
 [EntryFg]
 Active = false

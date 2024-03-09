@@ -22,7 +22,7 @@ const (
 	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
-func callPager(feedback string, pager string) string {
+func callPager(feedback string, pager string, pagerTitle string) string {
 	var err error
 	var shCall string
 	var tempFile *os.File
@@ -46,10 +46,11 @@ func callPager(feedback string, pager string) string {
 		panic("Could not write feedback to temp file.")
 	}
 
-	if pager == "./courier_d" || pager == "courier" {
-		shCall = fmt.Sprintf("%v %v -t \"HUI Feedback\"",
+	if pager == "./pkg/courier" || pager == "courier" {
+		shCall = fmt.Sprintf(`%v %v -t "%v"`,
 		                     pager,
-		                     tempFilePath)
+		                     tempFilePath,
+		                     pagerTitle)
 	} else {
 		shCall = fmt.Sprintf("%v %v", pager, tempFilePath)
 	}
@@ -75,11 +76,12 @@ func DrawUpper(cfg ComCfg, header []string, termW int, title []string) {
 	}
 }
 
-func GenerateLower(cmdline  string,
-                   cmdmode  bool,
-                   comcfg   ComCfg,
-                   feedback *string,
-                   termW    int)    string {
+func GenerateLower(cmdline    string,
+                   cmdmode    bool,
+                   comcfg     ComCfg,
+                   feedback   *string,
+                   pagerTitle string,
+                   termW      int)    string {
 	var fits bool
 	var ret string
 	
@@ -94,7 +96,7 @@ func GenerateLower(cmdline  string,
 	} else {
 		ret, fits = tryFitFeedback(*feedback, comcfg.FeedbackPrefix, termW)
 		if fits == false {
-			ret = callPager(*feedback, comcfg.AppPager)
+			ret = callPager(*feedback, comcfg.AppPager, pagerTitle)
 			*feedback = ""
 			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
 		}

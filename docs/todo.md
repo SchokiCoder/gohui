@@ -51,7 +51,10 @@ to a struct defined in common.
 I first wanted to make it global variables in hui but... eh,
 plus I would have had to import hui in scripts, which means circular inclusion.
 
-- hui: add go-entry config-values
++ hui: add go-entry config-values
+
+Also add PagerTitle to hui and courier config.
+Also also fix pagerTitle not being given to dev-courier at all.
 
 - hui: add scripting interface for start and quit
 - courier: add scripting interface for start and quit

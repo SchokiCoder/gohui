@@ -343,6 +343,7 @@ func main() {
 		                             cmdmode,
 		                             comcfg,
 		                             &feedback,
+		                             coucfg.PagerTitle,
 		                             termW)
 
 		common.DrawUpper(comcfg, headerLines, termW, titleLines)

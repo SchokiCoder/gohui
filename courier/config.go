@@ -9,6 +9,7 @@ import (
 
 type CouCfg struct {
 	Header           string
+	PagerTitle       string
 	ContentAlignment string
 	ContentFg        common.FgColor
 	ContentBg        common.BgColor

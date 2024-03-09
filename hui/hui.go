@@ -105,6 +105,9 @@ func drawMenu(contentHeight int,
 		} else if curMenu.Entries[i].ShellSession != "" {
 			prefix = huicfg.EntryShellSessionPrefix
 			postfix = huicfg.EntryShellSessionPostfix
+		} else if curMenu.Entries[i].Go != "" {
+			prefix = huicfg.EntryGoPrefix
+			postfix = huicfg.EntryGoPostfix
 		} else {
 			prefix = huicfg.EntryMenuPrefix
 			postfix = huicfg.EntryMenuPostfix
@@ -389,6 +392,7 @@ func main() {
 		                             runtime.CmdMode,
 		                             comcfg,
 		                             &runtime.Feedback,
+		                             huicfg.PagerTitle,
 		                             termW)
 
 		common.DrawUpper(comcfg, headerLines, termW, titleLines)

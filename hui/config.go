@@ -11,6 +11,7 @@ import (
 
 type HuiCfg struct {
 	Header                   string
+	PagerTitle               string
 	KeyExecute               string
 	EntryMenuPrefix          string
 	EntryMenuPostfix         string
@@ -18,6 +19,8 @@ type HuiCfg struct {
 	EntryShellPostfix        string
 	EntryShellSessionPrefix  string
 	EntryShellSessionPostfix string
+	EntryGoPrefix            string
+	EntryGoPostfix           string
 	EntryAlignment           string
 	EntryFg                  common.FgColor
 	EntryBg                  common.BgColor

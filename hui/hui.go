@@ -206,6 +206,10 @@ func handleInput(comcfg   common.ComCfg,
 	var err error
 	var input = make([]byte, 1)
 
+	if runtime.AcceptInput == false {
+		return
+	}
+
 	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(fmt.Sprintf("Switching to raw mode failed: %v", err))
@@ -351,26 +355,61 @@ func handleShell(shell string) string {
 	}
 }
 
-func main() {
-	var comcfg = common.CfgFromFile()
+func tick(comcfg *common.ComCfg,
+          huicfg *HuiCfg,
+          menuPath *MenuPath,
+          runtime *common.HuiRuntime) {
 	var contentHeight int
 	var curMenu Menu
 	var err error
 	var headerLines []string
-	var huicfg = cfgFromFile()
 	var lower string
-	var menuPath = make(MenuPath, 1, 8)
-	var runtime = common.NewHuiRuntime()
 	var termH, termW int
 	var titleLines []string
 
+	fmt.Print(common.SEQ_CLEAR)
+	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
+	if err != nil {
+		panic(fmt.Sprintf("Could not get term size: %v", err))
+	}
+	curMenu = huicfg.Menus[menuPath.curMenu()]
+
+	headerLines = common.SplitByLines(termW, huicfg.Header)
+	titleLines = common.SplitByLines(termW, curMenu.Title)
+	lower = common.GenerateLower(runtime.CmdLine,
+	                             runtime.CmdMode,
+	                             *comcfg,
+	                             &runtime.Feedback,
+	                             huicfg.PagerTitle,
+	                             termW)
+
+	common.DrawUpper(*comcfg, headerLines, termW, titleLines)
+
+	contentHeight = termH -
+	                len(common.SplitByLines(termW, huicfg.Header)) -
+	                1 -
+	                len(common.SplitByLines(termW, curMenu.Title)) -
+	                1
+	drawMenu(contentHeight, curMenu, runtime.Cursor, *huicfg, termW)
+
+	common.SetCursor(1, termH)
+	fmt.Printf("%v", lower)
+
+	handleInput(*comcfg, *huicfg, menuPath, runtime)
+}
+
+func main() {
+	var comcfg = common.CfgFromFile()
+	var huicfg = cfgFromFile()
+	var menuPath = make(MenuPath, 1, 8)
+	var runtime = common.NewHuiRuntime()
+
 	_, mainMenuExists := huicfg.Menus["main"]
 
-	if mainMenuExists {
-		menuPath[0] = "main"
-	} else {
+	if mainMenuExists == false {
 		panic("\"main\" menu not found in config.")
 	}
+	menuPath[0] = "main"
 
 	runtime.Active = handleArgs()
 	
@@ -378,35 +417,16 @@ func main() {
 	defer fmt.Printf(common.SEQ_CRSR_SHOW)
 	defer fmt.Printf("%v%v", common.SEQ_FG_DEFAULT, common.SEQ_BG_DEFAULT)
 
+	if huicfg.GoStart != "" {
+		scripts.FuncMap[huicfg.GoStart](&runtime)
+	}
+
 	for runtime.Active {
-		fmt.Print(common.SEQ_CLEAR)
-		termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
-		if err != nil {
-			panic(fmt.Sprintf("Could not get term size: %v", err))
-		}
-		curMenu = huicfg.Menus[menuPath.curMenu()]
+		tick(&comcfg, &huicfg, &menuPath, &runtime)
+	}
 
-		headerLines = common.SplitByLines(termW, huicfg.Header)
-		titleLines = common.SplitByLines(termW, curMenu.Title)
-		lower = common.GenerateLower(runtime.CmdLine,
-		                             runtime.CmdMode,
-		                             comcfg,
-		                             &runtime.Feedback,
-		                             huicfg.PagerTitle,
-		                             termW)
-
-		common.DrawUpper(comcfg, headerLines, termW, titleLines)
-
-		contentHeight = termH -
-		                len(common.SplitByLines(termW, huicfg.Header)) -
-		                1 -
-		                len(common.SplitByLines(termW, curMenu.Title)) -
-		                1
-		drawMenu(contentHeight, curMenu, runtime.Cursor, huicfg, termW)
-
-		common.SetCursor(1, termH)
-		fmt.Printf("%v", lower)
-
-		handleInput(comcfg, huicfg, &menuPath, &runtime)
+	if huicfg.GoQuit != "" {
+		scripts.FuncMap[huicfg.GoQuit](&runtime)
+		tick(&comcfg, &huicfg, &menuPath, &runtime)
 	}
 }

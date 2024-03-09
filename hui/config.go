@@ -22,6 +22,8 @@ type HuiCfg struct {
 	EntryGoPrefix            string
 	EntryGoPostfix           string
 	EntryAlignment           string
+	GoStart                  string
+	GoQuit                   string
 	EntryFg                  common.FgColor
 	EntryBg                  common.BgColor
 	EntryHoverFg             common.FgColor

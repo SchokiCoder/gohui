@@ -223,6 +223,7 @@ func tryFitFeedback(feedback       string,
 }
 
 type HuiRuntime struct {
+	AcceptInput bool
 	Active bool
 	CmdLine string
 	CmdMode bool
@@ -232,6 +233,7 @@ type HuiRuntime struct {
 
 func NewHuiRuntime() HuiRuntime {
 	return HuiRuntime {
+		AcceptInput: true,
 		Active: true,
 		CmdLine: "",
 		CmdMode: false,

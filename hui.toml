@@ -16,6 +16,9 @@ EntryShellSessionPostfix = ">"
 
 EntryAlignment = "center"
 
+GoStart = 'Welcome'
+GoQuit = 'Goodbye'
+
 [EntryFg]
 Active = false
 R = 0

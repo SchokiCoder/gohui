@@ -8,8 +8,15 @@ import (
 )
 
 var FuncMap = map[string]func(*common.HuiRuntime) {
+	"Goodbye": Goodbye,
 	"PutWordsIntoMyMouth": PutWordsIntoMyMouth,
 	"Quit": Quit,
+	"Welcome": Welcome,
+}
+
+func Goodbye(runtime *common.HuiRuntime) {
+	runtime.AcceptInput = false
+	runtime.Feedback = "Come back soon.\nWe have muffins!"
 }
 
 func PutWordsIntoMyMouth(runtime *common.HuiRuntime) {
@@ -22,4 +29,10 @@ func PutWordsIntoMyMouth(runtime *common.HuiRuntime) {
  */
 func Quit(runtime *common.HuiRuntime) {
 	runtime.Active = false
+}
+
+func Welcome(runtime *common.HuiRuntime) {
+	runtime.Feedback = `Welcome, welcome to HUI.
+You have chosen or been chosen to use one of our finest actively developed apps.
+I have thought so much of HUI that i elected to pin it on Github.`
 }

@@ -56,7 +56,7 @@ plus I would have had to import hui in scripts, which means circular inclusion.
 Also add PagerTitle to hui and courier config.
 Also also fix pagerTitle not being given to dev-courier at all.
 
-- hui: add scripting interface for start and quit
++ hui: add scripting interface for start and quit
 - courier: add scripting interface for start and quit
 
 - add config validation for if a script function actually exists in func map

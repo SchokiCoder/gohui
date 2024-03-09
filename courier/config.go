@@ -11,6 +11,8 @@ type CouCfg struct {
 	Header           string
 	PagerTitle       string
 	ContentAlignment string
+	GoStart          string
+	GoQuit           string
 	ContentFg        common.FgColor
 	ContentBg        common.BgColor
 }

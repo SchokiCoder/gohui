@@ -42,7 +42,7 @@
 - look for original features that need to be implemented before implementing
   next
 
-# v1.2
+# v1.2 The non-brazilian Update
 
 + hui: add go scripting interface for entries
 
@@ -57,7 +57,8 @@ Also add PagerTitle to hui and courier config.
 Also also fix pagerTitle not being given to dev-courier at all.
 
 + hui: add scripting interface for start and quit
-- courier: add scripting interface for start and quit
++ courier: add scripting interface for start and quit
+- add all main func variables to runtime struct?
 
 - add config validation for if a script function actually exists in func map
 - update demo configs

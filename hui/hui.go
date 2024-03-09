@@ -272,7 +272,7 @@ func handleKey(key      string,
 		} else if curEntry.ShellSession != "" {
 			runtime.Feedback = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
-			scripts.FuncMap[curEntry.Go](runtime)
+			scripts.HuiFuncs[curEntry.Go](runtime)
 		}
 	
 	case comcfg.KeyCmdmode:
@@ -418,7 +418,7 @@ func main() {
 	defer fmt.Printf("%v%v", common.SEQ_FG_DEFAULT, common.SEQ_BG_DEFAULT)
 
 	if huicfg.GoStart != "" {
-		scripts.FuncMap[huicfg.GoStart](&runtime)
+		scripts.HuiFuncs[huicfg.GoStart](&runtime)
 	}
 
 	for runtime.Active {
@@ -426,7 +426,7 @@ func main() {
 	}
 
 	if huicfg.GoQuit != "" {
-		scripts.FuncMap[huicfg.GoQuit](&runtime)
+		scripts.HuiFuncs[huicfg.GoQuit](&runtime)
 		tick(&comcfg, &huicfg, &menuPath, &runtime)
 	}
 }

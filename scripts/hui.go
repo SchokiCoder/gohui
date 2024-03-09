@@ -7,19 +7,19 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-var FuncMap = map[string]func(*common.HuiRuntime) {
-	"Goodbye": Goodbye,
-	"PutWordsIntoMyMouth": PutWordsIntoMyMouth,
-	"Quit": Quit,
-	"Welcome": Welcome,
+var HuiFuncs = map[string]func(*common.HuiRuntime) {
+	"Goodbye": huiGoodbye,
+	"PutWordsIntoMyMouth": putWordsIntoMyMouth,
+	"Quit": quit,
+	"Welcome": huiWelcome,
 }
 
-func Goodbye(runtime *common.HuiRuntime) {
+func huiGoodbye(runtime *common.HuiRuntime) {
 	runtime.AcceptInput = false
 	runtime.Feedback = "Come back soon.\nWe have muffins!"
 }
 
-func PutWordsIntoMyMouth(runtime *common.HuiRuntime) {
+func putWordsIntoMyMouth(runtime *common.HuiRuntime) {
 	runtime.CmdMode = true
 	runtime.CmdLine = "Surprise"
 }
@@ -27,11 +27,11 @@ func PutWordsIntoMyMouth(runtime *common.HuiRuntime) {
 /* Do not touch this!
  * Used by demo cfg.
  */
-func Quit(runtime *common.HuiRuntime) {
+func quit(runtime *common.HuiRuntime) {
 	runtime.Active = false
 }
 
-func Welcome(runtime *common.HuiRuntime) {
+func huiWelcome(runtime *common.HuiRuntime) {
 	runtime.Feedback = `Welcome, welcome to HUI.
 You have chosen or been chosen to use one of our finest actively developed apps.
 I have thought so much of HUI that i elected to pin it on Github.`

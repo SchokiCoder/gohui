@@ -5,6 +5,9 @@ PagerTitle = 'Courier - Feedback'
 
 ContentAlignment = "center"
 
+GoStart = 'Welcome'
+GoQuit = 'Goodbye'
+
 [ContentFg]
 Active = false
 R = 0

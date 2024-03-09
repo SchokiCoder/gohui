@@ -222,6 +222,26 @@ func tryFitFeedback(feedback       string,
 	return retStr, retFits
 }
 
+type CouRuntime struct {
+	AcceptInput bool
+	Active bool
+	CmdLine string
+	CmdMode bool
+	Scroll int
+	Feedback string
+}
+
+func NewCouRuntime() CouRuntime {
+	return CouRuntime {
+		AcceptInput: true,
+		Active: true,
+		CmdLine: "",
+		CmdMode: false,
+		Scroll: 0,
+		Feedback: "",
+	}
+}
+
 type HuiRuntime struct {
 	AcceptInput bool
 	Active bool

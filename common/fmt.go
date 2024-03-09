@@ -4,19 +4,24 @@
 package common
 
 import (
+	"github.com/SchokiCoder/gohui/csi"
+
 	"fmt"
 	"strings"
 )
 
 func Cprinta(alignment string,
-             fg FgColor,
-             bg BgColor,
+             fg csi.FgColor,
+             bg csi.BgColor,
              termW int,
              str string) (n int, err error) {
 	return fmt.Printf("%v", Csprinta(alignment, fg, bg, termW, str))
 }
 
-func Cprintf(fg FgColor, bg BgColor, format string, a ...any) (n int, err error) {
+func Cprintf(fg csi.FgColor,
+             bg csi.BgColor,
+             format string,
+             a ...any)       (n int, err error) {
 	var output string
 
 	output = Csprintf(fg, bg, format, a...)
@@ -25,8 +30,8 @@ func Cprintf(fg FgColor, bg BgColor, format string, a ...any) (n int, err error)
 }
 
 func Cprintfa(alignment string,
-              fg FgColor,
-              bg BgColor,
+              fg csi.FgColor,
+              bg csi.BgColor,
               termW int,
               format string,
               a ...any)      (n int, err error) {
@@ -35,8 +40,8 @@ func Cprintfa(alignment string,
 }
 
 func Csprinta(alignment string,
-              fg FgColor,
-              bg BgColor,
+              fg csi.FgColor,
+              bg csi.BgColor,
               termW int,
               str string) string {
 	var ret = Csprintfa(alignment, fg, bg, termW, "%v", str)
@@ -58,19 +63,19 @@ func Csprinta(alignment string,
 	}
 }
 
-func Csprintf(fg FgColor, bg BgColor, format string, a ...any) string {
+func Csprintf(fg csi.FgColor, bg csi.BgColor, format string, a ...any) string {
 	var ret string
 
 	ret = fmt.Sprintf(format, a...)
 	ret = fmt.Sprintf("%v%v%v%v%v",
-	                  fg, bg, ret, SEQ_FG_DEFAULT, SEQ_BG_DEFAULT)
+	                  fg, bg, ret, csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	return ret
 }
 
 func Csprintfa(alignment string,
-               fg FgColor,
-               bg BgColor,
+               fg csi.FgColor,
+               bg csi.BgColor,
                termW int,
                format string,
                a ...any)      string {

@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/SchokiCoder/gohui/common"
+	"github.com/SchokiCoder/gohui/csi"
 	"github.com/SchokiCoder/gohui/scripts"
 
 	"errors"
@@ -66,19 +67,18 @@ Internal commands:
 
 func drawContent(contentLines  []string,
                  contentHeight int,
-                 coucfg        CouCfg,
-                 scroll        int,
+                 runtime       common.CouRuntime,
                  termW         int) {
-	var drawRange int = scroll + contentHeight
+	var drawRange int = runtime.Scroll + contentHeight
 
 	if drawRange > len(contentLines) {
 		drawRange = len(contentLines)
 	}
 
-	for _, v := range contentLines[scroll:drawRange] {
-		common.Cprinta(coucfg.ContentAlignment,
-		               coucfg.ContentFg,
-		               coucfg.ContentBg,
+	for _, v := range contentLines[runtime.Scroll:drawRange] {
+		common.Cprinta(runtime.Coucfg.ContentAlignment,
+		               runtime.Coucfg.ContentFg,
+		               runtime.Coucfg.ContentBg,
 		               termW,
 		               v)
 	}
@@ -189,8 +189,7 @@ func handleCommand(contentLineCount int, runtime *common.CouRuntime) string {
 	return ret
 }
 
-func handleInput(comcfg           common.ComCfg,
-                 contentLineCount int,
+func handleInput(contentLineCount int,
                  runtime          *common.CouRuntime) {
 	var canonicalState *term.State
 	var err error
@@ -214,73 +213,64 @@ func handleInput(comcfg           common.ComCfg,
 
 	for i := 0; i < len(input); i++ {
 		handleKey(string(input),
-		          comcfg,
 		          contentLineCount,
 		          runtime)
 	}
 }
 
-func handleKey(key              string,
-               comcfg           common.ComCfg,
-               contentLineCount int,
-               runtime          *common.CouRuntime) {
+func handleKey(key string, contentLineCount int, runtime *common.CouRuntime) {
 	if runtime.CmdMode {
-		handleKeyCmdline(key, comcfg, contentLineCount, runtime)
+		handleKeyCmdline(key, contentLineCount, runtime)
 		return
 	}
 	
 	switch key {
-	case comcfg.KeyUp:
+	case runtime.Comcfg.KeyUp:
 		if runtime.Scroll > 0 {
 			runtime.Scroll--
 		}
 
-	case comcfg.KeyDown:
+	case runtime.Comcfg.KeyDown:
 		if runtime.Scroll < contentLineCount {
 			runtime.Scroll++
 		}
 
 
-	case comcfg.KeyCmdmode:
+	case runtime.Comcfg.KeyCmdmode:
 		runtime.CmdMode = true
-		fmt.Printf(common.SEQ_CRSR_SHOW)
+		fmt.Printf(csi.CURSOR_SHOW)
 
-	case comcfg.KeyQuit:
+	case runtime.Comcfg.KeyQuit:
 		fallthrough
-	case comcfg.KeyLeft:
+	case runtime.Comcfg.KeyLeft:
 		fallthrough
-	case common.SIGINT:
+	case csi.SIGINT:
 		fallthrough
-	case common.SIGTSTP:
+	case csi.SIGTSTP:
 		runtime.Active = false
 	}
 }
 
 func handleKeyCmdline(key              string,
-                      comcfg           common.ComCfg,
                       contentLineCount int,
                       runtime          *common.CouRuntime) {
 	switch key {
-	case comcfg.KeyCmdenter:
+	case runtime.Comcfg.KeyCmdenter:
 		runtime.Feedback = handleCommand(contentLineCount, runtime)
 		fallthrough
-	case common.SIGINT:
+	case csi.SIGINT:
 		fallthrough
-	case common.SIGTSTP:
+	case csi.SIGTSTP:
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
-		fmt.Printf(common.SEQ_CRSR_HIDE)
+		fmt.Printf(csi.CURSOR_HIDE)
 
 	default:
 		runtime.CmdLine = fmt.Sprintf("%v%v", runtime.CmdLine, string(key))
 	}
 }
 
-func tick(comcfg common.ComCfg,
-          content string,
-          coucfg *CouCfg,
-          runtime *common.CouRuntime,
-          title string) {
+func tick(runtime *common.CouRuntime) {
 	var contentLines []string
 	var contentHeight int
 	var err error
@@ -289,61 +279,57 @@ func tick(comcfg common.ComCfg,
 	var termH, termW int
 	var titleLines []string
 
-	fmt.Print(common.SEQ_CLEAR)
+	fmt.Print(csi.CLEAR)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
 
-	headerLines = common.SplitByLines(termW, coucfg.Header)
-	titleLines = common.SplitByLines(termW, title)
-	contentLines = common.SplitByLines(termW, content)
+	headerLines = common.SplitByLines(termW, runtime.Coucfg.Header)
+	titleLines = common.SplitByLines(termW, runtime.Title)
+	contentLines = common.SplitByLines(termW, runtime.Content)
 	lower = common.GenerateLower(runtime.CmdLine,
 	                             runtime.CmdMode,
-	                             comcfg,
+	                             runtime.Comcfg,
 	                             &runtime.Feedback,
-	                             coucfg.PagerTitle,
+	                             runtime.Coucfg.PagerTitle,
 	                             termW)
 
-	common.DrawUpper(comcfg, headerLines, termW, titleLines)
+	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, coucfg.Header)) -
+	                len(common.SplitByLines(termW, runtime.Coucfg.Header)) -
 	                1 -
-	                len(common.SplitByLines(termW, title)) -
+	                len(common.SplitByLines(termW, runtime.Title)) -
 	                1
 
-	drawContent(contentLines, contentHeight, *coucfg, runtime.Scroll, termW)
+	drawContent(contentLines, contentHeight, *runtime, termW)
 
-	common.SetCursor(1, termH)
+	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 
-	handleInput(comcfg, len(contentLines), runtime)
+	handleInput(len(contentLines), runtime)
 }
 
 func main() {
-	var comcfg = common.CfgFromFile()
-	var content string
-	var coucfg = cfgFromFile()
 	var runtime = common.NewCouRuntime()
-	var title string
 
-	content, runtime.Active = handleArgs(&title)
+	runtime.Content, runtime.Active = handleArgs(&runtime.Title)
 
-	fmt.Printf(common.SEQ_CRSR_HIDE)
-	defer fmt.Printf(common.SEQ_CRSR_SHOW)
-	defer fmt.Printf("%v%v", common.SEQ_FG_DEFAULT, common.SEQ_BG_DEFAULT)
+	fmt.Printf(csi.CURSOR_HIDE)
+	defer fmt.Printf(csi.CURSOR_SHOW)
+	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if coucfg.GoStart != "" {
-		scripts.CouFuncs[coucfg.GoStart](&runtime)
+	if runtime.Coucfg.GoStart != "" {
+		scripts.CouFuncs[runtime.Coucfg.GoStart](&runtime)
 	}
 
 	for runtime.Active {
-		tick(comcfg, content, &coucfg, &runtime, title)
+		tick(&runtime)
 	}
 
-	if coucfg.GoQuit != "" {
-		scripts.CouFuncs[coucfg.GoQuit](&runtime)
-		tick(comcfg, content, &coucfg, &runtime, title)
+	if runtime.Coucfg.GoQuit != "" {
+		scripts.CouFuncs[runtime.Coucfg.GoQuit](&runtime)
+		tick(&runtime)
 	}
 }

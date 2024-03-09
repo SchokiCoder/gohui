@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package main
+package config
 
 import (
-	"github.com/SchokiCoder/gohui/common"
+	"github.com/SchokiCoder/gohui/csi"
 
 	"fmt"
 )
@@ -24,17 +24,17 @@ type HuiCfg struct {
 	EntryAlignment           string
 	GoStart                  string
 	GoQuit                   string
-	EntryFg                  common.FgColor
-	EntryBg                  common.BgColor
-	EntryHoverFg             common.FgColor
-	EntryHoverBg             common.BgColor
+	EntryFg                  csi.FgColor
+	EntryBg                  csi.BgColor
+	EntryHoverFg             csi.FgColor
+	EntryHoverBg             csi.BgColor
 	Menus                    map[string]Menu
 }
 
-func cfgFromFile() HuiCfg {
+func HuiCfgFromFile() HuiCfg {
 	var ret HuiCfg
 
-	common.AnyCfgFromFile(&ret, "hui.toml")
+	anyCfgFromFile(&ret, "hui.toml")
 
 	ret.validateAlignments()
 	ret.validateMenus()
@@ -43,7 +43,7 @@ func cfgFromFile() HuiCfg {
 }
 
 func (c HuiCfg) validateAlignments() {
-	common.ValidateAlignment(c.EntryAlignment)
+	validateAlignment(c.EntryAlignment)
 }
 
 func (c HuiCfg) validateMenus() {

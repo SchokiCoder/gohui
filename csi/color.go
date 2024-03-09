@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package common
+package csi
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ func (c FgColor) String() string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[38;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
-		return SEQ_FG_DEFAULT
+		return FG_DEFAULT
 	}
 }
 
@@ -29,6 +29,6 @@ func (c BgColor) String() string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[48;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
-		return SEQ_BG_DEFAULT
+		return BG_DEFAULT
 	}
 }

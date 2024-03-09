@@ -6,6 +6,8 @@ package main
 
 import (
 	"github.com/SchokiCoder/gohui/common"
+	"github.com/SchokiCoder/gohui/config"
+	"github.com/SchokiCoder/gohui/csi"
 	"github.com/SchokiCoder/gohui/scripts"
 
 	"io"
@@ -15,8 +17,6 @@ import (
 	"os"
 	"os/exec"
 )
-
-type MenuPath []string
 
 const HELP = `Usage: hui [OPTIONS]
 
@@ -72,20 +72,16 @@ var AppNameFormal string
 var AppRepo       string
 var AppVersion    string
 
-func (mp MenuPath) curMenu() string {
-	return mp[len(mp) - 1]
-}
-
 func drawMenu(contentHeight int,
-              curMenu Menu,
+              curMenu config.Menu,
               cursor int,
-              huicfg HuiCfg,
+              huicfg config.HuiCfg,
               termW int) {
 	var drawBegin int
 	var drawEnd int
 	var prefix, postfix string
-	var fg common.FgColor
-	var bg common.BgColor
+	var fg csi.FgColor
+	var bg csi.BgColor
 
 	if len(curMenu.Entries) > contentHeight {
 		drawBegin = cursor
@@ -166,7 +162,7 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(curMenu Menu, runtime *common.HuiRuntime) string {
+func handleCommand(curMenu config.Menu, runtime *common.HuiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
@@ -198,10 +194,7 @@ func handleCommand(curMenu Menu, runtime *common.HuiRuntime) string {
 	return ret
 }
 
-func handleInput(comcfg   common.ComCfg,
-                 huicfg   HuiCfg,
-                 menuPath *MenuPath,
-                 runtime  *common.HuiRuntime) {
+func handleInput(runtime  *common.HuiRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input = make([]byte, 1)
@@ -223,50 +216,46 @@ func handleInput(comcfg   common.ComCfg,
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
 	for i := 0; i < len(input); i++ {
-		handleKey(string(input), comcfg, huicfg, menuPath, runtime)
+		handleKey(string(input), runtime)
 	}
 }
 
-func handleKey(key      string,
-               comcfg   common.ComCfg,
-               huicfg   HuiCfg,
-               menuPath *MenuPath,
-               runtime  *common.HuiRuntime) {
-	var curMenu = huicfg.Menus[menuPath.curMenu()]
+func handleKey(key string, runtime *common.HuiRuntime) {
+	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.CurMenu()]
 	var curEntry = &curMenu.Entries[runtime.Cursor]
 
 	if runtime.CmdMode {
-		handleKeyCmdline(key, comcfg, curMenu, runtime)
+		handleKeyCmdline(key, curMenu, runtime)
 		return
 	}
 	
 	switch key {
-	case comcfg.KeyQuit:
+	case runtime.Comcfg.KeyQuit:
 		runtime.Active = false
 
-	case comcfg.KeyLeft:
-		if len(*menuPath) > 1 {
-			*menuPath = (*menuPath)[:len(*menuPath) - 1]
+	case runtime.Comcfg.KeyLeft:
+		if len(runtime.Menupath) > 1 {
+			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
 			runtime.Cursor = 0
 		}
 
-	case comcfg.KeyDown:
+	case runtime.Comcfg.KeyDown:
 		if runtime.Cursor < len(curMenu.Entries) - 1 {
 			runtime.Cursor++
 		}
 
-	case comcfg.KeyUp:
+	case runtime.Comcfg.KeyUp:
 		if runtime.Cursor > 0 {
 			runtime.Cursor--
 		}
 
-	case comcfg.KeyRight:
+	case runtime.Comcfg.KeyRight:
 		if curEntry.Menu != "" {
-			*menuPath = append(*menuPath, curEntry.Menu)
+			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
 			runtime.Cursor = 0
 		}
 
-	case huicfg.KeyExecute:
+	case runtime.Huicfg.KeyExecute:
 		if curEntry.Shell != "" {
 			runtime.Feedback = handleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
@@ -275,31 +264,30 @@ func handleKey(key      string,
 			scripts.HuiFuncs[curEntry.Go](runtime)
 		}
 	
-	case comcfg.KeyCmdmode:
+	case runtime.Comcfg.KeyCmdmode:
 		runtime.CmdMode = true
-		fmt.Printf(common.SEQ_CRSR_SHOW)
+		fmt.Printf(csi.CURSOR_SHOW)
 
-	case common.SIGINT:
+	case csi.SIGINT:
 		fallthrough
-	case common.SIGTSTP:
+	case csi.SIGTSTP:
 		runtime.Active = false
 	}
 }
 
 func handleKeyCmdline(key     string,
-		      comcfg  common.ComCfg,
-                      curMenu Menu,
+                      curMenu config.Menu,
                       runtime *common.HuiRuntime) {
 	switch key {
-	case comcfg.KeyCmdenter:
+	case runtime.Comcfg.KeyCmdenter:
 		runtime.Feedback = handleCommand(curMenu, runtime)
 		fallthrough
-	case common.SIGINT:
+	case csi.SIGINT:
 		fallthrough
-	case common.SIGTSTP:
+	case csi.SIGTSTP:
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
-		fmt.Printf(common.SEQ_CRSR_HIDE)
+		fmt.Printf(csi.CURSOR_HIDE)
 
 	default:
 		runtime.CmdLine = fmt.Sprintf("%v%v",
@@ -355,78 +343,72 @@ func handleShell(shell string) string {
 	}
 }
 
-func tick(comcfg *common.ComCfg,
-          huicfg *HuiCfg,
-          menuPath *MenuPath,
-          runtime *common.HuiRuntime) {
+func tick(runtime *common.HuiRuntime) {
 	var contentHeight int
-	var curMenu Menu
+	var curMenu config.Menu
 	var err error
 	var headerLines []string
 	var lower string
 	var termH, termW int
 	var titleLines []string
 
-	fmt.Print(common.SEQ_CLEAR)
+	fmt.Print(csi.CLEAR)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
-	curMenu = huicfg.Menus[menuPath.curMenu()]
+	curMenu = runtime.Huicfg.Menus[runtime.Menupath.CurMenu()]
 
-	headerLines = common.SplitByLines(termW, huicfg.Header)
+	headerLines = common.SplitByLines(termW, runtime.Huicfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
 	lower = common.GenerateLower(runtime.CmdLine,
 	                             runtime.CmdMode,
-	                             *comcfg,
+	                             runtime.Comcfg,
 	                             &runtime.Feedback,
-	                             huicfg.PagerTitle,
+	                             runtime.Huicfg.PagerTitle,
 	                             termW)
 
-	common.DrawUpper(*comcfg, headerLines, termW, titleLines)
+	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, huicfg.Header)) -
+	                len(common.SplitByLines(termW, runtime.Huicfg.Header)) -
 	                1 -
 	                len(common.SplitByLines(termW, curMenu.Title)) -
 	                1
-	drawMenu(contentHeight, curMenu, runtime.Cursor, *huicfg, termW)
+	drawMenu(contentHeight, curMenu, runtime.Cursor, runtime.Huicfg, termW)
 
-	common.SetCursor(1, termH)
+	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 
-	handleInput(*comcfg, *huicfg, menuPath, runtime)
+	handleInput(runtime)
 }
 
 func main() {
-	var comcfg = common.CfgFromFile()
-	var huicfg = cfgFromFile()
-	var menuPath = make(MenuPath, 1, 8)
 	var runtime = common.NewHuiRuntime()
 
-	_, mainMenuExists := huicfg.Menus["main"]
+	_, mainMenuExists := runtime.Huicfg.Menus["main"]
 
 	if mainMenuExists == false {
 		panic("\"main\" menu not found in config.")
 	}
-	menuPath[0] = "main"
+	runtime.Menupath[0] = "main"
 
 	runtime.Active = handleArgs()
 	
-	fmt.Printf(common.SEQ_CRSR_HIDE)
-	defer fmt.Printf(common.SEQ_CRSR_SHOW)
-	defer fmt.Printf("%v%v", common.SEQ_FG_DEFAULT, common.SEQ_BG_DEFAULT)
+	fmt.Printf(csi.CURSOR_HIDE)
+	defer fmt.Printf(csi.CURSOR_SHOW)
+	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if huicfg.GoStart != "" {
-		scripts.HuiFuncs[huicfg.GoStart](&runtime)
+	if runtime.Huicfg.GoStart != "" {
+		scripts.HuiFuncs[runtime.Huicfg.GoStart](&runtime)
 	}
 
 	for runtime.Active {
-		tick(&comcfg, &huicfg, &menuPath, &runtime)
+		tick(&runtime)
 	}
 
-	if huicfg.GoQuit != "" {
-		scripts.HuiFuncs[huicfg.GoQuit](&runtime)
-		tick(&comcfg, &huicfg, &menuPath, &runtime)
+	if runtime.Huicfg.GoQuit != "" {
+		scripts.HuiFuncs[runtime.Huicfg.GoQuit](&runtime)
+		tick(&runtime)
 	}
 }

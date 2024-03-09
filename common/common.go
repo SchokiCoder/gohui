@@ -4,22 +4,14 @@
 package common
 
 import (
+	"github.com/SchokiCoder/gohui/config"
+	"github.com/SchokiCoder/gohui/csi"
+
 	"os/exec"
 	"fmt"
 	"io"
 	"os"
 	"strings"
-)
-
-const (
-	SIGINT  = "\003"
-	SIGTSTP = "\004"
-
-	SEQ_CLEAR      = "\033[H\033[2J"
-	SEQ_FG_DEFAULT = "\033[39m"
-	SEQ_BG_DEFAULT = "\033[49m"
-	SEQ_CRSR_HIDE  = "\033[?25l"
-	SEQ_CRSR_SHOW  = "\033[?25h"
 )
 
 func callPager(feedback string, pager string, pagerTitle string) string {
@@ -58,19 +50,19 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 	return HandleShellSession(shCall)
 }
 
-func DrawUpper(cfg ComCfg, header []string, termW int, title []string) {
+func DrawUpper(comcfg config.ComCfg, header []string, termW int, title []string) {
 	for _, v := range header {
-		Cprinta(cfg.HeaderAlignment,
-		        cfg.HeaderFg,
-		        cfg.HeaderBg,
+		Cprinta(comcfg.HeaderAlignment,
+		        comcfg.HeaderFg,
+		        comcfg.HeaderBg,
 		        termW,
 		        v)
 	}
 
 	for _, v := range title {
-		Cprinta(cfg.TitleAlignment,
-		        cfg.TitleFg,
-		        cfg.TitleBg,
+		Cprinta(comcfg.TitleAlignment,
+		        comcfg.TitleFg,
+		        comcfg.TitleBg,
 		        termW,
 		        v)
 	}
@@ -78,10 +70,10 @@ func DrawUpper(cfg ComCfg, header []string, termW int, title []string) {
 
 func GenerateLower(cmdline    string,
                    cmdmode    bool,
-                   comcfg     ComCfg,
+                   comcfg     config.ComCfg,
                    feedback   *string,
                    pagerTitle string,
-                   termW      int)    string {
+                   termW      int)           string {
 	var fits bool
 	var ret string
 	
@@ -142,7 +134,7 @@ func HandleShellSession(shell string) string {
 		return fmt.Sprintf("Child error: %s", err)
 	}
 
-	fmt.Printf("%v", SEQ_CLEAR)
+	fmt.Printf("%v", csi.CLEAR)
 
 	if len(strerr) > 0 {
 		return string(strerr)
@@ -171,10 +163,6 @@ If you did not receive a copy of the license, see below:
 
 func PrintVersion(appName, appVersion string) {
 	fmt.Printf("%v: version %v\n", appName, appVersion)
-}
-
-func SetCursor(x, y int) {
-	fmt.Printf("\033[%v;%vH", y, x);
 }
 
 func SplitByLines(maxLineLen int, str string) []string {
@@ -227,8 +215,12 @@ type CouRuntime struct {
 	Active bool
 	CmdLine string
 	CmdMode bool
+	Comcfg config.ComCfg
+	Content string
+	Coucfg config.CouCfg
 	Scroll int
 	Feedback string
+	Title string
 }
 
 func NewCouRuntime() CouRuntime {
@@ -237,9 +229,19 @@ func NewCouRuntime() CouRuntime {
 		Active: true,
 		CmdLine: "",
 		CmdMode: false,
+		Comcfg: config.ComCfgFromFile(),
+		Content: "",
+		Coucfg: config.CouCfgFromFile(),
 		Scroll: 0,
 		Feedback: "",
+		Title: "",
 	}
+}
+
+type MenuPath []string
+
+func (mp MenuPath) CurMenu() string {
+	return mp[len(mp) - 1]
 }
 
 type HuiRuntime struct {
@@ -247,8 +249,11 @@ type HuiRuntime struct {
 	Active bool
 	CmdLine string
 	CmdMode bool
+	Comcfg config.ComCfg
 	Cursor int
 	Feedback string
+	Huicfg config.HuiCfg
+	Menupath MenuPath
 }
 
 func NewHuiRuntime() HuiRuntime {
@@ -257,7 +262,10 @@ func NewHuiRuntime() HuiRuntime {
 		Active: true,
 		CmdLine: "",
 		CmdMode: false,
+		Comcfg: config.ComCfgFromFile(),
 		Cursor: 0,
 		Feedback: "",
+		Huicfg: config.HuiCfgFromFile(),
+		Menupath: make(MenuPath, 1, 8),
 	}
 }

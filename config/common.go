@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package common
+package config
 
 import (
+	"github.com/BurntSushi/toml"
+	"github.com/SchokiCoder/gohui/csi"
+
 	"errors"
 	"io"
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"os"
 	"strings"
 )
@@ -27,17 +29,17 @@ type ComCfg struct {
 	TitleAlignment           string
 	CmdlineAlignment         string
 	FeedbackAlignment        string
-	HeaderFg                 FgColor
-	HeaderBg                 BgColor
-	TitleFg                  FgColor
-	TitleBg                  BgColor
-	FeedbackFg               FgColor
-	FeedbackBg               BgColor
-	CmdlineFg                FgColor
-	CmdlineBg                BgColor
+	HeaderFg                 csi.FgColor
+	HeaderBg                 csi.BgColor
+	TitleFg                  csi.FgColor
+	TitleBg                  csi.BgColor
+	FeedbackFg               csi.FgColor
+	FeedbackBg               csi.BgColor
+	CmdlineFg                csi.FgColor
+	CmdlineBg                csi.BgColor
 }
 
-func AnyCfgFromFile(cfg interface{}, cfgFileName string) {
+func anyCfgFromFile(cfg interface{}, cfgFileName string) {
 	type path struct {
 		EnvVar string
 		Core   string
@@ -101,17 +103,17 @@ func AnyCfgFromFile(cfg interface{}, cfgFileName string) {
 	}
 }
 
-func CfgFromFile() ComCfg {
+func ComCfgFromFile() ComCfg {
 	var ret ComCfg
 
-	AnyCfgFromFile(&ret, "common.toml")
+	anyCfgFromFile(&ret, "common.toml")
 	ret.validateAlignments()
 	ret.validatePager()
 
 	return ret
 }
 
-func ValidateAlignment(alignment string) {
+func validateAlignment(alignment string) {
 	switch alignment {
 	case "left":
 	case "center":
@@ -124,10 +126,10 @@ func ValidateAlignment(alignment string) {
 }
 
 func (c ComCfg) validateAlignments() {
-	ValidateAlignment(c.HeaderAlignment)
-	ValidateAlignment(c.TitleAlignment)
-	ValidateAlignment(c.CmdlineAlignment)
-	ValidateAlignment(c.FeedbackAlignment)
+	validateAlignment(c.HeaderAlignment)
+	validateAlignment(c.TitleAlignment)
+	validateAlignment(c.CmdlineAlignment)
+	validateAlignment(c.FeedbackAlignment)
 }
 
 func (c ComCfg) validatePager() {

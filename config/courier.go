@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package main
+package config
 
 import (
-	"github.com/SchokiCoder/gohui/common"
+	"github.com/SchokiCoder/gohui/csi"
 )
 
 type CouCfg struct {
@@ -13,19 +13,19 @@ type CouCfg struct {
 	ContentAlignment string
 	GoStart          string
 	GoQuit           string
-	ContentFg        common.FgColor
-	ContentBg        common.BgColor
+	ContentFg        csi.FgColor
+	ContentBg        csi.BgColor
 }
 
-func cfgFromFile() CouCfg {
+func CouCfgFromFile() CouCfg {
 	var ret CouCfg
 
-	common.AnyCfgFromFile(&ret, "courier.toml")
+	anyCfgFromFile(&ret, "courier.toml")
 	ret.validateAlignments()
 
 	return ret
 }
 
 func (c CouCfg) validateAlignments() {
-	common.ValidateAlignment(c.ContentAlignment)
+	validateAlignment(c.ContentAlignment)
 }

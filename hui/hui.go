@@ -6,9 +6,7 @@ package main
 
 import (
 	"github.com/SchokiCoder/gohui/common"
-	"github.com/SchokiCoder/gohui/config"
 	"github.com/SchokiCoder/gohui/csi"
-	"github.com/SchokiCoder/gohui/scripts"
 
 	"io"
 	"fmt"
@@ -17,6 +15,39 @@ import (
 	"os"
 	"os/exec"
 )
+
+type menuPath []string
+
+func (mp menuPath) curMenu() string {
+	return mp[len(mp) - 1]
+}
+
+type huiRuntime struct {
+	AcceptInput bool
+	Active bool
+	CmdLine string
+	CmdMode bool
+	Comcfg common.ComConfig
+	Cursor int
+	Feedback string
+	Huicfg huiConfig
+	Menupath menuPath
+}
+
+func newHuiRuntime() huiRuntime {
+	return huiRuntime {
+		AcceptInput: true,
+		Active: true,
+		CmdLine: "",
+		CmdMode: false,
+		Comcfg: common.ComConfigFromFile(),
+		Cursor: 0,
+		Feedback: "",
+		Huicfg: huiConfigFromFile(),
+		Menupath: make(menuPath, 1, 8),
+	}
+}
+
 
 const HELP = `Usage: hui [OPTIONS]
 
@@ -73,9 +104,9 @@ var AppRepo       string
 var AppVersion    string
 
 func drawMenu(contentHeight int,
-              curMenu config.Menu,
+              curMenu Menu,
               cursor int,
-              huicfg config.HuiCfg,
+              huicfg huiConfig,
               termW int) {
 	var drawBegin int
 	var drawEnd int
@@ -162,7 +193,7 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(curMenu config.Menu, runtime *common.HuiRuntime) string {
+func handleCommand(curMenu Menu, runtime *huiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
@@ -194,7 +225,7 @@ func handleCommand(curMenu config.Menu, runtime *common.HuiRuntime) string {
 	return ret
 }
 
-func handleInput(runtime  *common.HuiRuntime) {
+func handleInput(runtime *huiRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input = make([]byte, 1)
@@ -220,8 +251,8 @@ func handleInput(runtime  *common.HuiRuntime) {
 	}
 }
 
-func handleKey(key string, runtime *common.HuiRuntime) {
-	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.CurMenu()]
+func handleKey(key string, runtime *huiRuntime) {
+	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
 	var curEntry = &curMenu.Entries[runtime.Cursor]
 
 	if runtime.CmdMode {
@@ -261,7 +292,7 @@ func handleKey(key string, runtime *common.HuiRuntime) {
 		} else if curEntry.ShellSession != "" {
 			runtime.Feedback = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
-			scripts.HuiFuncs[curEntry.Go](runtime)
+			huiFuncs[curEntry.Go](runtime)
 		}
 	
 	case runtime.Comcfg.KeyCmdmode:
@@ -276,8 +307,8 @@ func handleKey(key string, runtime *common.HuiRuntime) {
 }
 
 func handleKeyCmdline(key     string,
-                      curMenu config.Menu,
-                      runtime *common.HuiRuntime) {
+                      curMenu Menu,
+                      runtime *huiRuntime) {
 	switch key {
 	case runtime.Comcfg.KeyCmdenter:
 		runtime.Feedback = handleCommand(curMenu, runtime)
@@ -343,9 +374,9 @@ func handleShell(shell string) string {
 	}
 }
 
-func tick(runtime *common.HuiRuntime) {
+func tick(runtime *huiRuntime) {
 	var contentHeight int
-	var curMenu config.Menu
+	var curMenu Menu
 	var err error
 	var headerLines []string
 	var lower string
@@ -357,7 +388,7 @@ func tick(runtime *common.HuiRuntime) {
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
-	curMenu = runtime.Huicfg.Menus[runtime.Menupath.CurMenu()]
+	curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
 
 	headerLines = common.SplitByLines(termW, runtime.Huicfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
@@ -384,7 +415,7 @@ func tick(runtime *common.HuiRuntime) {
 }
 
 func main() {
-	var runtime = common.NewHuiRuntime()
+	var runtime = newHuiRuntime()
 
 	_, mainMenuExists := runtime.Huicfg.Menus["main"]
 
@@ -400,7 +431,7 @@ func main() {
 	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if runtime.Huicfg.GoStart != "" {
-		scripts.HuiFuncs[runtime.Huicfg.GoStart](&runtime)
+		huiFuncs[runtime.Huicfg.GoStart](&runtime)
 	}
 
 	for runtime.Active {
@@ -408,7 +439,7 @@ func main() {
 	}
 
 	if runtime.Huicfg.GoQuit != "" {
-		scripts.HuiFuncs[runtime.Huicfg.GoQuit](&runtime)
+		huiFuncs[runtime.Huicfg.GoQuit](&runtime)
 		tick(&runtime)
 	}
 }

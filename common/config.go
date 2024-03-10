@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package config
+package common
 
 import (
 	"github.com/BurntSushi/toml"
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-type ComCfg struct {
+type ComConfig struct {
 	AppPager                 string
 	KeyLeft                  string
 	KeyDown                  string
@@ -39,7 +39,7 @@ type ComCfg struct {
 	CmdlineBg                csi.BgColor
 }
 
-func anyCfgFromFile(cfg interface{}, cfgFileName string) {
+func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 	type path struct {
 		EnvVar string
 		Core   string
@@ -103,17 +103,17 @@ func anyCfgFromFile(cfg interface{}, cfgFileName string) {
 	}
 }
 
-func ComCfgFromFile() ComCfg {
-	var ret ComCfg
+func ComConfigFromFile() ComConfig {
+	var ret ComConfig
 
-	anyCfgFromFile(&ret, "common.toml")
+	AnyConfigFromFile(&ret, "common.toml")
 	ret.validateAlignments()
 	ret.validatePager()
 
 	return ret
 }
 
-func validateAlignment(alignment string) {
+func ValidateAlignment(alignment string) {
 	switch alignment {
 	case "left":
 	case "center":
@@ -125,14 +125,14 @@ func validateAlignment(alignment string) {
 	}
 }
 
-func (c ComCfg) validateAlignments() {
-	validateAlignment(c.HeaderAlignment)
-	validateAlignment(c.TitleAlignment)
-	validateAlignment(c.CmdlineAlignment)
-	validateAlignment(c.FeedbackAlignment)
+func (c ComConfig) validateAlignments() {
+	ValidateAlignment(c.HeaderAlignment)
+	ValidateAlignment(c.TitleAlignment)
+	ValidateAlignment(c.CmdlineAlignment)
+	ValidateAlignment(c.FeedbackAlignment)
 }
 
-func (c ComCfg) validatePager() {
+func (c ComConfig) validatePager() {
 	var pagerExists = false
 	var path = os.Getenv("PATH")
 

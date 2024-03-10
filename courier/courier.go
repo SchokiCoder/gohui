@@ -7,7 +7,6 @@ package main
 import (
 	"github.com/SchokiCoder/gohui/common"
 	"github.com/SchokiCoder/gohui/csi"
-	"github.com/SchokiCoder/gohui/scripts"
 
 	"errors"
 	"fmt"
@@ -16,6 +15,34 @@ import (
 	"os"
 	"strconv"
 )
+
+type couRuntime struct {
+	AcceptInput bool
+	Active bool
+	CmdLine string
+	CmdMode bool
+	Comcfg common.ComConfig
+	Content string
+	Coucfg couConfig
+	Scroll int
+	Feedback string
+	Title string
+}
+
+func newCouRuntime() couRuntime {
+	return couRuntime {
+		AcceptInput: true,
+		Active: true,
+		CmdLine: "",
+		CmdMode: false,
+		Comcfg: common.ComConfigFromFile(),
+		Content: "",
+		Coucfg: couConfigFromFile(),
+		Scroll: 0,
+		Feedback: "",
+		Title: "",
+	}
+}
 
 var AppLicense    string
 var AppLicenseUrl string
@@ -67,7 +94,7 @@ Internal commands:
 
 func drawContent(contentLines  []string,
                  contentHeight int,
-                 runtime       common.CouRuntime,
+                 runtime       couRuntime,
                  termW         int) {
 	var drawRange int = runtime.Scroll + contentHeight
 
@@ -157,7 +184,7 @@ func handleArgs(title *string) (string, bool) {
 	return string(ret), true
 }
 
-func handleCommand(contentLineCount int, runtime *common.CouRuntime) string {
+func handleCommand(contentLineCount int, runtime *couRuntime) string {
 	var err error
 	var ret string = ""
 	var num uint64
@@ -190,7 +217,7 @@ func handleCommand(contentLineCount int, runtime *common.CouRuntime) string {
 }
 
 func handleInput(contentLineCount int,
-                 runtime          *common.CouRuntime) {
+                 runtime          *couRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input = make([]byte, 1)
@@ -218,7 +245,7 @@ func handleInput(contentLineCount int,
 	}
 }
 
-func handleKey(key string, contentLineCount int, runtime *common.CouRuntime) {
+func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 	if runtime.CmdMode {
 		handleKeyCmdline(key, contentLineCount, runtime)
 		return
@@ -253,7 +280,7 @@ func handleKey(key string, contentLineCount int, runtime *common.CouRuntime) {
 
 func handleKeyCmdline(key              string,
                       contentLineCount int,
-                      runtime          *common.CouRuntime) {
+                      runtime          *couRuntime) {
 	switch key {
 	case runtime.Comcfg.KeyCmdenter:
 		runtime.Feedback = handleCommand(contentLineCount, runtime)
@@ -270,7 +297,7 @@ func handleKeyCmdline(key              string,
 	}
 }
 
-func tick(runtime *common.CouRuntime) {
+func tick(runtime *couRuntime) {
 	var contentLines []string
 	var contentHeight int
 	var err error
@@ -312,7 +339,7 @@ func tick(runtime *common.CouRuntime) {
 }
 
 func main() {
-	var runtime = common.NewCouRuntime()
+	var runtime = newCouRuntime()
 
 	runtime.Content, runtime.Active = handleArgs(&runtime.Title)
 
@@ -321,7 +348,7 @@ func main() {
 	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if runtime.Coucfg.GoStart != "" {
-		scripts.CouFuncs[runtime.Coucfg.GoStart](&runtime)
+		couFuncs[runtime.Coucfg.GoStart](&runtime)
 	}
 
 	for runtime.Active {
@@ -329,7 +356,7 @@ func main() {
 	}
 
 	if runtime.Coucfg.GoQuit != "" {
-		scripts.CouFuncs[runtime.Coucfg.GoQuit](&runtime)
+		couFuncs[runtime.Coucfg.GoQuit](&runtime)
 		tick(&runtime)
 	}
 }

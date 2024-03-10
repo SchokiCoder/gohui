@@ -1,25 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package scripts
+package main
 
-import (
-	"github.com/SchokiCoder/gohui/common"
-)
-
-var HuiFuncs = map[string]func(*common.HuiRuntime) {
+var huiFuncs = map[string]func(*huiRuntime) {
 	"Goodbye": huiGoodbye,
 	"PutWordsIntoMyMouth": putWordsIntoMyMouth,
 	"Quit": quit,
 	"Welcome": huiWelcome,
 }
 
-func huiGoodbye(runtime *common.HuiRuntime) {
+func huiGoodbye(runtime *huiRuntime) {
 	runtime.AcceptInput = false
-	runtime.Feedback = "Come back soon.\nWe have muffins!"
+	runtime.Feedback = "HUI End Feedback Msg"
 }
 
-func putWordsIntoMyMouth(runtime *common.HuiRuntime) {
+func putWordsIntoMyMouth(runtime *huiRuntime) {
 	runtime.CmdMode = true
 	runtime.CmdLine = "Surprise"
 }
@@ -27,11 +23,11 @@ func putWordsIntoMyMouth(runtime *common.HuiRuntime) {
 /* Do not touch this!
  * Used by demo cfg.
  */
-func quit(runtime *common.HuiRuntime) {
+func quit(runtime *huiRuntime) {
 	runtime.Active = false
 }
 
-func huiWelcome(runtime *common.HuiRuntime) {
+func huiWelcome(runtime *huiRuntime) {
 	runtime.Feedback = `Welcome, welcome to HUI.
 You have chosen or been chosen to use one of our finest actively developed apps.
 I have thought so much of HUI that i elected to pin it on Github.`

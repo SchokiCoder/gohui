@@ -4,7 +4,6 @@
 package common
 
 import (
-	"github.com/SchokiCoder/gohui/config"
 	"github.com/SchokiCoder/gohui/csi"
 
 	"os/exec"
@@ -50,7 +49,7 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 	return HandleShellSession(shCall)
 }
 
-func DrawUpper(comcfg config.ComCfg, header []string, termW int, title []string) {
+func DrawUpper(comcfg ComConfig, header []string, termW int, title []string) {
 	for _, v := range header {
 		Cprinta(comcfg.HeaderAlignment,
 		        comcfg.HeaderFg,
@@ -70,7 +69,7 @@ func DrawUpper(comcfg config.ComCfg, header []string, termW int, title []string)
 
 func GenerateLower(cmdline    string,
                    cmdmode    bool,
-                   comcfg     config.ComCfg,
+                   comcfg     ComConfig,
                    feedback   *string,
                    pagerTitle string,
                    termW      int)           string {
@@ -208,64 +207,4 @@ func tryFitFeedback(feedback       string,
 	}
 
 	return retStr, retFits
-}
-
-type CouRuntime struct {
-	AcceptInput bool
-	Active bool
-	CmdLine string
-	CmdMode bool
-	Comcfg config.ComCfg
-	Content string
-	Coucfg config.CouCfg
-	Scroll int
-	Feedback string
-	Title string
-}
-
-func NewCouRuntime() CouRuntime {
-	return CouRuntime {
-		AcceptInput: true,
-		Active: true,
-		CmdLine: "",
-		CmdMode: false,
-		Comcfg: config.ComCfgFromFile(),
-		Content: "",
-		Coucfg: config.CouCfgFromFile(),
-		Scroll: 0,
-		Feedback: "",
-		Title: "",
-	}
-}
-
-type MenuPath []string
-
-func (mp MenuPath) CurMenu() string {
-	return mp[len(mp) - 1]
-}
-
-type HuiRuntime struct {
-	AcceptInput bool
-	Active bool
-	CmdLine string
-	CmdMode bool
-	Comcfg config.ComCfg
-	Cursor int
-	Feedback string
-	Huicfg config.HuiCfg
-	Menupath MenuPath
-}
-
-func NewHuiRuntime() HuiRuntime {
-	return HuiRuntime {
-		AcceptInput: true,
-		Active: true,
-		CmdLine: "",
-		CmdMode: false,
-		Comcfg: config.ComCfgFromFile(),
-		Cursor: 0,
-		Feedback: "",
-		Huicfg: config.HuiCfgFromFile(),
-		Menupath: make(MenuPath, 1, 8),
-	}
 }

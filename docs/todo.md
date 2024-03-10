@@ -62,7 +62,10 @@ Also also fix pagerTitle not being given to dev-courier at all.
 
 This was painful.
 
-- add config validation for if a script function actually exists in func map
++ add config validation for if a script function actually exists in func map
+
+Also undo me chopping everything into tiny modules.
+
 - update demo configs
 - set version
 

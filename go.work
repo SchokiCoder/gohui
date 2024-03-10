@@ -1,8 +1,6 @@
 go 1.21
 
 use common
-use config
 use courier
 use csi
 use hui
-use scripts

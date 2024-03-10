@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-package scripts
+package main
 
-import (
-	"github.com/SchokiCoder/gohui/common"
-)
-
-var CouFuncs = map[string]func(*common.CouRuntime) {
+var couFuncs = map[string]func(*couRuntime) {
 	"Goodbye": couGoodbye,
 	"Welcome": couWelcome,
 }
@@ -20,11 +16,11 @@ var CouFuncs = map[string]func(*common.CouRuntime) {
  * At this point only `pkill courier` may help you.
  */
 
-func couGoodbye(runtime *common.CouRuntime) {
+func couGoodbye(runtime *couRuntime) {
 	runtime.CmdMode = true
-	runtime.CmdLine = "Come back soon. We have muffins too!"
+	runtime.CmdLine = "Courier End CmdLine Msg"
 }
 
-func couWelcome(runtime *common.CouRuntime) {
+func couWelcome(runtime *couRuntime) {
 	runtime.CmdLine = "Eesterexs"
 }

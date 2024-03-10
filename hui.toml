@@ -9,10 +9,10 @@ EntryMenuPrefix = "> ["
 EntryMenuPostfix = "]"
 EntryShellPrefix = "> "
 EntryShellPostfix = ""
-EntryGoPrefix = "> !"
-EntryGoPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
+EntryGoPrefix = "> !"
+EntryGoPostfix = ""
 
 EntryAlignment = "center"
 

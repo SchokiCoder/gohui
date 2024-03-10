@@ -1,4 +1,5 @@
 Header = "House User Interface - Demo Config\n"
+PagerTitle = 'HUI - Feedback'
 
 KeyExecute = "L"
 
@@ -8,8 +9,13 @@ EntryShellPrefix = "> "
 EntryShellPostfix = ""
 EntryShellSessionPrefix = "> <"
 EntryShellSessionPostfix = ">"
+EntryGoPrefix = "> !"
+EntryGoPostfix = ""
 
 EntryAlignment = "left"
+
+GoStart = ''
+GoQuit = ''
 
 [EntryFg]
 Active = false

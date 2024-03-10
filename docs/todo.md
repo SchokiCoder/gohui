@@ -37,10 +37,12 @@
   Thus a "left" key press would send you to the menu entry that you entered.
 - set version to 1.3
 
-# bleh
+# now
 
 - look for original features that need to be implemented before implementing
   next
+
+-----
 
 # v1.2 The non-brazilian Update
 
@@ -66,10 +68,11 @@ This was painful.
 
 Also undo me chopping everything into tiny modules.
 
-- update demo configs
-- set version
++ update demo configs
 
------
+- fix -v, -a and -h not doing their thing
+
+- set version to 1.2.
 
 # v1.1
 

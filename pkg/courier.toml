@@ -1,6 +1,10 @@
 Header = "Courier - Demo Config\n"
+PagerTitle = 'Courier - Feedback'
 
 ContentAlignment = "left"
+
+GoStart = ''
+GoQuit = ''
 
 [ContentFg]
 Active = false

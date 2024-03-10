@@ -70,9 +70,9 @@ Also undo me chopping everything into tiny modules.
 
 + update demo configs
 
-- fix -v, -a and -h not doing their thing
++ fix event scripts interfering with flags (-v, -a and -h)
 
-- set version to 1.2.
+Also set version to 1.2.
 
 # v1.1
 

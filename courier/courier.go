@@ -342,6 +342,9 @@ func main() {
 	var runtime = newCouRuntime()
 
 	runtime.Content, runtime.Active = handleArgs(&runtime.Title)
+	if runtime.Active == false {
+		return
+	}
 
 	fmt.Printf(csi.CURSOR_HIDE)
 	defer fmt.Printf(csi.CURSOR_SHOW)

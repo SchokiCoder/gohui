@@ -425,7 +425,10 @@ func main() {
 	runtime.Menupath[0] = "main"
 
 	runtime.Active = handleArgs()
-	
+	if runtime.Active == false {
+		return
+	}
+
 	fmt.Printf(csi.CURSOR_HIDE)
 	defer fmt.Printf(csi.CURSOR_SHOW)
 	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)

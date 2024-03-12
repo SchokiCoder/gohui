@@ -21,7 +21,7 @@
 - update demo config
 - set version
 
-# v1.3 niceties
+# niceties
 
 - add arrow key support for navigation
 - add arrow key support for cmdline
@@ -35,12 +35,22 @@
   "Entry type is \"shell\", cannot enter."
 - add cursor for each menu in menu_path
   Thus a "left" key press would send you to the menu entry that you entered.
-- set version to 1.3
+- set version to 
 
-# now
+# The Replacement Update
 
-- look for original features that need to be implemented before implementing
-  next
+- configs: add all vars to some struct
+  (for position independency within the toml)
+
+- add custom commands via scripts
+  (test with a shell command
+   ("sh " everything after that throw into handleShell `sh echo $USER`))
+
+- BSD compat tests
+	- OpenBSD
+	- FreeBSD
+
+- set version to 1.3.
 
 -----
 

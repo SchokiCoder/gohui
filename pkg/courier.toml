@@ -1,19 +1,23 @@
 Header = "Courier - Demo Config\n"
-PagerTitle = 'Courier - Feedback'
 
-ContentAlignment = "left"
+[Pager]
+Title = 'Courier - Feedback'
 
-GoStart = ''
-GoQuit = ''
+[Content]
+Alignment = "left"
 
-[ContentFg]
+[Content.Fg]
 Active = false
 R = 0
 G = 0
 B = 0
 
-[ContentBg]
+[Content.Bg]
 Active = false
 R = 0
 G = 0
 B = 0
+
+[Events]
+Start = ''
+Quit = ''

@@ -10,14 +10,26 @@ import (
 	"fmt"
 )
 
+type contentConfig struct {
+	Alignment string
+	Fg        csi.FgColor
+	Bg        csi.BgColor
+}
+
+type eventsConfig struct {
+	Start string
+	Quit  string
+}
+
+type pagerConfig struct {
+	Title string
+}
+
 type couConfig struct {
-	Header           string
-	PagerTitle       string
-	ContentAlignment string
-	GoStart          string
-	GoQuit           string
-	ContentFg        csi.FgColor
-	ContentBg        csi.BgColor
+	Header  string
+	Pager   pagerConfig
+	Content contentConfig
+	Events  eventsConfig
 }
 
 func couConfigFromFile() couConfig {
@@ -25,18 +37,18 @@ func couConfigFromFile() couConfig {
 
 	common.AnyConfigFromFile(&ret, "courier.toml")
 	ret.validateAlignments()
-	if ret.GoStart != "" {
-		validateGo(ret.GoStart)
+	if ret.Events.Start != "" {
+		validateGo(ret.Events.Start)
 	}
-	if ret.GoQuit != "" {
-		validateGo(ret.GoQuit)
+	if ret.Events.Quit != "" {
+		validateGo(ret.Events.Quit)
 	}
 
 	return ret
 }
 
 func (c couConfig) validateAlignments() {
-	common.ValidateAlignment(c.ContentAlignment)
+	common.ValidateAlignment(c.Content.Alignment)
 }
 
 func validateGo(fnName string) {

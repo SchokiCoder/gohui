@@ -51,17 +51,17 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 
 func DrawUpper(comcfg ComConfig, header []string, termW int, title []string) {
 	for _, v := range header {
-		Cprinta(comcfg.HeaderAlignment,
-		        comcfg.HeaderFg,
-		        comcfg.HeaderBg,
+		Cprinta(comcfg.Header.Alignment,
+		        comcfg.Header.Fg,
+		        comcfg.Header.Bg,
 		        termW,
 		        v)
 	}
 
 	for _, v := range title {
-		Cprinta(comcfg.TitleAlignment,
-		        comcfg.TitleFg,
-		        comcfg.TitleBg,
+		Cprinta(comcfg.Title.Alignment,
+		        comcfg.Title.Fg,
+		        comcfg.Title.Bg,
 		        termW,
 		        v)
 	}
@@ -77,24 +77,24 @@ func GenerateLower(cmdline    string,
 	var ret string
 	
 	if cmdmode == true {
-		ret = Csprintfa(comcfg.CmdlineAlignment,
-		                comcfg.CmdlineFg,
-			        comcfg.CmdlineBg,
+		ret = Csprintfa(comcfg.CmdLine.Alignment,
+		                comcfg.CmdLine.Fg,
+			        comcfg.CmdLine.Bg,
 			        termW,
 			        "%v%v",
-			        comcfg.CmdlinePrefix,
+			        comcfg.CmdLine.Prefix,
 			        cmdline)
 	} else {
-		ret, fits = tryFitFeedback(*feedback, comcfg.FeedbackPrefix, termW)
+		ret, fits = tryFitFeedback(*feedback, comcfg.Feedback.Prefix, termW)
 		if fits == false {
-			ret = callPager(*feedback, comcfg.AppPager, pagerTitle)
+			ret = callPager(*feedback, comcfg.Pager.Name, pagerTitle)
 			*feedback = ""
-			ret, _ = tryFitFeedback(ret, comcfg.FeedbackPrefix, termW)
+			ret, _ = tryFitFeedback(ret, comcfg.Feedback.Prefix, termW)
 		}
 
-		ret = Csprintfa(comcfg.FeedbackAlignment,
-		                comcfg.FeedbackFg,
-		                comcfg.FeedbackBg,
+		ret = Csprintfa(comcfg.Feedback.Alignment,
+		                comcfg.Feedback.Fg,
+		                comcfg.Feedback.Bg,
 		                termW,
 		                "%v",
 		                ret)

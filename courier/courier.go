@@ -103,9 +103,9 @@ func drawContent(contentLines  []string,
 	}
 
 	for _, v := range contentLines[runtime.Scroll:drawRange] {
-		common.Cprinta(runtime.Coucfg.ContentAlignment,
-		               runtime.Coucfg.ContentFg,
-		               runtime.Coucfg.ContentBg,
+		common.Cprinta(runtime.Coucfg.Content.Alignment,
+		               runtime.Coucfg.Content.Fg,
+		               runtime.Coucfg.Content.Bg,
 		               termW,
 		               v)
 	}
@@ -252,24 +252,24 @@ func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 	}
 	
 	switch key {
-	case runtime.Comcfg.KeyUp:
+	case runtime.Comcfg.Keys.Up:
 		if runtime.Scroll > 0 {
 			runtime.Scroll--
 		}
 
-	case runtime.Comcfg.KeyDown:
+	case runtime.Comcfg.Keys.Down:
 		if runtime.Scroll < contentLineCount {
 			runtime.Scroll++
 		}
 
 
-	case runtime.Comcfg.KeyCmdmode:
+	case runtime.Comcfg.Keys.Cmdmode:
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
-	case runtime.Comcfg.KeyQuit:
+	case runtime.Comcfg.Keys.Quit:
 		fallthrough
-	case runtime.Comcfg.KeyLeft:
+	case runtime.Comcfg.Keys.Left:
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
@@ -282,7 +282,7 @@ func handleKeyCmdline(key              string,
                       contentLineCount int,
                       runtime          *couRuntime) {
 	switch key {
-	case runtime.Comcfg.KeyCmdenter:
+	case runtime.Comcfg.Keys.Cmdenter:
 		runtime.Feedback = handleCommand(contentLineCount, runtime)
 		fallthrough
 	case csi.SIGINT:
@@ -319,7 +319,7 @@ func tick(runtime *couRuntime) {
 	                             runtime.CmdMode,
 	                             runtime.Comcfg,
 	                             &runtime.Feedback,
-	                             runtime.Coucfg.PagerTitle,
+	                             runtime.Coucfg.Pager.Title,
 	                             termW)
 
 	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
@@ -350,16 +350,16 @@ func main() {
 	defer fmt.Printf(csi.CURSOR_SHOW)
 	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if runtime.Coucfg.GoStart != "" {
-		couFuncs[runtime.Coucfg.GoStart](&runtime)
+	if runtime.Coucfg.Events.Start != "" {
+		couFuncs[runtime.Coucfg.Events.Start](&runtime)
 	}
 
 	for runtime.Active {
 		tick(&runtime)
 	}
 
-	if runtime.Coucfg.GoQuit != "" {
-		couFuncs[runtime.Coucfg.GoQuit](&runtime)
+	if runtime.Coucfg.Events.Quit != "" {
+		couFuncs[runtime.Coucfg.Events.Quit](&runtime)
 		tick(&runtime)
 	}
 }

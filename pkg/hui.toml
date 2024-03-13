@@ -1,45 +1,49 @@
 Header = "House User Interface - Demo Config\n"
-PagerTitle = 'HUI - Feedback'
 
-KeyExecute = "L"
+[Pager]
+Title = 'HUI - Feedback'
 
-EntryMenuPrefix = "> ["
-EntryMenuPostfix = "]"
-EntryShellPrefix = "> "
-EntryShellPostfix = ""
-EntryShellSessionPrefix = "> <"
-EntryShellSessionPostfix = ">"
-EntryGoPrefix = "> !"
-EntryGoPostfix = ""
+[Keys]
+Execute = "L"
 
-EntryAlignment = "left"
+[Entry]
+Alignment = "left"
+MenuPrefix = "> ["
+MenuPostfix = "]"
+ShellPrefix = "> "
+ShellPostfix = ""
+ShellSessionPrefix = "> <"
+ShellSessionPostfix = ">"
+GoPrefix = "> !"
+GoPostfix = ""
 
-GoStart = ''
-GoQuit = ''
-
-[EntryFg]
+[Entry.Fg]
 Active = false
 R = 0
 G = 0
 B = 0
 
-[EntryBg]
+[Entry.Bg]
 Active = false
 R = 0
 G = 0
 B = 0
 
-[EntryHoverFg]
+[Entry.HoverFg]
 Active = true
 R = 0
 G = 0
 B = 0
 
-[EntryHoverBg]
+[Entry.HoverBg]
 Active = true
 R = 255
 G = 255
 B = 255
+
+[Events]
+Start = ''
+Quit = ''
 
 [Menus]
 [Menus.main]

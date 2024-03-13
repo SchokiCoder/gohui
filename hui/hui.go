@@ -104,7 +104,7 @@ var AppRepo       string
 var AppVersion    string
 
 func drawMenu(contentHeight int,
-              curMenu Menu,
+              curMenu menu,
               cursor int,
               huicfg huiConfig,
               termW int) {
@@ -127,28 +127,28 @@ func drawMenu(contentHeight int,
 	
 	for i := drawBegin; i < len(curMenu.Entries) && i < drawEnd; i++ {
 		if curMenu.Entries[i].Shell != "" {
-			prefix = huicfg.EntryShellPrefix
-			postfix = huicfg.EntryShellPostfix
+			prefix = huicfg.Entry.ShellPrefix
+			postfix = huicfg.Entry.ShellPostfix
 		} else if curMenu.Entries[i].ShellSession != "" {
-			prefix = huicfg.EntryShellSessionPrefix
-			postfix = huicfg.EntryShellSessionPostfix
+			prefix = huicfg.Entry.ShellSessionPrefix
+			postfix = huicfg.Entry.ShellSessionPostfix
 		} else if curMenu.Entries[i].Go != "" {
-			prefix = huicfg.EntryGoPrefix
-			postfix = huicfg.EntryGoPostfix
+			prefix = huicfg.Entry.GoPrefix
+			postfix = huicfg.Entry.GoPostfix
 		} else {
-			prefix = huicfg.EntryMenuPrefix
-			postfix = huicfg.EntryMenuPostfix
+			prefix = huicfg.Entry.MenuPrefix
+			postfix = huicfg.Entry.MenuPostfix
 		}
 		
 		if i == cursor {
-			fg = huicfg.EntryHoverFg
-			bg = huicfg.EntryHoverBg
+			fg = huicfg.Entry.HoverFg
+			bg = huicfg.Entry.HoverBg
 		} else {
-			fg = huicfg.EntryFg
-			bg = huicfg.EntryBg
+			fg = huicfg.Entry.Fg
+			bg = huicfg.Entry.Bg
 		}
 		
-		common.Cprinta(huicfg.EntryAlignment,
+		common.Cprinta(huicfg.Entry.Alignment,
 		               fg,
 		               bg,
 		               termW,
@@ -193,7 +193,7 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(curMenu Menu, runtime *huiRuntime) string {
+func handleCommand(curMenu menu, runtime *huiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
@@ -261,32 +261,32 @@ func handleKey(key string, runtime *huiRuntime) {
 	}
 	
 	switch key {
-	case runtime.Comcfg.KeyQuit:
+	case runtime.Comcfg.Keys.Quit:
 		runtime.Active = false
 
-	case runtime.Comcfg.KeyLeft:
+	case runtime.Comcfg.Keys.Left:
 		if len(runtime.Menupath) > 1 {
 			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
 			runtime.Cursor = 0
 		}
 
-	case runtime.Comcfg.KeyDown:
+	case runtime.Comcfg.Keys.Down:
 		if runtime.Cursor < len(curMenu.Entries) - 1 {
 			runtime.Cursor++
 		}
 
-	case runtime.Comcfg.KeyUp:
+	case runtime.Comcfg.Keys.Up:
 		if runtime.Cursor > 0 {
 			runtime.Cursor--
 		}
 
-	case runtime.Comcfg.KeyRight:
+	case runtime.Comcfg.Keys.Right:
 		if curEntry.Menu != "" {
 			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
 			runtime.Cursor = 0
 		}
 
-	case runtime.Huicfg.KeyExecute:
+	case runtime.Huicfg.Keys.Execute:
 		if curEntry.Shell != "" {
 			runtime.Feedback = handleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
@@ -295,7 +295,7 @@ func handleKey(key string, runtime *huiRuntime) {
 			huiFuncs[curEntry.Go](runtime)
 		}
 	
-	case runtime.Comcfg.KeyCmdmode:
+	case runtime.Comcfg.Keys.Cmdmode:
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
@@ -307,10 +307,10 @@ func handleKey(key string, runtime *huiRuntime) {
 }
 
 func handleKeyCmdline(key     string,
-                      curMenu Menu,
+                      curMenu menu,
                       runtime *huiRuntime) {
 	switch key {
-	case runtime.Comcfg.KeyCmdenter:
+	case runtime.Comcfg.Keys.Cmdenter:
 		runtime.Feedback = handleCommand(curMenu, runtime)
 		fallthrough
 	case csi.SIGINT:
@@ -376,12 +376,12 @@ func handleShell(shell string) string {
 
 func tick(runtime *huiRuntime) {
 	var contentHeight int
-	var curMenu Menu
-	var err error
-	var headerLines []string
-	var lower string
-	var termH, termW int
-	var titleLines []string
+	var curMenu       menu
+	var err           error
+	var headerLines   []string
+	var lower         string
+	var termH, termW  int
+	var titleLines    []string
 
 	fmt.Print(csi.CLEAR)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
@@ -396,7 +396,7 @@ func tick(runtime *huiRuntime) {
 	                             runtime.CmdMode,
 	                             runtime.Comcfg,
 	                             &runtime.Feedback,
-	                             runtime.Huicfg.PagerTitle,
+	                             runtime.Huicfg.Pager.Title,
 	                             termW)
 
 	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
@@ -433,16 +433,16 @@ func main() {
 	defer fmt.Printf(csi.CURSOR_SHOW)
 	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if runtime.Huicfg.GoStart != "" {
-		huiFuncs[runtime.Huicfg.GoStart](&runtime)
+	if runtime.Huicfg.Events.Start != "" {
+		huiFuncs[runtime.Huicfg.Events.Start](&runtime)
 	}
 
 	for runtime.Active {
 		tick(&runtime)
 	}
 
-	if runtime.Huicfg.GoQuit != "" {
-		huiFuncs[runtime.Huicfg.GoQuit](&runtime)
+	if runtime.Huicfg.Events.Quit != "" {
+		huiFuncs[runtime.Huicfg.Events.Quit](&runtime)
 		tick(&runtime)
 	}
 }

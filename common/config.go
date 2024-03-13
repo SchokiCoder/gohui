@@ -14,29 +14,53 @@ import (
 	"strings"
 )
 
+type cmdlineConfig struct {
+	Alignment string
+	Prefix    string
+	Fg        csi.FgColor
+	Bg        csi.BgColor
+}
+
+type feedbackConfig struct {
+	Alignment string
+	Prefix    string
+	Fg        csi.FgColor
+	Bg        csi.BgColor
+}
+
+type headerConfig struct {
+	Alignment string
+	Fg        csi.FgColor
+	Bg        csi.BgColor
+}
+
+type pagerConfig struct {
+	Name string
+}
+
+type keysConfig struct {
+	Left     string
+	Down     string
+	Up       string
+	Right    string
+	Quit     string
+	Cmdmode  string
+	Cmdenter string
+}
+
+type titleConfig struct {
+	Alignment string
+	Fg        csi.FgColor
+	Bg        csi.BgColor
+}
+
 type ComConfig struct {
-	AppPager                 string
-	KeyLeft                  string
-	KeyDown                  string
-	KeyUp                    string
-	KeyRight                 string
-	KeyQuit                  string
-	KeyCmdmode               string
-	KeyCmdenter              string
-	CmdlinePrefix            string
-	FeedbackPrefix           string
-	HeaderAlignment          string
-	TitleAlignment           string
-	CmdlineAlignment         string
-	FeedbackAlignment        string
-	HeaderFg                 csi.FgColor
-	HeaderBg                 csi.BgColor
-	TitleFg                  csi.FgColor
-	TitleBg                  csi.BgColor
-	FeedbackFg               csi.FgColor
-	FeedbackBg               csi.BgColor
-	CmdlineFg                csi.FgColor
-	CmdlineBg                csi.BgColor
+	Pager    pagerConfig
+	Keys     keysConfig
+	Header   headerConfig
+	Title    titleConfig
+	CmdLine  cmdlineConfig
+	Feedback feedbackConfig
 }
 
 func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
@@ -126,23 +150,23 @@ func ValidateAlignment(alignment string) {
 }
 
 func (c ComConfig) validateAlignments() {
-	ValidateAlignment(c.HeaderAlignment)
-	ValidateAlignment(c.TitleAlignment)
-	ValidateAlignment(c.CmdlineAlignment)
-	ValidateAlignment(c.FeedbackAlignment)
+	ValidateAlignment(c.Header.Alignment)
+	ValidateAlignment(c.Title.Alignment)
+	ValidateAlignment(c.CmdLine.Alignment)
+	ValidateAlignment(c.Feedback.Alignment)
 }
 
 func (c ComConfig) validatePager() {
 	var pagerExists = false
 	var path = os.Getenv("PATH")
 
-	_, err := os.Stat(c.AppPager)
+	_, err := os.Stat(c.Pager.Name)
 	if errors.Is(err, os.ErrNotExist) == false {
 		return
 	}
 
 	for _, v := range strings.Split(path, ":") {
-		_, err := os.Stat(fmt.Sprintf("%v/%v", v, c.AppPager))
+		_, err := os.Stat(fmt.Sprintf("%v/%v", v, c.Pager.Name))
 		if errors.Is(err, os.ErrNotExist) == false {
 			pagerExists = true
 			break
@@ -151,6 +175,6 @@ func (c ComConfig) validatePager() {
 
 	if pagerExists == false {
 		panic(fmt.Sprintf(`The configured pager "%v" can not be found.`,
-		                  c.AppPager))
+		                  c.Pager.Name))
 	}
 }

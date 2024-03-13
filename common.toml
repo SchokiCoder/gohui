@@ -1,67 +1,75 @@
 # Dev test config
 
-AppPager = "./pkg/courier"
+[Pager]
+Name = "./pkg/courier"
 
-KeyLeft = "h"
-KeyDown = "j"
-KeyUp = "k"
-KeyRight = "l"
-KeyQuit = "q"
-KeyCmdmode = ":"
-KeyCmdenter = "\r"
+[Keys]
+Left = "h"
+Down = "j"
+Up = "k"
+Right = "l"
+Quit = "q"
+Cmdmode = ":"
+Cmdenter = "\r"
 
-CmdlinePrefix = ":"
-FeedbackPrefix = "<"
+[Header]
+Alignment = "right"
 
-HeaderAlignment = "right"
-TitleAlignment = "left"
-CmdlineAlignment = "right"
-FeedbackAlignment = "center"
-
-[HeaderFg]
+[Header.Fg]
 Active = false
 R = 230
 G = 230
 B = 230
 
-[HeaderBg]
+[Header.Bg]
 Active = false
 R = 20
 G = 50
 B = 20
 
-[TitleFg]
+[Title]
+Alignment = "left"
+
+[Title.Fg]
 Active = false
 R = 230
 G = 230
 B = 230
 
-[TitleBg]
+[Title.Bg]
 Active = false
 R = 20
 G = 50
 B = 50
 
-[FeedbackFg]
-Active = true
-R = 175
-G = 175
-B = 175
+[CmdLine]
+Alignment = "right"
+Prefix = ":"
 
-[FeedbackBg]
-Active = false
-R = 0
-G = 0
-B = 0
-
-[CmdlineFg]
+[CmdLine.Fg]
 Active = false
 R = 200
 G = 255
 B = 200
 
-[CmdlineBg]
+[CmdLine.Bg]
 Active = false
 R = 20
 G = 20
 B = 20
+
+[Feedback]
+Alignment = "center"
+Prefix = "<"
+
+[Feedback.Fg]
+Active = true
+R = 175
+G = 175
+B = 175
+
+[Feedback.Bg]
+Active = false
+R = 0
+G = 0
+B = 0

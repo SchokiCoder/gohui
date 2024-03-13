@@ -1,21 +1,25 @@
 # Dev test config
 
 Header = "Dev courier test\n"
-PagerTitle = 'Courier - Feedback'
 
-ContentAlignment = "center"
+[Pager]
+Title = 'Courier - Feedback'
 
-GoStart = 'Welcome'
-GoQuit = 'Goodbye'
+[Content]
+Alignment = "center"
 
-[ContentFg]
+[Content.Fg]
 Active = false
 R = 0
 G = 0
 B = 0
 
-[ContentBg]
+[Content.Bg]
 Active = false
 R = 0
 G = 0
 B = 0
+
+[Events]
+Start = 'Welcome'
+Quit = 'Goodbye'

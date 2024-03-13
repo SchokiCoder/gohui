@@ -39,8 +39,9 @@
 
 # The Replacement Update
 
-- configs: add all vars to some struct
-  (for position independency within the toml)
++ configs: add most variables to some struct
+
+This is for position independency within the toml and it looks better.
 
 - add custom commands via scripts
   (test with a shell command

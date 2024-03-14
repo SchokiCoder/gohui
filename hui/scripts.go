@@ -13,7 +13,7 @@ var huiCommands = map[string]func(string, *huiRuntime) string {
 }
 
 func shCommand(cmd string, _ *huiRuntime) string {
-	return handleShell(cmd)
+	return common.HandleShell(cmd)
 }
 
 func shsCommand(cmd string, _ *huiRuntime) string {

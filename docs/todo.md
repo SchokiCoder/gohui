@@ -44,7 +44,7 @@
 This is for position independency within the toml and it looks better.
 
 + hui: add custom commands via scripts
-- courier: add custom commands via scripts
++ courier: add custom commands via scripts
 
 - BSD compat tests
 	- OpenBSD

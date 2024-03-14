@@ -14,6 +14,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type couRuntime struct {
@@ -188,7 +189,13 @@ func handleCommand(contentLineCount int, runtime *couRuntime) string {
 	var err error
 	var ret string = ""
 	var num uint64
-	
+
+	cmdLineParts := strings.SplitN(runtime.CmdLine, " ", 2)
+	fn := couCommands[cmdLineParts[0]]
+	if fn != nil {
+		return fn(cmdLineParts[1], runtime)
+	}
+
 	switch runtime.CmdLine {
 	case "q":
 		fallthrough

@@ -103,6 +103,53 @@ func GenerateLower(cmdline    string,
 	return ret
 }
 
+func HandleShell(shell string) string {
+	var cmd *exec.Cmd
+	var cmderr io.ReadCloser
+	var cmdout io.ReadCloser
+	var err error
+	var strerr []byte
+	var strout []byte
+
+	cmd = exec.Command("sh", "-c", shell)
+
+	cmderr, err = cmd.StderrPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stderr: %s", err)
+	}
+
+	cmdout, err = cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Sprintf("Could not get stdout: %s", err)
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return fmt.Sprintf("Could not start child process: %s", err)
+	}
+
+	strerr, err = io.ReadAll(cmderr)
+	if err != nil {
+		return fmt.Sprintf("Could not read stderr: %s", err)
+	}
+
+	strout, err = io.ReadAll(cmdout)
+	if err != nil {
+		return fmt.Sprintf("Could not read stdout: %s", err)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Sprintf("Child error: %s", err)
+	}
+
+	if len(strerr) > 0 {
+		return string(strerr)
+	} else {
+		return string(strout)
+	}
+}
+
 func HandleShellSession(shell string) string {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser

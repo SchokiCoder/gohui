@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"golang.org/x/term"
 	"strconv"
+	"strings"
 	"os"
 	"os/exec"
 )
@@ -197,7 +198,13 @@ func handleCommand(curMenu menu, runtime *huiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
-	
+
+	cmdLineParts := strings.SplitN(runtime.CmdLine, " ", 2)
+	fn := huiCommands[cmdLineParts[0]]
+	if fn != nil {
+		return fn(cmdLineParts[1], runtime)
+	}
+
 	switch runtime.CmdLine {
 	case "q":
 		fallthrough

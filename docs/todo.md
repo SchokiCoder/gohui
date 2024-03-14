@@ -37,15 +37,14 @@
   Thus a "left" key press would send you to the menu entry that you entered.
 - set version to 
 
-# The Replacement Update
+# The White Magic Update
 
 + configs: add most variables to some struct
 
 This is for position independency within the toml and it looks better.
 
-- add custom commands via scripts
-  (test with a shell command
-   ("sh " everything after that throw into handleShell `sh echo $USER`))
++ hui: add custom commands via scripts
+- courier: add custom commands via scripts
 
 - BSD compat tests
 	- OpenBSD

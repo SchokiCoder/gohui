@@ -3,6 +3,23 @@
 
 package main
 
+import (
+	"github.com/SchokiCoder/gohui/common"
+)
+
+var huiCommands = map[string]func(string, *huiRuntime) string {
+	"sh": shCommand,
+	"shs": shsCommand,
+}
+
+func shCommand(cmd string, _ *huiRuntime) string {
+	return handleShell(cmd)
+}
+
+func shsCommand(cmd string, _ *huiRuntime) string {
+	return common.HandleShellSession(cmd)
+}
+
 var huiFuncs = map[string]func(*huiRuntime) {
 	"Goodbye": huiGoodbye,
 	"PutWordsIntoMyMouth": putWordsIntoMyMouth,

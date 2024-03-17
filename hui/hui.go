@@ -138,7 +138,7 @@ func drawMenu(contentHeight int,
 			prefix = huicfg.Entry.MenuPrefix
 			postfix = huicfg.Entry.MenuPostfix
 		}
-		
+
 		if i == cursor {
 			fg = huicfg.Entry.HoverFg
 			bg = huicfg.Entry.HoverBg
@@ -146,7 +146,7 @@ func drawMenu(contentHeight int,
 			fg = huicfg.Entry.Fg
 			bg = huicfg.Entry.Bg
 		}
-		
+
 		common.Cprinta(huicfg.Entry.Alignment,
 		               fg,
 		               bg,

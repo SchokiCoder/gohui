@@ -27,15 +27,24 @@
 - add arrow key support for cmdline
 - add del key support for cmdline
 - add return key support for cmdline
-- pgup and pgdown support
+- add pgup and pgdown support
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
-  entry
+entry
   "Entry type is \"menu\", cannot execute."
   "Entry type is \"shell\", cannot enter."
+
+- hui: add entry prefix and postfix variations for on cursor hover
+
+This is for colorless environments.
+
 - add cursor for each menu in menu_path
-  Thus a "left" key press would send you to the menu entry that you entered.
-- set version to 
+
+Thus a "left" key press would send you to the menu entry that you entered.
+
+- add csi 4 bit colors?
+
+- set version to 1.4.
 
 # The White Magic Update
 
@@ -46,11 +55,18 @@ This is for position independency within the toml and it looks better.
 + hui: add custom commands via scripts
 + courier: add custom commands via scripts
 
-- BSD compat tests
-	- OpenBSD
-	- FreeBSD
++ BSD compat tests
+	+ FreeBSD
+	+ OpenBSD
 
-- set version to 1.3.
++ bypass a bug with entry fg color inconsistency before cursor
+compared with after
+
+This happens once text with FG of #000000 has been printed.
+After that the default FG color will change, at least on Fedora 39 and
+Ubuntu 23.10.
+So instead just explicitly print white instead of default color.
+Also set version to 1.3.
 
 -----
 

@@ -264,16 +264,6 @@ func handleKey(key string, runtime *huiRuntime) {
 	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
 	var curEntry = &curMenu.Entries[runtime.Cursor]
 
-	if len(key) == 3 && runtime.CmdMode {
-		handleKeyCmdlineCsi(key, runtime)
-		return
-	}
-
-	if len(key) == 3 {
-		handleKeyCsi(key, curEntry, curMenu, runtime)
-		return
-	}
-
 	if runtime.CmdMode {
 		handleKeyCmdline(key, curMenu, runtime)
 		return
@@ -283,22 +273,30 @@ func handleKey(key string, runtime *huiRuntime) {
 	case runtime.Comcfg.Keys.Quit:
 		runtime.Active = false
 
+	case csi.CURSOR_LEFT:
+		fallthrough
 	case runtime.Comcfg.Keys.Left:
 		if len(runtime.Menupath) > 1 {
 			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
 			runtime.Cursor = 0
 		}
 
+	case csi.CURSOR_DOWN:
+		fallthrough
 	case runtime.Comcfg.Keys.Down:
 		if runtime.Cursor < len(curMenu.Entries) - 1 {
 			runtime.Cursor++
 		}
 
+	case csi.CURSOR_UP:
+		fallthrough
 	case runtime.Comcfg.Keys.Up:
 		if runtime.Cursor > 0 {
 			runtime.Cursor--
 		}
 
+	case csi.CURSOR_RIGHT:
+		fallthrough
 	case runtime.Comcfg.Keys.Right:
 		if curEntry.Menu != "" {
 			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
@@ -338,17 +336,6 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 		runtime.CmdLineCursor = 0
 		fmt.Printf(csi.CURSOR_HIDE)
 
-	default:
-		runtime.CmdLineCursor++
-		runtime.CmdLine = fmt.Sprintf("%v%v%v",
-		                              runtime.CmdLine[:runtime.CmdLineCursor - 1],
-		                              string(key),
-		                              runtime.CmdLine[runtime.CmdLineCursor - 1:])
-	}
-}
-
-func handleKeyCmdlineCsi(key string, runtime *huiRuntime) {
-	switch key {
 	case csi.CURSOR_RIGHT:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
 			runtime.CmdLineCursor++
@@ -358,32 +345,13 @@ func handleKeyCmdlineCsi(key string, runtime *huiRuntime) {
 		if runtime.CmdLineCursor > 0 {
 			runtime.CmdLineCursor--
 		}
-	}
-}
 
-func handleKeyCsi(key string, curEntry *entry, curMenu menu, runtime *huiRuntime) {
-	switch key {
-	case csi.CURSOR_UP:
-		if runtime.Cursor > 0 {
-			runtime.Cursor--
-		}
-
-	case csi.CURSOR_DOWN:
-		if runtime.Cursor < len(curMenu.Entries) - 1 {
-			runtime.Cursor++
-		}
-
-	case csi.CURSOR_RIGHT:
-		if curEntry.Menu != "" {
-			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
-			runtime.Cursor = 0
-		}
-
-	case csi.CURSOR_LEFT:
-		if len(runtime.Menupath) > 1 {
-			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
-			runtime.Cursor = 0
-		}
+	default:
+		runtime.CmdLineCursor++
+		runtime.CmdLine = fmt.Sprintf("%v%v%v",
+		                              runtime.CmdLine[:runtime.CmdLineCursor - 1],
+		                              string(key),
+		                              runtime.CmdLine[runtime.CmdLineCursor - 1:])
 	}
 }
 

@@ -23,6 +23,7 @@
 
 # niceties
 
++ update README and add comments to help with config customization
 - add arrow key support for navigation
 - add arrow key support for cmdline
 - add del key support for cmdline
@@ -46,6 +47,8 @@ Thus a "left" key press would send you to the menu entry that you entered.
 
 - set version to 1.4.
 
+-----
+
 # The White Magic Update
 
 + configs: add most variables to some struct
@@ -67,8 +70,6 @@ After that the default FG color will change, at least on Fedora 39 and
 Ubuntu 23.10.
 So instead just explicitly print white instead of default color.
 Also set version to 1.3.
-
------
 
 # v1.2 The non-brazilian Update
 

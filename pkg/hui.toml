@@ -42,10 +42,22 @@ G = 255
 B = 255
 
 [Events]
+
+# These call Go code from huiFuncs within hui/scripts.go.
+# Scripting is for advanced users and is thus "gatekept" by you having to
+# recompile.
+
 Start = ''
 Quit = ''
 
 [Menus]
+
+# Every entry has a Caption and just ONE of the following:
+# Menu, Shell, ShellSession, Go.
+# Shell and ShellSession differ in that ShellSession is used for commands that
+# run in their own mainloop with their own interactive stdin.
+# Go calls code from huiFuncs within hui/scripts.go.
+
 [Menus.main]
 Title = "Main Menu\n---------"
 

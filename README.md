@@ -11,7 +11,7 @@ QQ  QQQQQQ
 4P  4QQQQP
 ```
 
-# What is this
+# What is this?
 
 A customizable terminal user-interface for common tasks and personal tastes.  
 In a config file, you can create menus and commands within and then deploy it to
@@ -36,23 +36,22 @@ Follow these steps:
 - `chmod u+x *.sh`
 - `sudo ./install.sh` (`sudo` or `doas` may needed)
 
-# Origins
-
-This project is a Go language rewrite of
-[the original hui](https://github.com/SchokiCoder/hui).  
-This will reimplement all of the original features plus a config file system,
-so you don't have to recompile the source every time you want to change the
-config.  
-Some minor implementation details may vary, hopefully for the better.  
-
 # Contributing
 
 If you wish to do that, follow these steps to make it convenient for everyone:  
 
 - have a look at docs/todo.md to see short term goals
-- have a look at docs/goals.md to see long term goals
 - create a fork on GitHub
 - commit your changes
 - create a pull request on GitHub
 
 Thank you and have fun.  
+
+# Origins
+
+This project is a Go language rewrite of
+[the original and now obsolete hui](https://github.com/SchokiCoder/hui).  
+This will reimplement all of the original features plus a config file system,
+so you don't have to recompile the source every time you want to change the
+config.  
+Some minor implementation details may vary, hopefully for the better.  

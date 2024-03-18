@@ -25,6 +25,7 @@ type huiRuntime struct {
 	AcceptInput bool
 	Active bool
 	CmdLine string
+	CmdLineCursor int
 	CmdMode bool
 	Comcfg common.ComConfig
 	Cursor int
@@ -38,6 +39,7 @@ func newHuiRuntime() huiRuntime {
 		AcceptInput: true,
 		Active: true,
 		CmdLine: "",
+		CmdLineCursor: 0,
 		CmdMode: false,
 		Comcfg: common.ComConfigFromFile(),
 		Cursor: 0,
@@ -227,6 +229,7 @@ func handleCommand(curMenu menu, runtime *huiRuntime) string {
 	}
 	
 	runtime.CmdLine = ""
+	runtime.CmdLineCursor = 0
 	return ret
 }
 
@@ -254,22 +257,28 @@ func handleInput(runtime *huiRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	if len(input) == 1 {
-		handleKey(string(input), runtime)
-	} else if len(input) == 3 {
-		handleKeyCsi(string(input), runtime)
-	}
+	handleKey(string(input), runtime)
 }
 
 func handleKey(key string, runtime *huiRuntime) {
 	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
 	var curEntry = &curMenu.Entries[runtime.Cursor]
 
+	if len(key) == 3 && runtime.CmdMode {
+		handleKeyCmdlineCsi(key, runtime)
+		return
+	}
+
+	if len(key) == 3 {
+		handleKeyCsi(key, curEntry, curMenu, runtime)
+		return
+	}
+
 	if runtime.CmdMode {
 		handleKeyCmdline(key, curMenu, runtime)
 		return
 	}
-	
+
 	switch key {
 	case runtime.Comcfg.Keys.Quit:
 		runtime.Active = false
@@ -316,9 +325,7 @@ func handleKey(key string, runtime *huiRuntime) {
 	}
 }
 
-func handleKeyCmdline(key     string,
-                      curMenu menu,
-                      runtime *huiRuntime) {
+func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 	switch key {
 	case runtime.Comcfg.Keys.Cmdenter:
 		runtime.Feedback = handleCommand(curMenu, runtime)
@@ -328,37 +335,51 @@ func handleKeyCmdline(key     string,
 	case csi.SIGTSTP:
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
+		runtime.CmdLineCursor = 0
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	default:
-		runtime.CmdLine = fmt.Sprintf("%v%v",
-		                              runtime.CmdLine,
-		                              string(key))
+		runtime.CmdLineCursor++
+		runtime.CmdLine = fmt.Sprintf("%v%v%v",
+		                              runtime.CmdLine[:runtime.CmdLineCursor - 1],
+		                              string(key),
+		                              runtime.CmdLine[runtime.CmdLineCursor - 1:])
 	}
 }
 
-func handleKeyCsi(key string, runtime *huiRuntime) {
-	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
-	var curEntry = &curMenu.Entries[runtime.Cursor]
-
+func handleKeyCmdlineCsi(key string, runtime *huiRuntime) {
 	switch key {
-	case "\033[A":
+	case csi.CURSOR_RIGHT:
+		if runtime.CmdLineCursor < len(runtime.CmdLine) {
+			runtime.CmdLineCursor++
+		}
+
+	case csi.CURSOR_LEFT:
+		if runtime.CmdLineCursor > 0 {
+			runtime.CmdLineCursor--
+		}
+	}
+}
+
+func handleKeyCsi(key string, curEntry *entry, curMenu menu, runtime *huiRuntime) {
+	switch key {
+	case csi.CURSOR_UP:
 		if runtime.Cursor > 0 {
 			runtime.Cursor--
 		}
 
-	case "\033[B":
+	case csi.CURSOR_DOWN:
 		if runtime.Cursor < len(curMenu.Entries) - 1 {
 			runtime.Cursor++
 		}
 
-	case "\033[C":
+	case csi.CURSOR_RIGHT:
 		if curEntry.Menu != "" {
 			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
 			runtime.Cursor = 0
 		}
 
-	case "\033[D":
+	case csi.CURSOR_LEFT:
 		if len(runtime.Menupath) > 1 {
 			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
 			runtime.Cursor = 0
@@ -402,6 +423,8 @@ func tick(runtime *huiRuntime) {
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
+	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
+	              termH)
 
 	handleInput(runtime)
 }
@@ -423,7 +446,7 @@ func main() {
 
 	fmt.Printf(csi.CURSOR_HIDE)
 	defer fmt.Printf(csi.CURSOR_SHOW)
-	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
+	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if runtime.Huicfg.Events.Start != "" {
 		huiFuncs[runtime.Huicfg.Events.Start](&runtime)

@@ -25,11 +25,19 @@
 
 + update README and add comments to help with config customization
 + hui: add arrow key support for navigation
++ hui: add arrow key support for cmdline
+- hui: add del key support for cmdline
+- hui: add return key support for cmdline
+- hui: add pgup and pgdown support
+
 - courier: add arrow key support for navigation
-- add arrow key support for cmdline
-- add del key support for cmdline
-- add return key support for cmdline
-- add pgup and pgdown support
+- courier: add arrow key support for cmdline
+- courier: add del key support for cmdline
+- courier: add return key support for cmdline
+- courier: add pgup and pgdown support
+
+- add cmdLineHistory, which is navigated by up and down arrow
+
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
 entry

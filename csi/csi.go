@@ -16,6 +16,10 @@ const (
 	BG_DEFAULT = "\033[49m"
 	CURSOR_HIDE  = "\033[?25l"
 	CURSOR_SHOW  = "\033[?25h"
+	CURSOR_UP = "\033[A"
+	CURSOR_DOWN = "\033[B"
+	CURSOR_RIGHT = "\033[C"
+	CURSOR_LEFT = "\033[D"
 )
 
 func SetCursor(x, y int) {

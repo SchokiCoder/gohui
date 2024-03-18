@@ -233,7 +233,9 @@ func handleCommand(curMenu menu, runtime *huiRuntime) string {
 func handleInput(runtime *huiRuntime) {
 	var canonicalState *term.State
 	var err error
-	var input = make([]byte, 1)
+	var input string
+	var rawInput = make([]byte, 4)
+	var rawInputLen int
 
 	if runtime.AcceptInput == false {
 		return
@@ -244,15 +246,18 @@ func handleInput(runtime *huiRuntime) {
 		panic(fmt.Sprintf("Switching to raw mode failed: %v", err))
 	}
 
-	_, err = os.Stdin.Read(input)
+	rawInputLen, err = os.Stdin.Read(rawInput)
 	if err != nil {
 		panic(fmt.Sprintf("Reading from stdin failed: %v", err))
 	}
+	input = string(rawInput[0:rawInputLen])
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	for i := 0; i < len(input); i++ {
+	if len(input) == 1 {
 		handleKey(string(input), runtime)
+	} else if len(input) == 3 {
+		handleKeyCsi(string(input), runtime)
 	}
 }
 
@@ -329,6 +334,35 @@ func handleKeyCmdline(key     string,
 		runtime.CmdLine = fmt.Sprintf("%v%v",
 		                              runtime.CmdLine,
 		                              string(key))
+	}
+}
+
+func handleKeyCsi(key string, runtime *huiRuntime) {
+	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
+	var curEntry = &curMenu.Entries[runtime.Cursor]
+
+	switch key {
+	case "\033[A":
+		if runtime.Cursor > 0 {
+			runtime.Cursor--
+		}
+
+	case "\033[B":
+		if runtime.Cursor < len(curMenu.Entries) - 1 {
+			runtime.Cursor++
+		}
+
+	case "\033[C":
+		if curEntry.Menu != "" {
+			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
+			runtime.Cursor = 0
+		}
+
+	case "\033[D":
+		if len(runtime.Menupath) > 1 {
+			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
+			runtime.Cursor = 0
+		}
 	}
 }
 

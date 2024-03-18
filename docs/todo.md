@@ -24,7 +24,8 @@
 # niceties
 
 + update README and add comments to help with config customization
-- add arrow key support for navigation
++ hui: add arrow key support for navigation
+- courier: add arrow key support for navigation
 - add arrow key support for cmdline
 - add del key support for cmdline
 - add return key support for cmdline

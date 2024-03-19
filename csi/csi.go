@@ -23,6 +23,8 @@ const (
 	HOME = "\x1b[H"
 	INSERT = "\033[2~"
 	DELETE = "\033[3~"
+	PGUP = "\033[5~"
+	PGDOWN = "\033[6~"
 	END = "\x1b[F"
 	FG_DEFAULT = "\033[39m"
 	BG_DEFAULT = "\033[49m"

@@ -236,7 +236,7 @@ func handleCommand(curMenu menu, runtime *huiRuntime) string {
 	return ret
 }
 
-func handleInput(runtime *huiRuntime) {
+func handleInput(contentHeight int, runtime *huiRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input string
@@ -260,10 +260,10 @@ func handleInput(runtime *huiRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), runtime)
+	handleKey(string(input), contentHeight, runtime)
 }
 
-func handleKey(key string, runtime *huiRuntime) {
+func handleKey(key string, contentHeight int, runtime *huiRuntime) {
 	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
 	var curEntry = &curMenu.Entries[runtime.Cursor]
 
@@ -318,6 +318,20 @@ func handleKey(key string, runtime *huiRuntime) {
 	case runtime.Comcfg.Keys.Cmdmode:
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
+
+	case csi.PGUP:
+		if runtime.Cursor - contentHeight < 0 {
+			runtime.Cursor = 0
+		} else {
+			runtime.Cursor -= contentHeight
+		}
+
+	case csi.PGDOWN:
+		if runtime.Cursor + contentHeight >= len(curMenu.Entries) {
+			runtime.Cursor = len(curMenu.Entries) - 1
+		} else {
+			runtime.Cursor += contentHeight
+		}
 
 	case csi.HOME:
 		runtime.Cursor = 0
@@ -435,7 +449,7 @@ func tick(runtime *huiRuntime) {
 	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
 	              termH)
 
-	handleInput(runtime)
+	handleInput(contentHeight, runtime)
 }
 
 func main() {

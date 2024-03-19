@@ -34,7 +34,7 @@
 
 Also fix unsupported csi's being added to cmdline as input.
 
-- hui: add pgup and pgdown support
++ hui: add pgup and pgdown support for navigation
 
 - courier: add arrow key support for navigation
 - courier: add arrow key support for cmdline
@@ -44,7 +44,7 @@ Also fix unsupported csi's being added to cmdline as input.
 - courier: add end key support for navigation and cmdline
 - courier: add insert key support for cmdline
 - courier: fix unsupported csi's being added to cmdline as input
-- courier: add pgup and pgdown support
+- courier: add pgup and pgdown support for navigation
 
 - rename parameter runtime into rt to solve line len issues
 

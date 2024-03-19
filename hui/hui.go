@@ -316,6 +316,9 @@ func handleKey(key string, runtime *huiRuntime) {
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
+	case csi.HOME:
+		runtime.Cursor = 0
+
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
@@ -352,6 +355,9 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 		if runtime.CmdLineCursor > 0 {
 			runtime.CmdLineCursor--
 		}
+
+	case csi.HOME:
+		runtime.CmdLineCursor = 0
 
 	case csi.DELETE:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {

@@ -20,9 +20,9 @@ const (
 	CURSOR_DOWN = "\033[B"
 	CURSOR_RIGHT = "\033[C"
 	CURSOR_LEFT = "\033[D"
-	HOME = "\033[1~"
+	HOME = "\x1b[H"
 	DELETE = "\033[3~"
-	END = "\033[4~"
+	END = "\x1b[F"
 	FG_DEFAULT = "\033[39m"
 	BG_DEFAULT = "\033[49m"
 )

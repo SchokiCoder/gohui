@@ -26,14 +26,24 @@
 + update README and add comments to help with config customization
 + hui: add arrow key support for navigation
 + hui: add arrow key support for cmdline
-- hui: add del key support for cmdline
++ hui: add del key support for cmdline
 - hui: add return key support for cmdline
+- hui: add home key support for navigation
+- hui: add home key support for cmdline
+- hui: add end key support for navigation
+- hui: add end key support for cmdline
+- hui: add insert key support for cmdline
 - hui: add pgup and pgdown support
 
 - courier: add arrow key support for navigation
 - courier: add arrow key support for cmdline
 - courier: add del key support for cmdline
 - courier: add return key support for cmdline
+- courier: add home key support for navigation
+- courier: add home key support for cmdline
+- courier: add end key support for navigation
+- courier: add end key support for cmdline
+- courier: add insert key support for cmdline
 - courier: add pgup and pgdown support
 
 - add cmdLineHistory, which is navigated by up and down arrow

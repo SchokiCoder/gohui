@@ -346,12 +346,17 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 			runtime.CmdLineCursor--
 		}
 
+	case csi.DELETE:
+		if runtime.CmdLineCursor < len(runtime.CmdLine) {
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
+			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
+		}
+
 	default:
 		runtime.CmdLineCursor++
-		runtime.CmdLine = fmt.Sprintf("%v%v%v",
-		                              runtime.CmdLine[:runtime.CmdLineCursor - 1],
-		                              string(key),
-		                              runtime.CmdLine[runtime.CmdLineCursor - 1:])
+		runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
+		                  key +
+		                  runtime.CmdLine[runtime.CmdLineCursor - 1:]
 	}
 }
 

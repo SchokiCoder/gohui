@@ -11,7 +11,7 @@ const (
 	SIGINT  = "\003"
 	SIGTSTP = "\004"
 
-	BACKSPACE = "\b"
+	BACKSPACE = "\x7f"
 
 	CLEAR = "\033[H\033[2J"
 	CURSOR_HIDE  = "\033[?25l"

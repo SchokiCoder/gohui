@@ -336,6 +336,13 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 		runtime.CmdLineCursor = 0
 		fmt.Printf(csi.CURSOR_HIDE)
 
+	case csi.BACKSPACE:
+		if runtime.CmdLineCursor > 0 {
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
+			                  runtime.CmdLine[runtime.CmdLineCursor:]
+			runtime.CmdLineCursor--
+		}
+
 	case csi.CURSOR_RIGHT:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
 			runtime.CmdLineCursor++

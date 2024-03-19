@@ -21,6 +21,7 @@ const (
 	CURSOR_RIGHT = "\033[C"
 	CURSOR_LEFT = "\033[D"
 	HOME = "\x1b[H"
+	INSERT = "\033[2~"
 	DELETE = "\033[3~"
 	END = "\x1b[F"
 	FG_DEFAULT = "\033[39m"

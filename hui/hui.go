@@ -26,6 +26,7 @@ type huiRuntime struct {
 	Active bool
 	CmdLine string
 	CmdLineCursor int
+	CmdLineInsert bool
 	CmdMode bool
 	Comcfg common.ComConfig
 	Cursor int
@@ -40,6 +41,7 @@ func newHuiRuntime() huiRuntime {
 		Active: true,
 		CmdLine: "",
 		CmdLineCursor: 0,
+		CmdLineInsert: false,
 		CmdMode: false,
 		Comcfg: common.ComConfigFromFile(),
 		Cursor: 0,
@@ -230,6 +232,7 @@ func handleCommand(curMenu menu, runtime *huiRuntime) string {
 	
 	runtime.CmdLine = ""
 	runtime.CmdLineCursor = 0
+	runtime.CmdLineInsert = false
 	return ret
 }
 
@@ -340,6 +343,7 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
 		runtime.CmdLineCursor = 0
+		runtime.CmdLineInsert = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
@@ -362,8 +366,8 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 	case csi.HOME:
 		runtime.CmdLineCursor = 0
 
-	case csi.END:
-		runtime.CmdLineCursor = len(runtime.CmdLine)
+	case csi.INSERT:
+		runtime.CmdLineInsert = !runtime.CmdLineInsert
 
 	case csi.DELETE:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
@@ -371,11 +375,24 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
 		}
 
+	case csi.END:
+		runtime.CmdLineCursor = len(runtime.CmdLine)
+
 	default:
-		runtime.CmdLineCursor++
-		runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
-		                  key +
-		                  runtime.CmdLine[runtime.CmdLineCursor - 1:]
+		if len(key) == 1 {
+			var insertReplace = 0
+
+			if runtime.CmdLineInsert == true &&
+			   runtime.CmdLineCursor < len(runtime.CmdLine) {
+				insertReplace = 1
+			}
+
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
+				          key +
+				          runtime.CmdLine[runtime.CmdLineCursor +
+				                          insertReplace:]
+			runtime.CmdLineCursor++
+		}
 	}
 }
 

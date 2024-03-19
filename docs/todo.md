@@ -30,7 +30,10 @@
 + hui: add backspace key support for cmdline
 + hui: add home key support for navigation and cmdline
 + hui: add end key support for navigation and cmdline
-- hui: add insert key support for cmdline
++ hui: add insert key support for cmdline
+
+Also fix unsupported csi's being added to cmdline as input.
+
 - hui: add pgup and pgdown support
 
 - courier: add arrow key support for navigation
@@ -40,7 +43,10 @@
 - courier: add home key support for navigation and cmdline
 - courier: add end key support for navigation and cmdline
 - courier: add insert key support for cmdline
+- courier: fix unsupported csi's being added to cmdline as input
 - courier: add pgup and pgdown support
+
+- rename parameter runtime into rt to solve line len issues
 
 - add cmdLineHistory, which is navigated by up and down arrow
 

@@ -319,6 +319,9 @@ func handleKey(key string, runtime *huiRuntime) {
 	case csi.HOME:
 		runtime.Cursor = 0
 
+	case csi.END:
+		runtime.Cursor = len(curMenu.Entries) - 1
+
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
@@ -358,6 +361,9 @@ func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
 
 	case csi.HOME:
 		runtime.CmdLineCursor = 0
+
+	case csi.END:
+		runtime.CmdLineCursor = len(runtime.CmdLine)
 
 	case csi.DELETE:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {

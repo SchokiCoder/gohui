@@ -28,9 +28,8 @@
 + hui: add arrow key support for cmdline
 + hui: add del key support for cmdline
 + hui: add backspace key support for cmdline
-- hui: add home key support for navigation and cmdline
-- hui: add end key support for navigation
-- hui: add end key support for cmdline
++ hui: add home key support for navigation and cmdline
++ hui: add end key support for navigation and cmdline
 - hui: add insert key support for cmdline
 - hui: add pgup and pgdown support
 
@@ -39,8 +38,7 @@
 - courier: add del key support for cmdline
 - courier: add backspace key support for cmdline
 - courier: add home key support for navigation and cmdline
-- courier: add end key support for navigation
-- courier: add end key support for cmdline
+- courier: add end key support for navigation and cmdline
 - courier: add insert key support for cmdline
 - courier: add pgup and pgdown support
 

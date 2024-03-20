@@ -196,54 +196,54 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(curMenu menu, runtime *huiRuntime) string {
+func handleCommand(curMenu menu, rt *huiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
 
-	cmdLineParts := strings.SplitN(runtime.CmdLine, " ", 2)
+	cmdLineParts := strings.SplitN(rt.CmdLine, " ", 2)
 	fn := huiCommands[cmdLineParts[0]]
 	if fn != nil {
-		return fn(cmdLineParts[1], runtime)
+		return fn(cmdLineParts[1], rt)
 	}
 
-	switch runtime.CmdLine {
+	switch rt.CmdLine {
 	case "q":
 		fallthrough
 	case "quit":
 		fallthrough
 	case "exit":
-		runtime.Active = false
+		rt.Active = false
 
 	default:
-		num, err = strconv.ParseUint(runtime.CmdLine, 10, 32)
+		num, err = strconv.ParseUint(rt.CmdLine, 10, 32)
 		
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-			                  runtime.CmdLine)
+			                  rt.CmdLine)
 		} else {		
 			if int(num) < len(curMenu.Entries) - 1 {
-				runtime.Cursor = int(num)
+				rt.Cursor = int(num)
 			} else {
-				runtime.Cursor = int(len(curMenu.Entries) - 1)
+				rt.Cursor = int(len(curMenu.Entries) - 1)
 			}
 		}
 	}
 	
-	runtime.CmdLine = ""
-	runtime.CmdLineCursor = 0
-	runtime.CmdLineInsert = false
+	rt.CmdLine = ""
+	rt.CmdLineCursor = 0
+	rt.CmdLineInsert = false
 	return ret
 }
 
-func handleInput(contentHeight int, runtime *huiRuntime) {
+func handleInput(contentHeight int, rt *huiRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input string
 	var rawInput = make([]byte, 4)
 	var rawInputLen int
 
-	if runtime.AcceptInput == false {
+	if rt.AcceptInput == false {
 		return
 	}
 
@@ -260,157 +260,157 @@ func handleInput(contentHeight int, runtime *huiRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), contentHeight, runtime)
+	handleKey(string(input), contentHeight, rt)
 }
 
-func handleKey(key string, contentHeight int, runtime *huiRuntime) {
-	var curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
-	var curEntry = &curMenu.Entries[runtime.Cursor]
+func handleKey(key string, contentHeight int, rt *huiRuntime) {
+	var curMenu = rt.Huicfg.Menus[rt.Menupath.curMenu()]
+	var curEntry = &curMenu.Entries[rt.Cursor]
 
-	if runtime.CmdMode {
-		handleKeyCmdline(key, curMenu, runtime)
+	if rt.CmdMode {
+		handleKeyCmdline(key, curMenu, rt)
 		return
 	}
 
 	switch key {
-	case runtime.Comcfg.Keys.Quit:
-		runtime.Active = false
+	case rt.Comcfg.Keys.Quit:
+		rt.Active = false
 
 	case csi.CURSOR_LEFT:
 		fallthrough
-	case runtime.Comcfg.Keys.Left:
-		if len(runtime.Menupath) > 1 {
-			runtime.Menupath = runtime.Menupath[:len(runtime.Menupath) - 1]
-			runtime.Cursor = 0
+	case rt.Comcfg.Keys.Left:
+		if len(rt.Menupath) > 1 {
+			rt.Menupath = rt.Menupath[:len(rt.Menupath) - 1]
+			rt.Cursor = 0
 		}
 
 	case csi.CURSOR_DOWN:
 		fallthrough
-	case runtime.Comcfg.Keys.Down:
-		if runtime.Cursor < len(curMenu.Entries) - 1 {
-			runtime.Cursor++
+	case rt.Comcfg.Keys.Down:
+		if rt.Cursor < len(curMenu.Entries) - 1 {
+			rt.Cursor++
 		}
 
 	case csi.CURSOR_UP:
 		fallthrough
-	case runtime.Comcfg.Keys.Up:
-		if runtime.Cursor > 0 {
-			runtime.Cursor--
+	case rt.Comcfg.Keys.Up:
+		if rt.Cursor > 0 {
+			rt.Cursor--
 		}
 
 	case csi.CURSOR_RIGHT:
 		fallthrough
-	case runtime.Comcfg.Keys.Right:
+	case rt.Comcfg.Keys.Right:
 		if curEntry.Menu != "" {
-			runtime.Menupath = append(runtime.Menupath, curEntry.Menu)
-			runtime.Cursor = 0
+			rt.Menupath = append(rt.Menupath, curEntry.Menu)
+			rt.Cursor = 0
 		}
 
-	case runtime.Huicfg.Keys.Execute:
+	case rt.Huicfg.Keys.Execute:
 		if curEntry.Shell != "" {
-			runtime.Feedback = common.HandleShell(curEntry.Shell)
+			rt.Feedback = common.HandleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
-			runtime.Feedback = common.HandleShellSession(curEntry.ShellSession)
+			rt.Feedback = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
-			huiFuncs[curEntry.Go](runtime)
+			huiFuncs[curEntry.Go](rt)
 		}
 	
-	case runtime.Comcfg.Keys.Cmdmode:
-		runtime.CmdMode = true
+	case rt.Comcfg.Keys.Cmdmode:
+		rt.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
 	case csi.PGUP:
-		if runtime.Cursor - contentHeight < 0 {
-			runtime.Cursor = 0
+		if rt.Cursor - contentHeight < 0 {
+			rt.Cursor = 0
 		} else {
-			runtime.Cursor -= contentHeight
+			rt.Cursor -= contentHeight
 		}
 
 	case csi.PGDOWN:
-		if runtime.Cursor + contentHeight >= len(curMenu.Entries) {
-			runtime.Cursor = len(curMenu.Entries) - 1
+		if rt.Cursor + contentHeight >= len(curMenu.Entries) {
+			rt.Cursor = len(curMenu.Entries) - 1
 		} else {
-			runtime.Cursor += contentHeight
+			rt.Cursor += contentHeight
 		}
 
 	case csi.HOME:
-		runtime.Cursor = 0
+		rt.Cursor = 0
 
 	case csi.END:
-		runtime.Cursor = len(curMenu.Entries) - 1
+		rt.Cursor = len(curMenu.Entries) - 1
 
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
-		runtime.Active = false
+		rt.Active = false
 	}
 }
 
-func handleKeyCmdline(key string, curMenu menu, runtime *huiRuntime) {
+func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 	switch key {
-	case runtime.Comcfg.Keys.Cmdenter:
-		runtime.Feedback = handleCommand(curMenu, runtime)
+	case rt.Comcfg.Keys.Cmdenter:
+		rt.Feedback = handleCommand(curMenu, rt)
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
-		runtime.CmdMode = false
-		runtime.CmdLine = ""
-		runtime.CmdLineCursor = 0
-		runtime.CmdLineInsert = false
+		rt.CmdMode = false
+		rt.CmdLine = ""
+		rt.CmdLineCursor = 0
+		rt.CmdLineInsert = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
-		if runtime.CmdLineCursor > 0 {
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
-			                  runtime.CmdLine[runtime.CmdLineCursor:]
-			runtime.CmdLineCursor--
+		if rt.CmdLineCursor > 0 {
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor - 1] +
+			             rt.CmdLine[rt.CmdLineCursor:]
+			rt.CmdLineCursor--
 		}
 
 	case csi.CURSOR_RIGHT:
-		if runtime.CmdLineCursor < len(runtime.CmdLine) {
-			runtime.CmdLineCursor++
+		if rt.CmdLineCursor < len(rt.CmdLine) {
+			rt.CmdLineCursor++
 		}
 
 	case csi.CURSOR_LEFT:
-		if runtime.CmdLineCursor > 0 {
-			runtime.CmdLineCursor--
+		if rt.CmdLineCursor > 0 {
+			rt.CmdLineCursor--
 		}
 
 	case csi.HOME:
-		runtime.CmdLineCursor = 0
+		rt.CmdLineCursor = 0
 
 	case csi.INSERT:
-		runtime.CmdLineInsert = !runtime.CmdLineInsert
+		rt.CmdLineInsert = !rt.CmdLineInsert
 
 	case csi.DELETE:
-		if runtime.CmdLineCursor < len(runtime.CmdLine) {
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
-			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
+		if rt.CmdLineCursor < len(rt.CmdLine) {
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
+			             rt.CmdLine[rt.CmdLineCursor + 1:]
 		}
 
 	case csi.END:
-		runtime.CmdLineCursor = len(runtime.CmdLine)
+		rt.CmdLineCursor = len(rt.CmdLine)
 
 	default:
 		if len(key) == 1 {
 			var insertReplace = 0
 
-			if runtime.CmdLineInsert == true &&
-			   runtime.CmdLineCursor < len(runtime.CmdLine) {
+			if rt.CmdLineInsert == true &&
+			   rt.CmdLineCursor < len(rt.CmdLine) {
 				insertReplace = 1
 			}
 
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
-				          key +
-				          runtime.CmdLine[runtime.CmdLineCursor +
-				                          insertReplace:]
-			runtime.CmdLineCursor++
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
+				     key +
+				     rt.CmdLine[rt.CmdLineCursor +
+				                insertReplace:]
+			rt.CmdLineCursor++
 		}
 	}
 }
 
-func tick(runtime *huiRuntime) {
+func tick(rt *huiRuntime) {
 	var contentHeight int
 	var curMenu       menu
 	var err           error
@@ -424,46 +424,46 @@ func tick(runtime *huiRuntime) {
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
-	curMenu = runtime.Huicfg.Menus[runtime.Menupath.curMenu()]
+	curMenu = rt.Huicfg.Menus[rt.Menupath.curMenu()]
 
-	headerLines = common.SplitByLines(termW, runtime.Huicfg.Header)
+	headerLines = common.SplitByLines(termW, rt.Huicfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
-	lower = common.GenerateLower(runtime.CmdLine,
-	                             runtime.CmdMode,
-	                             runtime.Comcfg,
-	                             &runtime.Feedback,
-	                             runtime.Huicfg.Pager.Title,
+	lower = common.GenerateLower(rt.CmdLine,
+	                             rt.CmdMode,
+	                             rt.Comcfg,
+	                             &rt.Feedback,
+	                             rt.Huicfg.Pager.Title,
 	                             termW)
 
-	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
+	common.DrawUpper(rt.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, runtime.Huicfg.Header)) -
+	                len(common.SplitByLines(termW, rt.Huicfg.Header)) -
 	                1 -
 	                len(common.SplitByLines(termW, curMenu.Title)) -
 	                1
-	drawMenu(contentHeight, curMenu, runtime.Cursor, runtime.Huicfg, termW)
+	drawMenu(contentHeight, curMenu, rt.Cursor, rt.Huicfg, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
-	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
+	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
 	              termH)
 
-	handleInput(contentHeight, runtime)
+	handleInput(contentHeight, rt)
 }
 
 func main() {
-	var runtime = newHuiRuntime()
+	var rt = newHuiRuntime()
 
-	_, mainMenuExists := runtime.Huicfg.Menus["main"]
+	_, mainMenuExists := rt.Huicfg.Menus["main"]
 
 	if mainMenuExists == false {
 		panic("\"main\" menu not found in config.")
 	}
-	runtime.Menupath[0] = "main"
+	rt.Menupath[0] = "main"
 
-	runtime.Active = handleArgs()
-	if runtime.Active == false {
+	rt.Active = handleArgs()
+	if rt.Active == false {
 		return
 	}
 
@@ -471,16 +471,16 @@ func main() {
 	defer fmt.Printf(csi.CURSOR_SHOW)
 	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if runtime.Huicfg.Events.Start != "" {
-		huiFuncs[runtime.Huicfg.Events.Start](&runtime)
+	if rt.Huicfg.Events.Start != "" {
+		huiFuncs[rt.Huicfg.Events.Start](&rt)
 	}
 
-	for runtime.Active {
-		tick(&runtime)
+	for rt.Active {
+		tick(&rt)
 	}
 
-	if runtime.Huicfg.Events.Quit != "" {
-		huiFuncs[runtime.Huicfg.Events.Quit](&runtime)
-		tick(&runtime)
+	if rt.Huicfg.Events.Quit != "" {
+		huiFuncs[rt.Huicfg.Events.Quit](&rt)
+		tick(&rt)
 	}
 }

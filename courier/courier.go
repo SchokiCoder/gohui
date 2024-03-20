@@ -99,18 +99,18 @@ Internal commands:
 
 func drawContent(contentLines  []string,
                  contentHeight int,
-                 runtime       couRuntime,
+                 rt            couRuntime,
                  termW         int) {
-	var drawRange int = runtime.Scroll + contentHeight
+	var drawRange int = rt.Scroll + contentHeight
 
 	if drawRange > len(contentLines) {
 		drawRange = len(contentLines)
 	}
 
-	for _, v := range contentLines[runtime.Scroll:drawRange] {
-		common.Cprinta(runtime.Coucfg.Content.Alignment,
-		               runtime.Coucfg.Content.Fg,
-		               runtime.Coucfg.Content.Bg,
+	for _, v := range contentLines[rt.Scroll:drawRange] {
+		common.Cprinta(rt.Coucfg.Content.Alignment,
+		               rt.Coucfg.Content.Fg,
+		               rt.Coucfg.Content.Bg,
 		               termW,
 		               v)
 	}
@@ -189,54 +189,54 @@ func handleArgs(title *string) (string, bool) {
 	return string(ret), true
 }
 
-func handleCommand(contentLineCount int, runtime *couRuntime) string {
+func handleCommand(contentLineCount int, rt *couRuntime) string {
 	var err error
 	var ret string = ""
 	var num uint64
 
-	cmdLineParts := strings.SplitN(runtime.CmdLine, " ", 2)
+	cmdLineParts := strings.SplitN(rt.CmdLine, " ", 2)
 	fn := couCommands[cmdLineParts[0]]
 	if fn != nil {
-		return fn(cmdLineParts[1], runtime)
+		return fn(cmdLineParts[1], rt)
 	}
 
-	switch runtime.CmdLine {
+	switch rt.CmdLine {
 	case "q":
 		fallthrough
 	case "quit":
 		fallthrough
 	case "exit":
-		runtime.Active = false
+		rt.Active = false
 
 	default:
-		num, err = strconv.ParseUint(runtime.CmdLine, 10, 32)
+		num, err = strconv.ParseUint(rt.CmdLine, 10, 32)
 
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-			                  runtime.CmdLine)
+			                  rt.CmdLine)
 		} else {
 			if int(num) < contentLineCount {
-				runtime.Scroll = int(num)
+				rt.Scroll = int(num)
 			} else {
-				runtime.Scroll = contentLineCount
+				rt.Scroll = contentLineCount
 			}
 		}
 	}
 
-	runtime.CmdLine = ""
-	runtime.CmdLineCursor = 0
-	runtime.CmdLineInsert = false
+	rt.CmdLine = ""
+	rt.CmdLineCursor = 0
+	rt.CmdLineInsert = false
 	return ret
 }
 
-func handleInput(contentHeight int, contentLineCount int, runtime *couRuntime) {
+func handleInput(contentHeight int, contentLineCount int, rt *couRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input string
 	var rawInput = make([]byte, 4)
 	var rawInputLen int
 
-	if runtime.AcceptInput == false {
+	if rt.AcceptInput == false {
 		return
 	}
 
@@ -253,132 +253,132 @@ func handleInput(contentHeight int, contentLineCount int, runtime *couRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), contentHeight, contentLineCount, runtime)
+	handleKey(string(input), contentHeight, contentLineCount, rt)
 }
 
-func handleKey(key string, contentHeight int, contentLineCount int, runtime *couRuntime) {
-	if runtime.CmdMode {
-		handleKeyCmdline(key, contentLineCount, runtime)
+func handleKey(key string, contentHeight, contentLineCount int, rt *couRuntime) {
+	if rt.CmdMode {
+		handleKeyCmdline(key, contentLineCount, rt)
 		return
 	}
 	
 	switch key {
 	case csi.CURSOR_UP:
 		fallthrough
-	case runtime.Comcfg.Keys.Up:
-		if runtime.Scroll > 0 {
-			runtime.Scroll--
+	case rt.Comcfg.Keys.Up:
+		if rt.Scroll > 0 {
+			rt.Scroll--
 		}
 
 	case csi.CURSOR_DOWN:
 		fallthrough
-	case runtime.Comcfg.Keys.Down:
-		if runtime.Scroll < contentLineCount {
-			runtime.Scroll++
+	case rt.Comcfg.Keys.Down:
+		if rt.Scroll < contentLineCount {
+			rt.Scroll++
 		}
 
-	case runtime.Comcfg.Keys.Cmdmode:
-		runtime.CmdMode = true
+	case rt.Comcfg.Keys.Cmdmode:
+		rt.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
 	case csi.PGUP:
-		if runtime.Scroll - contentHeight < 0 {
-			runtime.Scroll = 0
+		if rt.Scroll - contentHeight < 0 {
+			rt.Scroll = 0
 		} else {
-			runtime.Scroll -= contentHeight
+			rt.Scroll -= contentHeight
 		}
 
 	case csi.PGDOWN:
-		if runtime.Scroll + contentHeight >= contentLineCount {
-			runtime.Scroll = contentLineCount - 1
+		if rt.Scroll + contentHeight >= contentLineCount {
+			rt.Scroll = contentLineCount - 1
 		} else {
-			runtime.Scroll += contentHeight
+			rt.Scroll += contentHeight
 		}
 
 	case csi.HOME:
-		runtime.Scroll = 0
+		rt.Scroll = 0
 
 	case csi.END:
-		runtime.Scroll = contentLineCount - 1
+		rt.Scroll = contentLineCount - 1
 
-	case runtime.Comcfg.Keys.Quit:
+	case rt.Comcfg.Keys.Quit:
 		fallthrough
 	case csi.CURSOR_LEFT:
 		fallthrough
-	case runtime.Comcfg.Keys.Left:
+	case rt.Comcfg.Keys.Left:
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
-		runtime.Active = false
+		rt.Active = false
 	}
 }
 
-func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
+func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 	switch key {
-	case runtime.Comcfg.Keys.Cmdenter:
-		runtime.Feedback = handleCommand(contentLineCount, runtime)
+	case rt.Comcfg.Keys.Cmdenter:
+		rt.Feedback = handleCommand(contentLineCount, rt)
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
-		runtime.CmdMode = false
-		runtime.CmdLine = ""
-		runtime.CmdLineCursor = 0
-		runtime.CmdLineInsert = false
+		rt.CmdMode = false
+		rt.CmdLine = ""
+		rt.CmdLineCursor = 0
+		rt.CmdLineInsert = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
-		if runtime.CmdLineCursor > 0 {
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
-			                  runtime.CmdLine[runtime.CmdLineCursor:]
-			runtime.CmdLineCursor--
+		if rt.CmdLineCursor > 0 {
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor - 1] +
+			             rt.CmdLine[rt.CmdLineCursor:]
+			rt.CmdLineCursor--
 		}
 
 	case csi.CURSOR_RIGHT:
-		if runtime.CmdLineCursor < len(runtime.CmdLine) {
-			runtime.CmdLineCursor++
+		if rt.CmdLineCursor < len(rt.CmdLine) {
+			rt.CmdLineCursor++
 		}
 
 	case csi.CURSOR_LEFT:
-		if runtime.CmdLineCursor > 0 {
-			runtime.CmdLineCursor--
+		if rt.CmdLineCursor > 0 {
+			rt.CmdLineCursor--
 		}
 
 	case csi.HOME:
-		runtime.CmdLineCursor = 0
+		rt.CmdLineCursor = 0
 
 	case csi.INSERT:
-		runtime.CmdLineInsert = !runtime.CmdLineInsert
+		rt.CmdLineInsert = !rt.CmdLineInsert
 
 	case csi.DELETE:
-		if runtime.CmdLineCursor < len(runtime.CmdLine) {
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
-			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
+		if rt.CmdLineCursor < len(rt.CmdLine) {
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
+			             rt.CmdLine[rt.CmdLineCursor + 1:]
 		}
 
 	case csi.END:
-		runtime.CmdLineCursor = len(runtime.CmdLine)
+		rt.CmdLineCursor = len(rt.CmdLine)
 
 	default:
 		if len(key) == 1 {
 			var insertReplace = 0
 
-			if runtime.CmdLineInsert == true &&
-			   runtime.CmdLineCursor < len(runtime.CmdLine) {
+			if rt.CmdLineInsert == true &&
+			   rt.CmdLineCursor < len(rt.CmdLine) {
 				insertReplace = 1
 			}
 
-			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
-				          key +
-				          runtime.CmdLine[runtime.CmdLineCursor +
-				                          insertReplace:]
-			runtime.CmdLineCursor++
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
+				     key +
+				     rt.CmdLine[rt.CmdLineCursor +
+				                insertReplace:]
+			rt.CmdLineCursor++
 		}
 	}
 }
 
-func tick(runtime *couRuntime) {
+func tick(rt *couRuntime) {
 	var contentLines []string
 	var contentHeight int
 	var err error
@@ -393,39 +393,39 @@ func tick(runtime *couRuntime) {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
 
-	headerLines = common.SplitByLines(termW, runtime.Coucfg.Header)
-	titleLines = common.SplitByLines(termW, runtime.Title)
-	contentLines = common.SplitByLines(termW, runtime.Content)
-	lower = common.GenerateLower(runtime.CmdLine,
-	                             runtime.CmdMode,
-	                             runtime.Comcfg,
-	                             &runtime.Feedback,
-	                             runtime.Coucfg.Pager.Title,
+	headerLines = common.SplitByLines(termW, rt.Coucfg.Header)
+	titleLines = common.SplitByLines(termW, rt.Title)
+	contentLines = common.SplitByLines(termW, rt.Content)
+	lower = common.GenerateLower(rt.CmdLine,
+	                             rt.CmdMode,
+	                             rt.Comcfg,
+	                             &rt.Feedback,
+	                             rt.Coucfg.Pager.Title,
 	                             termW)
 
-	common.DrawUpper(runtime.Comcfg, headerLines, termW, titleLines)
+	common.DrawUpper(rt.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, runtime.Coucfg.Header)) -
+	                len(common.SplitByLines(termW, rt.Coucfg.Header)) -
 	                1 -
-	                len(common.SplitByLines(termW, runtime.Title)) -
+	                len(common.SplitByLines(termW, rt.Title)) -
 	                1
 
-	drawContent(contentLines, contentHeight, *runtime, termW)
+	drawContent(contentLines, contentHeight, *rt, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
-	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
+	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
 	              termH)
 
-	handleInput(contentHeight, len(contentLines), runtime)
+	handleInput(contentHeight, len(contentLines), rt)
 }
 
 func main() {
-	var runtime = newCouRuntime()
+	var rt = newCouRuntime()
 
-	runtime.Content, runtime.Active = handleArgs(&runtime.Title)
-	if runtime.Active == false {
+	rt.Content, rt.Active = handleArgs(&rt.Title)
+	if rt.Active == false {
 		return
 	}
 
@@ -433,16 +433,16 @@ func main() {
 	defer fmt.Printf(csi.CURSOR_SHOW)
 	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
-	if runtime.Coucfg.Events.Start != "" {
-		couFuncs[runtime.Coucfg.Events.Start](&runtime)
+	if rt.Coucfg.Events.Start != "" {
+		couFuncs[rt.Coucfg.Events.Start](&rt)
 	}
 
-	for runtime.Active {
-		tick(&runtime)
+	for rt.Active {
+		tick(&rt)
 	}
 
-	if runtime.Coucfg.Events.Quit != "" {
-		couFuncs[runtime.Coucfg.Events.Quit](&runtime)
-		tick(&runtime)
+	if rt.Coucfg.Events.Quit != "" {
+		couFuncs[rt.Coucfg.Events.Quit](&rt)
+		tick(&rt)
 	}
 }

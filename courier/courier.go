@@ -301,6 +301,13 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 		runtime.CmdLine = ""
 		fmt.Printf(csi.CURSOR_HIDE)
 
+	case csi.BACKSPACE:
+		if runtime.CmdLineCursor > 0 {
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor - 1] +
+			                  runtime.CmdLine[runtime.CmdLineCursor:]
+			runtime.CmdLineCursor--
+		}
+
 	case csi.CURSOR_RIGHT:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
 			runtime.CmdLineCursor++
@@ -309,6 +316,12 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 	case csi.CURSOR_LEFT:
 		if runtime.CmdLineCursor > 0 {
 			runtime.CmdLineCursor--
+		}
+
+	case csi.DELETE:
+		if runtime.CmdLineCursor < len(runtime.CmdLine) {
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
+			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
 		}
 
 	default:

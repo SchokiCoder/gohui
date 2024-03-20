@@ -37,8 +37,7 @@ Also fix unsupported csi's being added to cmdline as input.
 + hui: add pgup and pgdown support for navigation
 
 + courier: add arrow key support for navigation and cmdline
-- courier: add del key support for cmdline
-- courier: add backspace key support for cmdline
++ courier: add del and backspace key support for cmdline
 - courier: add home key support for navigation and cmdline
 - courier: add end key support for navigation and cmdline
 - courier: add insert key support for cmdline

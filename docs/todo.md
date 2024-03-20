@@ -46,7 +46,7 @@ Also add missing cmdline cursor reset.
 
 Also fix unsupported csi's being added to cmdline as input.
 
-- courier: add pgup and pgdown support for navigation
++ courier: add pgup and pgdown support for navigation
 
 - rename parameter runtime into rt to solve line len issues
 

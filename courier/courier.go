@@ -229,7 +229,7 @@ func handleCommand(contentLineCount int, runtime *couRuntime) string {
 	return ret
 }
 
-func handleInput(contentLineCount int, runtime *couRuntime) {
+func handleInput(contentHeight int, contentLineCount int, runtime *couRuntime) {
 	var canonicalState *term.State
 	var err error
 	var input string
@@ -253,10 +253,10 @@ func handleInput(contentLineCount int, runtime *couRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), contentLineCount, runtime)
+	handleKey(string(input), contentHeight, contentLineCount, runtime)
 }
 
-func handleKey(key string, contentLineCount int, runtime *couRuntime) {
+func handleKey(key string, contentHeight int, contentLineCount int, runtime *couRuntime) {
 	if runtime.CmdMode {
 		handleKeyCmdline(key, contentLineCount, runtime)
 		return
@@ -280,6 +280,20 @@ func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 	case runtime.Comcfg.Keys.Cmdmode:
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
+
+	case csi.PGUP:
+		if runtime.Scroll - contentHeight < 0 {
+			runtime.Scroll = 0
+		} else {
+			runtime.Scroll -= contentHeight
+		}
+
+	case csi.PGDOWN:
+		if runtime.Scroll + contentHeight >= contentLineCount {
+			runtime.Scroll = contentLineCount - 1
+		} else {
+			runtime.Scroll += contentHeight
+		}
 
 	case csi.HOME:
 		runtime.Scroll = 0
@@ -404,7 +418,7 @@ func tick(runtime *couRuntime) {
 	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
 	              termH)
 
-	handleInput(len(contentLines), runtime)
+	handleInput(contentHeight, len(contentLines), runtime)
 }
 
 func main() {

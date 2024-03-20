@@ -219,8 +219,9 @@ func handleCommand(contentLineCount int, runtime *couRuntime) string {
 			}
 		}
 	}
-	
+
 	runtime.CmdLine = ""
+	runtime.CmdLineCursor = 0
 	return ret
 }
 
@@ -276,6 +277,12 @@ func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
+	case csi.HOME:
+		runtime.Scroll = 0
+
+	case csi.END:
+		runtime.Scroll = contentLineCount - 1
+
 	case runtime.Comcfg.Keys.Quit:
 		fallthrough
 	case csi.CURSOR_LEFT:
@@ -299,6 +306,7 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 	case csi.SIGTSTP:
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
+		runtime.CmdLineCursor = 0
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
@@ -318,11 +326,17 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 			runtime.CmdLineCursor--
 		}
 
+	case csi.HOME:
+		runtime.CmdLineCursor = 0
+
 	case csi.DELETE:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
 			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
 			                  runtime.CmdLine[runtime.CmdLineCursor + 1:]
 		}
+
+	case csi.END:
+		runtime.CmdLineCursor = len(runtime.CmdLine)
 
 	default:
 		runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +

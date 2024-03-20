@@ -36,8 +36,7 @@ Also fix unsupported csi's being added to cmdline as input.
 
 + hui: add pgup and pgdown support for navigation
 
-- courier: add arrow key support for navigation
-- courier: add arrow key support for cmdline
++ courier: add arrow key support for navigation and cmdline
 - courier: add del key support for cmdline
 - courier: add backspace key support for cmdline
 - courier: add home key support for navigation and cmdline
@@ -65,6 +64,8 @@ This is for colorless environments.
 Thus a "left" key press would send you to the menu entry that you entered.
 
 - add csi 4 bit colors?
+
+- TTY tests, BSD tests
 
 - set version to 1.4.
 

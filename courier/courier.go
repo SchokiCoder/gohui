@@ -21,6 +21,7 @@ type couRuntime struct {
 	AcceptInput bool
 	Active bool
 	CmdLine string
+	CmdLineCursor int
 	CmdMode bool
 	Comcfg common.ComConfig
 	Content string
@@ -223,11 +224,12 @@ func handleCommand(contentLineCount int, runtime *couRuntime) string {
 	return ret
 }
 
-func handleInput(contentLineCount int,
-                 runtime          *couRuntime) {
+func handleInput(contentLineCount int, runtime *couRuntime) {
 	var canonicalState *term.State
 	var err error
-	var input = make([]byte, 1)
+	var input string
+	var rawInput = make([]byte, 4)
+	var rawInputLen int
 
 	if runtime.AcceptInput == false {
 		return
@@ -238,18 +240,15 @@ func handleInput(contentLineCount int,
 		panic(fmt.Sprintf("Switching to raw mode failed: %v", err))
 	}
 
-	_, err = os.Stdin.Read(input)
+	rawInputLen, err = os.Stdin.Read(rawInput)
 	if err != nil {
 		panic(fmt.Sprintf("Reading from stdin failed: %v", err))
 	}
+	input = string(rawInput[0:rawInputLen])
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	for i := 0; i < len(input); i++ {
-		handleKey(string(input),
-		          contentLineCount,
-		          runtime)
-	}
+	handleKey(string(input), contentLineCount, runtime)
 }
 
 func handleKey(key string, contentLineCount int, runtime *couRuntime) {
@@ -259,22 +258,27 @@ func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 	}
 	
 	switch key {
+	case csi.CURSOR_UP:
+		fallthrough
 	case runtime.Comcfg.Keys.Up:
 		if runtime.Scroll > 0 {
 			runtime.Scroll--
 		}
 
+	case csi.CURSOR_DOWN:
+		fallthrough
 	case runtime.Comcfg.Keys.Down:
 		if runtime.Scroll < contentLineCount {
 			runtime.Scroll++
 		}
-
 
 	case runtime.Comcfg.Keys.Cmdmode:
 		runtime.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
 	case runtime.Comcfg.Keys.Quit:
+		fallthrough
+	case csi.CURSOR_LEFT:
 		fallthrough
 	case runtime.Comcfg.Keys.Left:
 		fallthrough
@@ -285,9 +289,7 @@ func handleKey(key string, contentLineCount int, runtime *couRuntime) {
 	}
 }
 
-func handleKeyCmdline(key              string,
-                      contentLineCount int,
-                      runtime          *couRuntime) {
+func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 	switch key {
 	case runtime.Comcfg.Keys.Cmdenter:
 		runtime.Feedback = handleCommand(contentLineCount, runtime)
@@ -299,8 +301,21 @@ func handleKeyCmdline(key              string,
 		runtime.CmdLine = ""
 		fmt.Printf(csi.CURSOR_HIDE)
 
+	case csi.CURSOR_RIGHT:
+		if runtime.CmdLineCursor < len(runtime.CmdLine) {
+			runtime.CmdLineCursor++
+		}
+
+	case csi.CURSOR_LEFT:
+		if runtime.CmdLineCursor > 0 {
+			runtime.CmdLineCursor--
+		}
+
 	default:
-		runtime.CmdLine = fmt.Sprintf("%v%v", runtime.CmdLine, string(key))
+		runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
+				          key +
+				          runtime.CmdLine[runtime.CmdLineCursor:]
+		runtime.CmdLineCursor++
 	}
 }
 
@@ -341,6 +356,8 @@ func tick(runtime *couRuntime) {
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
+	csi.SetCursor((len(runtime.Comcfg.CmdLine.Prefix) + runtime.CmdLineCursor + 1),
+	              termH)
 
 	handleInput(len(contentLines), runtime)
 }
@@ -355,7 +372,7 @@ func main() {
 
 	fmt.Printf(csi.CURSOR_HIDE)
 	defer fmt.Printf(csi.CURSOR_SHOW)
-	defer fmt.Printf("%v%v", csi.FG_DEFAULT, csi.BG_DEFAULT)
+	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if runtime.Coucfg.Events.Start != "" {
 		couFuncs[runtime.Coucfg.Events.Start](&runtime)

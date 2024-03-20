@@ -22,6 +22,7 @@ type couRuntime struct {
 	Active bool
 	CmdLine string
 	CmdLineCursor int
+	CmdLineInsert bool
 	CmdMode bool
 	Comcfg common.ComConfig
 	Content string
@@ -36,6 +37,8 @@ func newCouRuntime() couRuntime {
 		AcceptInput: true,
 		Active: true,
 		CmdLine: "",
+		CmdLineCursor: 0,
+		CmdLineInsert: false,
 		CmdMode: false,
 		Comcfg: common.ComConfigFromFile(),
 		Content: "",
@@ -222,6 +225,7 @@ func handleCommand(contentLineCount int, runtime *couRuntime) string {
 
 	runtime.CmdLine = ""
 	runtime.CmdLineCursor = 0
+	runtime.CmdLineInsert = false
 	return ret
 }
 
@@ -307,6 +311,7 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 		runtime.CmdMode = false
 		runtime.CmdLine = ""
 		runtime.CmdLineCursor = 0
+		runtime.CmdLineInsert = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
@@ -329,6 +334,9 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 	case csi.HOME:
 		runtime.CmdLineCursor = 0
 
+	case csi.INSERT:
+		runtime.CmdLineInsert = !runtime.CmdLineInsert
+
 	case csi.DELETE:
 		if runtime.CmdLineCursor < len(runtime.CmdLine) {
 			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
@@ -339,10 +347,20 @@ func handleKeyCmdline(key string, contentLineCount int, runtime *couRuntime) {
 		runtime.CmdLineCursor = len(runtime.CmdLine)
 
 	default:
-		runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
+		if len(key) == 1 {
+			var insertReplace = 0
+
+			if runtime.CmdLineInsert == true &&
+			   runtime.CmdLineCursor < len(runtime.CmdLine) {
+				insertReplace = 1
+			}
+
+			runtime.CmdLine = runtime.CmdLine[:runtime.CmdLineCursor] +
 				          key +
-				          runtime.CmdLine[runtime.CmdLineCursor:]
-		runtime.CmdLineCursor++
+				          runtime.CmdLine[runtime.CmdLineCursor +
+				                          insertReplace:]
+			runtime.CmdLineCursor++
+		}
 	}
 }
 

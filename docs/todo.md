@@ -42,8 +42,10 @@ Also fix unsupported csi's being added to cmdline as input.
 
 Also add missing cmdline cursor reset.
 
-- courier: add insert key support for cmdline
-- courier: fix unsupported csi's being added to cmdline as input
++ courier: add insert key support for cmdline
+
+Also fix unsupported csi's being added to cmdline as input.
+
 - courier: add pgup and pgdown support for navigation
 
 - rename parameter runtime into rt to solve line len issues

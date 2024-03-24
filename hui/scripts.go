@@ -34,12 +34,10 @@ func huiGoodbye(runtime *huiRuntime) {
 
 func putWordsIntoMyMouth(runtime *huiRuntime) {
 	runtime.CmdMode = true
+	runtime.CmdLineRowIdx = -1
 	runtime.CmdLine = "Surprise"
 }
 
-/* Do not touch this!
- * Used by demo cfg.
- */
 func quit(runtime *huiRuntime) {
 	runtime.Active = false
 }

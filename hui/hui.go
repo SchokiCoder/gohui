@@ -21,12 +21,16 @@ func (mp menuPath) curMenu() string {
 	return mp[len(mp) - 1]
 }
 
+const NUM_CMDLINE_ROWS = 10
+
 type huiRuntime struct {
 	AcceptInput bool
 	Active bool
 	CmdLine string
 	CmdLineCursor int
 	CmdLineInsert bool
+	CmdLineRowIdx int
+	CmdLineRows [NUM_CMDLINE_ROWS]string
 	CmdMode bool
 	Comcfg common.ComConfig
 	Cursor int
@@ -42,6 +46,7 @@ func newHuiRuntime() huiRuntime {
 		CmdLine: "",
 		CmdLineCursor: 0,
 		CmdLineInsert: false,
+		CmdLineRowIdx: -1,
 		CmdMode: false,
 		Comcfg: common.ComConfigFromFile(),
 		Cursor: 0,
@@ -229,10 +234,13 @@ func handleCommand(curMenu menu, rt *huiRuntime) string {
 			}
 		}
 	}
-	
-	rt.CmdLine = ""
-	rt.CmdLineCursor = 0
-	rt.CmdLineInsert = false
+
+	for i := 0; i < NUM_CMDLINE_ROWS - 1; i++ {
+		rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i] =
+			rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i - 1]
+	}
+	rt.CmdLineRows[0] = rt.CmdLine
+
 	return ret
 }
 
@@ -354,10 +362,11 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
-		rt.CmdMode = false
 		rt.CmdLine = ""
+		rt.CmdLineRowIdx = -1
 		rt.CmdLineCursor = 0
 		rt.CmdLineInsert = false
+		rt.CmdMode = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
@@ -372,10 +381,28 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 			rt.CmdLineCursor++
 		}
 
+	case csi.CURSOR_UP:
+		if rt.CmdLineRowIdx < NUM_CMDLINE_ROWS - 1 {
+			rt.CmdLineRowIdx++
+			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
+			rt.CmdLineCursor = len(rt.CmdLine)
+		}
+
 	case csi.CURSOR_LEFT:
 		if rt.CmdLineCursor > 0 {
 			rt.CmdLineCursor--
 		}
+
+	case csi.CURSOR_DOWN:
+		if rt.CmdLineRowIdx >= 0 {
+			rt.CmdLineRowIdx--
+		}
+		if rt.CmdLineRowIdx >= 0 {
+			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
+		} else {
+			rt.CmdLine = ""
+		}
+		rt.CmdLineCursor = len(rt.CmdLine)
 
 	case csi.HOME:
 		rt.CmdLineCursor = 0

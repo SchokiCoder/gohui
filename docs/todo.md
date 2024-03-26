@@ -51,7 +51,7 @@ Also fix unsupported csi's being added to cmdline as input.
 + rename "runtime" variables into "rt" to solve line len issues
 
 + hui: add cmdLineHistory, which is navigated by up and down arrow
-- courier: add cmdLineHistory, which is navigated by up and down arrow
++ courier: add cmdLineHistory, which is navigated by up and down arrow
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
@@ -67,24 +67,24 @@ This is for colorless environments.
 
 Thus a "left" key press would send you to the menu entry that you entered.
 
-- add csi 4 bit colors?
-
-- TTY tests, BSD tests
-
-- unify individual "handleKeyCmdLine"s into gohui/common
-  (by replacing runtime struct param with individual params)
+- unify cmdLine logic
+  (only difference is that custom commands should be able to alter the different
+   runtime structs)
   Doesn't work, depends on individual handleCommand's.
   Unifying these means unifying Runtime types.
   Unifying these means moving the specific configs into common.
   I will not let my skill issues ruin the workspace architecture again!
   I should read the Go book before proceeding!
 
-- move hui and courier cmdline commands into scripts and move handleCommand
-  into gohui/common?
-  by passing runtimes as interface{}?
+- cmdline: don't handleCommand on empty cmdline
+- cmdline: don't go back in cmdLineHistory when there is nothing yet
+
+- add csi 4 bit colors?
 
 - add numerical modificator for key commands?
   ("2j" goes down twice)
+
+- TTY tests, BSD tests
 
 - set version to 1.4.
 

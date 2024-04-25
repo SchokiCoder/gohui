@@ -8,6 +8,10 @@
 
 # later
 
+- just learned of shadowing via `:=`
+  I dislike this operator even more now.
+  Ban?
+
 - add configurable padding
   (lPadding and rPadding)
 	- how does padding interact with alignment?
@@ -52,6 +56,10 @@ Also fix unsupported csi's being added to cmdline as input.
 
 + hui: add cmdLineHistory, which is navigated by up and down arrow
 + courier: add cmdLineHistory, which is navigated by up and down arrow
+
++ gofmt
+
+Also make hui's and courier's cmdline stuff more alike.
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu

@@ -40,14 +40,14 @@ func (e entry) validate() {
 
 	if numContent < 1 {
 		panic(fmt.Sprintf(
-`Entry "%v" has no content.
+			`Entry "%v" has no content.
 Add a "Shell" value, "ShellSession" value or a "Menu" value.`,
-		                  e.Caption))
+			e.Caption))
 	} else if numContent > 1 {
 		panic(fmt.Sprintf(
-`Entry "%v" has too much content.
+			`Entry "%v" has too much content.
 Use only a "Shell" or a "ShellSession" value or a "Menu" value.`,
-		                  e.Caption))
+			e.Caption))
 	}
 }
 
@@ -135,6 +135,6 @@ func validateGo(fnName string) {
 	_, fnExists := huiFuncs[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Hui Go function "%v" could not be found.`,
-			          fnName))
+			fnName))
 	}
 }

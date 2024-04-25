@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
-//go:generate go ./genversion.go
+//go:generate go ./geninfo.go
 package main
 
 import (
@@ -10,52 +10,49 @@ import (
 
 	"fmt"
 	"golang.org/x/term"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 )
 
 type menuPath []string
 
 func (mp menuPath) curMenu() string {
-	return mp[len(mp) - 1]
+	return mp[len(mp)-1]
 }
 
-const NUM_CMDLINE_ROWS = 10
-
 type huiRuntime struct {
-	AcceptInput bool
-	Active bool
-	CmdLine string
+	AcceptInput   bool
+	Active        bool
+	CmdLine       string
 	CmdLineCursor int
 	CmdLineInsert bool
 	CmdLineRowIdx int
-	CmdLineRows [NUM_CMDLINE_ROWS]string
-	CmdMode bool
-	Comcfg common.ComConfig
-	Cursor int
-	Feedback string
-	Huicfg huiConfig
-	Menupath menuPath
+	CmdLineRows   [common.CmdlineMaxRows]string
+	CmdMode       bool
+	Comcfg        common.ComConfig
+	Cursor        int
+	Feedback      string
+	Huicfg        huiConfig
+	Menupath      menuPath
 }
 
 func newHuiRuntime() huiRuntime {
-	return huiRuntime {
-		AcceptInput: true,
-		Active: true,
-		CmdLine: "",
+	return huiRuntime{
+		AcceptInput:   true,
+		Active:        true,
+		CmdLine:       "",
 		CmdLineCursor: 0,
 		CmdLineInsert: false,
 		CmdLineRowIdx: -1,
-		CmdMode: false,
-		Comcfg: common.ComConfigFromFile(),
-		Cursor: 0,
-		Feedback: "",
-		Huicfg: huiConfigFromFile(),
-		Menupath: make(menuPath, 1, 8),
+		CmdMode:       false,
+		Comcfg:        common.ComConfigFromFile(),
+		Cursor:        0,
+		Feedback:      "",
+		Huicfg:        huiConfigFromFile(),
+		Menupath:      make(menuPath, 1, 8),
 	}
 }
-
 
 const HELP = `Usage: hui [OPTIONS]
 
@@ -63,64 +60,68 @@ Customizable terminal based user-interface for common tasks and personal tastes.
 
 Options:
 
-	-a --about
-		prints program name, version, license and repository information then exits
+    -a --about
+        prints program name, version, license and repository information then exits
 
-	-h --help
-		prints this message then exits
+    -h --help
+        prints this message then exits
 
-	-v --version
-		prints version information then exits
+    -v --version
+        prints version information then exits
 
 Default keybinds:
 
-	q
-		quit the program
+    q
+        quit the program
 
-	h
-		go back
+    h
+        go back
 
-	j
-		go down
+    j
+        go down
 
-	k
-		go up
+    k
+        go up
 
-	l
-		go into
+    l
+        go into
 
-	L
-		execute
+    L
+        execute
 
-	:
-		enter the internal command line
+    :
+        enter the internal command line
 
 Internal commands:
 
-	q quit exit
-		quit the program
+    q quit exit
+        quit the program
 
-	*number*
-		when given a positive number, it is used as a line number to scroll to
+    *number*
+        when given a positive number, it is used as a line number to scroll to
 `
 
-var AppLicense    string
-var AppLicenseUrl string
-var AppName       string
-var AppNameFormal string
-var AppRepo       string
-var AppVersion    string
+var (
+	AppLicense    string
+	AppLicenseUrl string
+	AppName       string
+	AppNameFormal string
+	AppRepo       string
+	AppVersion    string
+)
 
 func drawMenu(contentHeight int,
-              curMenu menu,
-              cursor int,
-              huicfg huiConfig,
-              termW int) {
-	var drawBegin int
-	var drawEnd int
-	var prefix, postfix string
-	var fg csi.FgColor
-	var bg csi.BgColor
+	curMenu menu,
+	cursor int,
+	huicfg huiConfig,
+	termW int) {
+	var (
+		drawBegin       int
+		drawEnd         int
+		prefix, postfix string
+		fg              csi.FgColor
+		bg              csi.BgColor
+	)
 
 	if len(curMenu.Entries) > contentHeight {
 		drawBegin = cursor
@@ -132,7 +133,7 @@ func drawMenu(contentHeight int,
 		drawBegin = 0
 		drawEnd = len(curMenu.Entries)
 	}
-	
+
 	for i := drawBegin; i < len(curMenu.Entries) && i < drawEnd; i++ {
 		if curMenu.Entries[i].Shell != "" {
 			prefix = huicfg.Entry.ShellPrefix
@@ -157,13 +158,13 @@ func drawMenu(contentHeight int,
 		}
 
 		common.Cprinta(huicfg.Entry.Alignment,
-		               fg,
-		               bg,
-		               termW,
-		               fmt.Sprintf("%v%v%v",
-		                           prefix,
-		                           curMenu.Entries[i].Caption,
-		                           postfix))
+			fg,
+			bg,
+			termW,
+			fmt.Sprintf("%v%v%v",
+				prefix,
+				curMenu.Entries[i].Caption,
+				postfix))
 	}
 }
 
@@ -180,11 +181,11 @@ func handleArgs() bool {
 			fallthrough
 		case "--about":
 			common.PrintAbout(AppLicense,
-			                  AppLicenseUrl,
-			                  AppName,
-			                  AppNameFormal,
-			                  AppRepo,
-			                  AppVersion)
+				AppLicenseUrl,
+				AppName,
+				AppNameFormal,
+				AppRepo,
+				AppVersion)
 			return false
 
 		case "-h":
@@ -201,7 +202,7 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(curMenu menu, rt *huiRuntime) string {
+func handleCommand(contentLineCount int, rt *huiRuntime) string {
 	var err error
 	var num uint64
 	var ret string = ""
@@ -222,25 +223,24 @@ func handleCommand(curMenu menu, rt *huiRuntime) string {
 
 	default:
 		num, err = strconv.ParseUint(rt.CmdLine, 10, 32)
-		
+
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-			                  rt.CmdLine)
-		} else {		
-			if int(num) < len(curMenu.Entries) - 1 {
+				rt.CmdLine)
+		} else {
+			if int(num) < contentLineCount {
 				rt.Cursor = int(num)
 			} else {
-				rt.Cursor = int(len(curMenu.Entries) - 1)
+				rt.Cursor = contentLineCount
 			}
 		}
 	}
 
-	for i := 0; i < NUM_CMDLINE_ROWS - 1; i++ {
-		rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i] =
-			rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i - 1]
+	for i := 0; i < len(rt.CmdLineRows)-1; i++ {
+		rt.CmdLineRows[len(rt.CmdLineRows)-1-i] =
+			rt.CmdLineRows[len(rt.CmdLineRows)-1-i-1]
 	}
 	rt.CmdLineRows[0] = rt.CmdLine
-
 	return ret
 }
 
@@ -276,7 +276,7 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 	var curEntry = &curMenu.Entries[rt.Cursor]
 
 	if rt.CmdMode {
-		handleKeyCmdline(key, curMenu, rt)
+		handleKeyCmdline(key, len(curMenu.Entries), rt)
 		return
 	}
 
@@ -288,14 +288,14 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 		fallthrough
 	case rt.Comcfg.Keys.Left:
 		if len(rt.Menupath) > 1 {
-			rt.Menupath = rt.Menupath[:len(rt.Menupath) - 1]
+			rt.Menupath = rt.Menupath[:len(rt.Menupath)-1]
 			rt.Cursor = 0
 		}
 
 	case csi.CURSOR_DOWN:
 		fallthrough
 	case rt.Comcfg.Keys.Down:
-		if rt.Cursor < len(curMenu.Entries) - 1 {
+		if rt.Cursor < len(curMenu.Entries)-1 {
 			rt.Cursor++
 		}
 
@@ -322,20 +322,20 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 		} else if curEntry.Go != "" {
 			huiFuncs[curEntry.Go](rt)
 		}
-	
+
 	case rt.Comcfg.Keys.Cmdmode:
 		rt.CmdMode = true
 		fmt.Printf(csi.CURSOR_SHOW)
 
 	case csi.PGUP:
-		if rt.Cursor - contentHeight < 0 {
+		if rt.Cursor-contentHeight < 0 {
 			rt.Cursor = 0
 		} else {
 			rt.Cursor -= contentHeight
 		}
 
 	case csi.PGDOWN:
-		if rt.Cursor + contentHeight >= len(curMenu.Entries) {
+		if rt.Cursor+contentHeight >= len(curMenu.Entries) {
 			rt.Cursor = len(curMenu.Entries) - 1
 		} else {
 			rt.Cursor += contentHeight
@@ -354,25 +354,25 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 	}
 }
 
-func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
+func handleKeyCmdline(key string, contentLineCount int, rt *huiRuntime) {
 	switch key {
 	case rt.Comcfg.Keys.Cmdenter:
-		rt.Feedback = handleCommand(curMenu, rt)
+		rt.Feedback = handleCommand(contentLineCount, rt)
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
 	case csi.SIGTSTP:
 		rt.CmdLine = ""
-		rt.CmdLineRowIdx = -1
 		rt.CmdLineCursor = 0
 		rt.CmdLineInsert = false
+		rt.CmdLineRowIdx = -1
 		rt.CmdMode = false
 		fmt.Printf(csi.CURSOR_HIDE)
 
 	case csi.BACKSPACE:
 		if rt.CmdLineCursor > 0 {
-			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor - 1] +
-			             rt.CmdLine[rt.CmdLineCursor:]
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor-1] +
+				rt.CmdLine[rt.CmdLineCursor:]
 			rt.CmdLineCursor--
 		}
 
@@ -382,7 +382,7 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 		}
 
 	case csi.CURSOR_UP:
-		if rt.CmdLineRowIdx < NUM_CMDLINE_ROWS - 1 {
+		if rt.CmdLineRowIdx < len(rt.CmdLineRows)-1 {
 			rt.CmdLineRowIdx++
 			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
 			rt.CmdLineCursor = len(rt.CmdLine)
@@ -413,7 +413,7 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 	case csi.DELETE:
 		if rt.CmdLineCursor < len(rt.CmdLine) {
 			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-			             rt.CmdLine[rt.CmdLineCursor + 1:]
+				rt.CmdLine[rt.CmdLineCursor+1:]
 		}
 
 	case csi.END:
@@ -424,14 +424,14 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 			var insertReplace = 0
 
 			if rt.CmdLineInsert == true &&
-			   rt.CmdLineCursor < len(rt.CmdLine) {
+				rt.CmdLineCursor < len(rt.CmdLine) {
 				insertReplace = 1
 			}
 
 			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-				     key +
-				     rt.CmdLine[rt.CmdLineCursor +
-				                insertReplace:]
+				key +
+				rt.CmdLine[rt.CmdLineCursor+
+					insertReplace:]
 			rt.CmdLineCursor++
 		}
 	}
@@ -439,12 +439,12 @@ func handleKeyCmdline(key string, curMenu menu, rt *huiRuntime) {
 
 func tick(rt *huiRuntime) {
 	var contentHeight int
-	var curMenu       menu
-	var err           error
-	var headerLines   []string
-	var lower         string
-	var termH, termW  int
-	var titleLines    []string
+	var curMenu menu
+	var err error
+	var headerLines []string
+	var lower string
+	var termH, termW int
+	var titleLines []string
 
 	fmt.Print(csi.CLEAR)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
@@ -456,25 +456,25 @@ func tick(rt *huiRuntime) {
 	headerLines = common.SplitByLines(termW, rt.Huicfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
 	lower = common.GenerateLower(rt.CmdLine,
-	                             rt.CmdMode,
-	                             rt.Comcfg,
-	                             &rt.Feedback,
-	                             rt.Huicfg.Pager.Title,
-	                             termW)
+		rt.CmdMode,
+		rt.Comcfg,
+		&rt.Feedback,
+		rt.Huicfg.Pager.Title,
+		termW)
 
 	common.DrawUpper(rt.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, rt.Huicfg.Header)) -
-	                1 -
-	                len(common.SplitByLines(termW, curMenu.Title)) -
-	                1
+		len(common.SplitByLines(termW, rt.Huicfg.Header)) -
+		1 -
+		len(common.SplitByLines(termW, curMenu.Title)) -
+		1
 	drawMenu(contentHeight, curMenu, rt.Cursor, rt.Huicfg, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
-	              termH)
+		termH)
 
 	handleInput(contentHeight, rt)
 }

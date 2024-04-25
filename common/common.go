@@ -6,11 +6,15 @@ package common
 import (
 	"github.com/SchokiCoder/gohui/csi"
 
-	"os/exec"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
+)
+
+const (
+	CmdlineMaxRows = 10
 )
 
 func callPager(feedback string, pager string, pagerTitle string) string {
@@ -28,7 +32,7 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 	tempFilePath = tempFile.Name()
 
 	tempFileContent = feedback
-	if tempFileContent[len(tempFileContent) - 1] != '\n' {
+	if tempFileContent[len(tempFileContent)-1] != '\n' {
 		tempFileContent = fmt.Sprintf("%v\n", tempFileContent)
 	}
 
@@ -39,9 +43,9 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 
 	if pager == "./pkg/courier" || pager == "courier" {
 		shCall = fmt.Sprintf(`%v %v -t "%v"`,
-		                     pager,
-		                     tempFilePath,
-		                     pagerTitle)
+			pager,
+			tempFilePath,
+			pagerTitle)
 	} else {
 		shCall = fmt.Sprintf("%v %v", pager, tempFilePath)
 	}
@@ -52,38 +56,40 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 func DrawUpper(comcfg ComConfig, header []string, termW int, title []string) {
 	for _, v := range header {
 		Cprinta(comcfg.Header.Alignment,
-		        comcfg.Header.Fg,
-		        comcfg.Header.Bg,
-		        termW,
-		        v)
+			comcfg.Header.Fg,
+			comcfg.Header.Bg,
+			termW,
+			v)
 	}
 
 	for _, v := range title {
 		Cprinta(comcfg.Title.Alignment,
-		        comcfg.Title.Fg,
-		        comcfg.Title.Bg,
-		        termW,
-		        v)
+			comcfg.Title.Fg,
+			comcfg.Title.Bg,
+			termW,
+			v)
 	}
 }
 
-func GenerateLower(cmdline    string,
-                   cmdmode    bool,
-                   comcfg     ComConfig,
-                   feedback   *string,
-                   pagerTitle string,
-                   termW      int)           string {
-	var fits bool
-	var ret string
-	
+func GenerateLower(cmdline string,
+	cmdmode bool,
+	comcfg ComConfig,
+	feedback *string,
+	pagerTitle string,
+	termW int) string {
+	var (
+		fits bool
+		ret  string
+	)
+
 	if cmdmode == true {
 		ret = Csprintfa(comcfg.CmdLine.Alignment,
-		                comcfg.CmdLine.Fg,
-			        comcfg.CmdLine.Bg,
-			        termW,
-			        "%v%v",
-			        comcfg.CmdLine.Prefix,
-			        cmdline)
+			comcfg.CmdLine.Fg,
+			comcfg.CmdLine.Bg,
+			termW,
+			"%v%v",
+			comcfg.CmdLine.Prefix,
+			cmdline)
 	} else {
 		ret, fits = tryFitFeedback(*feedback, comcfg.Feedback.Prefix, termW)
 		if fits == false {
@@ -93,11 +99,11 @@ func GenerateLower(cmdline    string,
 		}
 
 		ret = Csprintfa(comcfg.Feedback.Alignment,
-		                comcfg.Feedback.Fg,
-		                comcfg.Feedback.Bg,
-		                termW,
-		                "%v",
-		                ret)
+			comcfg.Feedback.Fg,
+			comcfg.Feedback.Bg,
+			termW,
+			"%v",
+			ret)
 	}
 
 	return ret
@@ -190,21 +196,21 @@ func HandleShellSession(shell string) string {
 }
 
 func PrintAbout(appLicense,
-                appLicenseUrl,
-                appName,
-                appNameFormal,
-                appRepo,
-                appVersion string) {
-	fmt.Printf(
-`The source code of "%v" aka %v %v is available, licensed under the %v at:
+	appLicenseUrl,
+	appName,
+	appNameFormal,
+	appRepo,
+	appVersion string) {
+	fmt.Printf("The source code of \"%v\" aka %v %v is available, "+
+		`licensed under the %v at:
 %v
 
 If you did not receive a copy of the license, see below:
 %v
 `,
-	           appNameFormal, appName, appVersion, appLicense,
-	           appRepo,
-	           appLicenseUrl);
+		appNameFormal, appName, appVersion, appLicense,
+		appRepo,
+		appLicenseUrl)
 }
 
 func PrintVersion(appName, appVersion string) {
@@ -218,8 +224,6 @@ func SplitByLines(maxLineLen int, str string) []string {
 
 	step1 = strings.Split(str, "\n")
 
-
-
 	for _, v := range step1 {
 		if len(v) <= maxLineLen {
 			step2 = append(step2, v)
@@ -228,7 +232,7 @@ func SplitByLines(maxLineLen int, str string) []string {
 
 		lastCut = 0
 		for len(v[lastCut:]) > maxLineLen {
-			step2 = append(step2, v[lastCut:lastCut + maxLineLen])
+			step2 = append(step2, v[lastCut:lastCut+maxLineLen])
 			lastCut += maxLineLen
 		}
 		step2 = append(step2, v[lastCut:])
@@ -237,11 +241,13 @@ func SplitByLines(maxLineLen int, str string) []string {
 	return step2
 }
 
-func tryFitFeedback(feedback       string,
-                    feedbackPrefix string,
-                    termW          int)    (string, bool) {
-	var retStr string
-	var retFits bool
+func tryFitFeedback(feedback string,
+	feedbackPrefix string,
+	termW int) (string, bool) {
+	var (
+		retStr  string
+		retFits bool
+	)
 
 	retStr = strings.TrimSpace(feedback)
 	retStr = fmt.Sprintf("%v%v", feedbackPrefix, retStr)

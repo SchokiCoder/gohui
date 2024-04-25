@@ -17,49 +17,49 @@ import (
 	"strings"
 )
 
-const NUM_CMDLINE_ROWS = 10
-
 type couRuntime struct {
-	AcceptInput bool
-	Active bool
-	CmdLine string
+	AcceptInput   bool
+	Active        bool
+	CmdLine       string
 	CmdLineCursor int
 	CmdLineInsert bool
 	CmdLineRowIdx int
-	CmdLineRows [NUM_CMDLINE_ROWS]string
-	CmdMode bool
-	Comcfg common.ComConfig
-	Content string
-	Coucfg couConfig
-	Scroll int
-	Feedback string
-	Title string
+	CmdLineRows   [common.CmdlineMaxRows]string
+	CmdMode       bool
+	Comcfg        common.ComConfig
+	Content       string
+	Coucfg        couConfig
+	Scroll        int
+	Feedback      string
+	Title         string
 }
 
 func newCouRuntime() couRuntime {
-	return couRuntime {
-		AcceptInput: true,
-		Active: true,
-		CmdLine: "",
+	return couRuntime{
+		AcceptInput:   true,
+		Active:        true,
+		CmdLine:       "",
 		CmdLineCursor: 0,
 		CmdLineInsert: false,
 		CmdLineRowIdx: -1,
-		CmdMode: false,
-		Comcfg: common.ComConfigFromFile(),
-		Content: "",
-		Coucfg: couConfigFromFile(),
-		Scroll: 0,
-		Feedback: "",
-		Title: "",
+		CmdMode:       false,
+		Comcfg:        common.ComConfigFromFile(),
+		Content:       "",
+		Coucfg:        couConfigFromFile(),
+		Scroll:        0,
+		Feedback:      "",
+		Title:         "",
 	}
 }
 
-var AppLicense    string
-var AppLicenseUrl string
-var AppName       string
-var AppNameFormal string
-var AppRepo       string
-var AppVersion    string
+var (
+	AppLicense    string
+	AppLicenseUrl string
+	AppName       string
+	AppNameFormal string
+	AppRepo       string
+	AppVersion    string
+)
 
 const HELP = `Usage: courier [OPTIONS] FILE
 
@@ -67,46 +67,48 @@ Small customizable pager, written for and usually distributed with hui.
 
 Options:
 
-	-a --about
-		prints program name, version, license and repository information then exits
+    -a --about
+        prints program name, version, license and repository information then exits
 
-	-h --help
-		prints this message then exits
+    -h --help
+        prints this message then exits
 
-	-t --title TITLE
-		takes an argument and prints given string as title below the header
+    -t --title TITLE
+        takes an argument and prints given string as title below the header
 
-	-v --version
-		prints version information then exits
+    -v --version
+        prints version information then exits
 
 Default keybinds:
 
-	q, h
-		quit the program
+    q, h
+        quit the program
 
-	j
-		go down
+    j
+        go down
 
-	k
-		go up
+    k
+        go up
 
-	:
-		enter the internal command line
+    :
+        enter the internal command line
 
 Internal commands:
 
-	q quit exit
-		quit the program
+    q quit exit
+        quit the program
 
-	*number*
-		when given a positive number, it is used as a line number to scroll to
+    *number*
+        when given a positive number, it is used as a line number to scroll to
 `
 
-func drawContent(contentLines  []string,
-                 contentHeight int,
-                 rt            couRuntime,
-                 termW         int) {
-	var drawRange int = rt.Scroll + contentHeight
+func drawContent(contentLines []string,
+	contentHeight int,
+	rt couRuntime,
+	termW int) {
+	var (
+		drawRange int = rt.Scroll + contentHeight
+	)
 
 	if drawRange > len(contentLines) {
 		drawRange = len(contentLines)
@@ -114,10 +116,10 @@ func drawContent(contentLines  []string,
 
 	for _, v := range contentLines[rt.Scroll:drawRange] {
 		common.Cprinta(rt.Coucfg.Content.Alignment,
-		               rt.Coucfg.Content.Fg,
-		               rt.Coucfg.Content.Bg,
-		               termW,
-		               v)
+			rt.Coucfg.Content.Fg,
+			rt.Coucfg.Content.Bg,
+			termW,
+			v)
 	}
 }
 
@@ -143,11 +145,11 @@ func handleArgs(title *string) (string, bool) {
 			fallthrough
 		case "--about":
 			common.PrintAbout(AppLicense,
-			                  AppLicenseUrl,
-			                  AppName,
-			                  AppNameFormal,
-			                  AppRepo,
-			                  AppVersion)
+				AppLicenseUrl,
+				AppName,
+				AppNameFormal,
+				AppRepo,
+				AppVersion)
 			return "", false
 
 		case "-h":
@@ -176,19 +178,19 @@ func handleArgs(title *string) (string, bool) {
 
 	if errors.Is(err, os.ErrNotExist) {
 		panic(fmt.Sprintf("File \"%v\" could not be found: %v",
-		                  path,
-		                  err))
+			path,
+			err))
 	} else if err != nil {
 		panic(fmt.Sprintf("File \"%v\" could not be opened: %v",
-		                  path,
-		                  err))
+			path,
+			err))
 	}
 
 	ret, err := io.ReadAll(f)
 	if err != nil {
 		panic(fmt.Sprintf("File \"%v\" could not be read: %v",
-		                  path,
-		                  err))
+			path,
+			err))
 	}
 
 	return string(ret), true
@@ -196,8 +198,8 @@ func handleArgs(title *string) (string, bool) {
 
 func handleCommand(contentLineCount int, rt *couRuntime) string {
 	var err error
-	var ret string = ""
 	var num uint64
+	var ret string = ""
 
 	cmdLineParts := strings.SplitN(rt.CmdLine, " ", 2)
 	fn := couCommands[cmdLineParts[0]]
@@ -218,7 +220,7 @@ func handleCommand(contentLineCount int, rt *couRuntime) string {
 
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-			                  rt.CmdLine)
+				rt.CmdLine)
 		} else {
 			if int(num) < contentLineCount {
 				rt.Scroll = int(num)
@@ -228,9 +230,9 @@ func handleCommand(contentLineCount int, rt *couRuntime) string {
 		}
 	}
 
-	for i := 0; i < NUM_CMDLINE_ROWS - 1; i++ {
-		rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i] =
-			rt.CmdLineRows[NUM_CMDLINE_ROWS - 1 - i - 1]
+	for i := 0; i < len(rt.CmdLineRows)-1; i++ {
+		rt.CmdLineRows[len(rt.CmdLineRows)-1-i] =
+			rt.CmdLineRows[len(rt.CmdLineRows)-1-i-1]
 	}
 	rt.CmdLineRows[0] = rt.CmdLine
 	return ret
@@ -268,7 +270,7 @@ func handleKey(key string, contentHeight, contentLineCount int, rt *couRuntime) 
 		handleKeyCmdline(key, contentLineCount, rt)
 		return
 	}
-	
+
 	switch key {
 	case csi.CURSOR_UP:
 		fallthrough
@@ -289,14 +291,14 @@ func handleKey(key string, contentHeight, contentLineCount int, rt *couRuntime) 
 		fmt.Printf(csi.CURSOR_SHOW)
 
 	case csi.PGUP:
-		if rt.Scroll - contentHeight < 0 {
+		if rt.Scroll-contentHeight < 0 {
 			rt.Scroll = 0
 		} else {
 			rt.Scroll -= contentHeight
 		}
 
 	case csi.PGDOWN:
-		if rt.Scroll + contentHeight >= contentLineCount {
+		if rt.Scroll+contentHeight >= contentLineCount {
 			rt.Scroll = contentLineCount - 1
 		} else {
 			rt.Scroll += contentHeight
@@ -338,8 +340,8 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 
 	case csi.BACKSPACE:
 		if rt.CmdLineCursor > 0 {
-			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor - 1] +
-			             rt.CmdLine[rt.CmdLineCursor:]
+			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor-1] +
+				rt.CmdLine[rt.CmdLineCursor:]
 			rt.CmdLineCursor--
 		}
 
@@ -349,7 +351,7 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 		}
 
 	case csi.CURSOR_UP:
-		if rt.CmdLineRowIdx < NUM_CMDLINE_ROWS - 1 {
+		if rt.CmdLineRowIdx < len(rt.CmdLineRows)-1 {
 			rt.CmdLineRowIdx++
 			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
 			rt.CmdLineCursor = len(rt.CmdLine)
@@ -371,8 +373,6 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 		}
 		rt.CmdLineCursor = len(rt.CmdLine)
 
-
-
 	case csi.HOME:
 		rt.CmdLineCursor = 0
 
@@ -382,7 +382,7 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 	case csi.DELETE:
 		if rt.CmdLineCursor < len(rt.CmdLine) {
 			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-			             rt.CmdLine[rt.CmdLineCursor + 1:]
+				rt.CmdLine[rt.CmdLineCursor+1:]
 		}
 
 	case csi.END:
@@ -393,14 +393,14 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 			var insertReplace = 0
 
 			if rt.CmdLineInsert == true &&
-			   rt.CmdLineCursor < len(rt.CmdLine) {
+				rt.CmdLineCursor < len(rt.CmdLine) {
 				insertReplace = 1
 			}
 
 			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-				     key +
-				     rt.CmdLine[rt.CmdLineCursor +
-				                insertReplace:]
+				key +
+				rt.CmdLine[rt.CmdLineCursor+
+					insertReplace:]
 			rt.CmdLineCursor++
 		}
 	}
@@ -425,26 +425,26 @@ func tick(rt *couRuntime) {
 	titleLines = common.SplitByLines(termW, rt.Title)
 	contentLines = common.SplitByLines(termW, rt.Content)
 	lower = common.GenerateLower(rt.CmdLine,
-	                             rt.CmdMode,
-	                             rt.Comcfg,
-	                             &rt.Feedback,
-	                             rt.Coucfg.Pager.Title,
-	                             termW)
+		rt.CmdMode,
+		rt.Comcfg,
+		&rt.Feedback,
+		rt.Coucfg.Pager.Title,
+		termW)
 
 	common.DrawUpper(rt.Comcfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-	                len(common.SplitByLines(termW, rt.Coucfg.Header)) -
-	                1 -
-	                len(common.SplitByLines(termW, rt.Title)) -
-	                1
+		len(common.SplitByLines(termW, rt.Coucfg.Header)) -
+		1 -
+		len(common.SplitByLines(termW, rt.Title)) -
+		1
 
 	drawContent(contentLines, contentHeight, *rt, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
-	              termH)
+		termH)
 
 	handleInput(contentHeight, len(contentLines), rt)
 }

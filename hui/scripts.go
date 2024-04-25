@@ -7,8 +7,8 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-var huiCommands = map[string]func(string, *huiRuntime) string {
-	"sh": shCommand,
+var huiCommands = map[string]func(string, *huiRuntime) string{
+	"sh":  shCommand,
 	"shs": shsCommand,
 }
 
@@ -20,11 +20,11 @@ func shsCommand(cmd string, _ *huiRuntime) string {
 	return common.HandleShellSession(cmd)
 }
 
-var huiFuncs = map[string]func(*huiRuntime) {
-	"Goodbye": huiGoodbye,
+var huiFuncs = map[string]func(*huiRuntime){
+	"Goodbye":             huiGoodbye,
 	"PutWordsIntoMyMouth": putWordsIntoMyMouth,
-	"Quit": quit,
-	"Welcome": huiWelcome,
+	"Quit":                quit,
+	"Welcome":             huiWelcome,
 }
 
 func huiGoodbye(runtime *huiRuntime) {

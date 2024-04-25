@@ -8,8 +8,8 @@ import (
 	"github.com/SchokiCoder/gohui/csi"
 
 	"errors"
-	"io"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -74,12 +74,12 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 	var err error
 	var f *os.File
 	var found bool = false
-	var paths = []path {
-		path {"",                "/etc/hui/"},
-		path {"XDG_CONFIG_HOME", "/hui/"},
-		path {"HOME",            "/.config/hui/"},
-		path {"HOME",            "/.hui/"},
-		path {"",                ""},
+	var paths = []path{
+		path{"", "/etc/hui/"},
+		path{"XDG_CONFIG_HOME", "/hui/"},
+		path{"HOME", "/.config/hui/"},
+		path{"HOME", "/.hui/"},
+		path{"", ""},
 	}
 	var prefix string
 
@@ -103,8 +103,8 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 			continue
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr,
-			            "Config file could not be opened: \"%v\", \"%v\"\n",
-			            paths, err)
+				"Config file could not be opened: \"%v\", \"%v\"\n",
+				paths, err)
 		} else {
 			found = true
 			break
@@ -118,7 +118,7 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 	str, err := io.ReadAll(f)
 	if err != nil {
 		panic(fmt.Sprintf("Config file could not be read: \"%v\", \"%v\"\n",
-		                  paths[i], err))
+			paths[i], err))
 	}
 
 	err = toml.Unmarshal(str, cfg)
@@ -170,11 +170,11 @@ func (c ComConfig) validatePager() {
 		if errors.Is(err, os.ErrNotExist) == false {
 			pagerExists = true
 			break
-		} 
+		}
 	}
 
 	if pagerExists == false {
 		panic(fmt.Sprintf(`The configured pager "%v" can not be found.`,
-		                  c.Pager.Name))
+			c.Pager.Name))
 	}
 }

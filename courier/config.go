@@ -55,6 +55,6 @@ func validateGo(fnName string) {
 	_, fnExists := couFuncs[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Courier Go function "%v" could not be found.`,
-			          fnName))
+			fnName))
 	}
 }

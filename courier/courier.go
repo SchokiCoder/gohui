@@ -13,8 +13,6 @@ import (
 	"golang.org/x/term"
 	"io"
 	"os"
-	"strconv"
-	"strings"
 )
 
 type couRuntime struct {
@@ -34,7 +32,7 @@ type couRuntime struct {
 	Title         string
 }
 
-func newCouRuntime() couRuntime {
+func newCouRuntime(fnMap common.ScriptFnMap) couRuntime {
 	return couRuntime{
 		AcceptInput:   true,
 		Active:        true,
@@ -45,7 +43,7 @@ func newCouRuntime() couRuntime {
 		CmdMode:       false,
 		Comcfg:        common.ComConfigFromFile(),
 		Content:       "",
-		Coucfg:        couConfigFromFile(),
+		Coucfg:        couConfigFromFile(fnMap),
 		Scroll:        0,
 		Feedback:      "",
 		Title:         "",
@@ -196,54 +194,17 @@ func handleArgs(title *string) (string, bool) {
 	return string(ret), true
 }
 
-func handleCommand(contentLineCount int, rt *couRuntime) string {
-	var err error
-	var num uint64
-	var ret string = ""
-
-	cmdLineParts := strings.SplitN(rt.CmdLine, " ", 2)
-	fn := couCommands[cmdLineParts[0]]
-	if fn != nil {
-		return fn(cmdLineParts[1], rt)
-	}
-
-	switch rt.CmdLine {
-	case "q":
-		fallthrough
-	case "quit":
-		fallthrough
-	case "exit":
-		rt.Active = false
-
-	default:
-		num, err = strconv.ParseUint(rt.CmdLine, 10, 32)
-
-		if err != nil {
-			ret = fmt.Sprintf("Command \"%v\" not recognised",
-				rt.CmdLine)
-		} else {
-			if int(num) < contentLineCount {
-				rt.Scroll = int(num)
-			} else {
-				rt.Scroll = contentLineCount
-			}
-		}
-	}
-
-	for i := 0; i < len(rt.CmdLineRows)-1; i++ {
-		rt.CmdLineRows[len(rt.CmdLineRows)-1-i] =
-			rt.CmdLineRows[len(rt.CmdLineRows)-1-i-1]
-	}
-	rt.CmdLineRows[0] = rt.CmdLine
-	return ret
-}
-
-func handleInput(contentHeight int, contentLineCount int, rt *couRuntime) {
-	var canonicalState *term.State
-	var err error
-	var input string
-	var rawInput = make([]byte, 4)
-	var rawInputLen int
+func handleInput(cmdMap common.ScriptCmdMap,
+	contentHeight int,
+	contentLineCount int,
+	rt *couRuntime) {
+	var (
+		canonicalState *term.State
+		err error
+		input string
+		rawInput = make([]byte, 4)
+		rawInputLen int
+	)
 
 	if rt.AcceptInput == false {
 		return
@@ -262,12 +223,16 @@ func handleInput(contentHeight int, contentLineCount int, rt *couRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), contentHeight, contentLineCount, rt)
+	handleKey(string(input), cmdMap, contentHeight, contentLineCount, rt)
 }
 
-func handleKey(key string, contentHeight, contentLineCount int, rt *couRuntime) {
+func handleKey(key string,
+	cmdMap common.ScriptCmdMap,
+	contentHeight, contentLineCount int,
+	rt *couRuntime) {
+
 	if rt.CmdMode {
-		handleKeyCmdline(key, contentLineCount, rt)
+		handleKeyCmdline(key, cmdMap, contentLineCount, rt)
 		return
 	}
 
@@ -323,10 +288,19 @@ func handleKey(key string, contentHeight, contentLineCount int, rt *couRuntime) 
 	}
 }
 
-func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
+func handleKeyCmdline(key string,
+	cmdMap common.ScriptCmdMap,
+	contentLineCount int,
+	rt *couRuntime) {
+
 	switch key {
 	case rt.Comcfg.Keys.Cmdenter:
-		rt.Feedback = handleCommand(contentLineCount, rt)
+		rt.Feedback = common.HandleCommand(&rt.Active,
+			rt.CmdLine,
+			rt.CmdLineRows[:],
+			contentLineCount,
+			&rt.Scroll,
+			cmdMap)
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
@@ -406,7 +380,7 @@ func handleKeyCmdline(key string, contentLineCount int, rt *couRuntime) {
 	}
 }
 
-func tick(rt *couRuntime) {
+func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 	var contentLines []string
 	var contentHeight int
 	var err error
@@ -446,11 +420,17 @@ func tick(rt *couRuntime) {
 	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
 		termH)
 
-	handleInput(contentHeight, len(contentLines), rt)
+	handleInput(cmdMap, contentHeight, len(contentLines), rt)
 }
 
 func main() {
-	var rt = newCouRuntime()
+	var cmdMap common.ScriptCmdMap
+	var fnMap common.ScriptFnMap
+	var rt couRuntime
+
+	cmdMap = getCmdMap(&rt)
+	fnMap = getFnMap(&rt)
+	rt = newCouRuntime(fnMap)
 
 	rt.Content, rt.Active = handleArgs(&rt.Title)
 	if rt.Active == false {
@@ -462,15 +442,15 @@ func main() {
 	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if rt.Coucfg.Events.Start != "" {
-		couFuncs[rt.Coucfg.Events.Start](&rt)
+		fnMap[rt.Coucfg.Events.Start]()
 	}
 
 	for rt.Active {
-		tick(&rt)
+		tick(cmdMap, &rt)
 	}
 
 	if rt.Coucfg.Events.Quit != "" {
-		couFuncs[rt.Coucfg.Events.Quit](&rt)
-		tick(&rt)
+		fnMap[rt.Coucfg.Events.Quit]()
+		tick(cmdMap, &rt)
 	}
 }

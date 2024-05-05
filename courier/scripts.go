@@ -7,24 +7,6 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-var couCommands = map[string]func(string, *couRuntime) string{
-	"sh":  shCommand,
-	"shs": shsCommand,
-}
-
-func shCommand(cmd string, _ *couRuntime) string {
-	return common.HandleShell(cmd)
-}
-
-func shsCommand(cmd string, _ *couRuntime) string {
-	return common.HandleShellSession(cmd)
-}
-
-var couFuncs = map[string]func(*couRuntime){
-	"Goodbye": couGoodbye,
-	"Welcome": couWelcome,
-}
-
 /* Warning: Setting courier's Feedback in the scripts can lead to recursion.
  * If the feedback is longer than one line, courier will be called for it.
  * If you for example have that happen on GoQuit, you will create a fork of
@@ -33,11 +15,33 @@ var couFuncs = map[string]func(*couRuntime){
  * At this point only `pkill courier` may help you.
  */
 
-func couGoodbye(runtime *couRuntime) {
-	runtime.CmdMode = true
-	runtime.CmdLine = "Courier End CmdLine Msg"
+func getCmdMap(rt *couRuntime) common.ScriptCmdMap {
+	sh := func(cmd string) string {
+		return common.HandleShell(cmd)
+	}
+
+	shs := func(cmd string) string {
+		return common.HandleShellSession(cmd)
+	}
+
+	return common.ScriptCmdMap{
+		"sh":  sh,
+		"shs": shs,
+	}
 }
 
-func couWelcome(runtime *couRuntime) {
-	runtime.CmdLine = "Eesterexs"
+func getFnMap(rt *couRuntime) common.ScriptFnMap {
+	goodbye := func() {
+		rt.CmdMode = true
+		rt.CmdLine = "Courier End CmdLine Msg"
+	}
+
+	welcome := func() {
+		rt.CmdLine = "Eesterexs"
+	}
+
+	return common.ScriptFnMap{
+		"Goodbye":             goodbye,
+		"Welcome":             welcome,
+	}
 }

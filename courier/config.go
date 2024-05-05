@@ -32,16 +32,16 @@ type couConfig struct {
 	Events  eventsConfig
 }
 
-func couConfigFromFile() couConfig {
+func couConfigFromFile(fnMap common.ScriptFnMap) couConfig {
 	var ret couConfig
 
 	common.AnyConfigFromFile(&ret, "courier.toml")
 	ret.validateAlignments()
 	if ret.Events.Start != "" {
-		validateGo(ret.Events.Start)
+		validateGo(fnMap, ret.Events.Start)
 	}
 	if ret.Events.Quit != "" {
-		validateGo(ret.Events.Quit)
+		validateGo(fnMap, ret.Events.Quit)
 	}
 
 	return ret
@@ -51,8 +51,8 @@ func (c couConfig) validateAlignments() {
 	common.ValidateAlignment(c.Content.Alignment)
 }
 
-func validateGo(fnName string) {
-	_, fnExists := couFuncs[fnName]
+func validateGo(fnMap common.ScriptFnMap, fnName string) {
+	_, fnExists := fnMap[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Courier Go function "%v" could not be found.`,
 			fnName))

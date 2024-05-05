@@ -61,9 +61,15 @@ Also fix unsupported csi's being added to cmdline as input.
 
 Also make hui's and courier's cmdline stuff more alike.
 
-- unify cmdLine logic
-  (only difference is that custom commands should be able to alter the different
-   runtime structs, which is no worry anymore thanks to closures)
++ unify cmdLine logic
+  (Only difference is that custom commands should be able to alter the different
+   runtime structs, which is no worry anymore thanks to closures.
+   Seriously they came in clutch, as I tried for weeks to elegantly solve this
+   without butchering the workspace.)
+
+- fix const names
+- other unifications feasible?
+- cmdline: cursor is bugged when alignment is not left
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu

@@ -11,8 +11,6 @@ import (
 	"fmt"
 	"golang.org/x/term"
 	"os"
-	"strconv"
-	"strings"
 )
 
 type menuPath []string
@@ -37,8 +35,8 @@ type huiRuntime struct {
 	Menupath      menuPath
 }
 
-func newHuiRuntime() huiRuntime {
-	return huiRuntime{
+func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
+	var ret = huiRuntime{
 		AcceptInput:   true,
 		Active:        true,
 		CmdLine:       "",
@@ -49,9 +47,12 @@ func newHuiRuntime() huiRuntime {
 		Comcfg:        common.ComConfigFromFile(),
 		Cursor:        0,
 		Feedback:      "",
-		Huicfg:        huiConfigFromFile(),
 		Menupath:      make(menuPath, 1, 8),
 	}
+
+	ret.Huicfg = huiConfigFromFile(fnMap, &ret)
+
+	return ret
 }
 
 const HELP = `Usage: hui [OPTIONS]
@@ -202,54 +203,17 @@ func handleArgs() bool {
 	return true
 }
 
-func handleCommand(contentLineCount int, rt *huiRuntime) string {
-	var err error
-	var num uint64
-	var ret string = ""
-
-	cmdLineParts := strings.SplitN(rt.CmdLine, " ", 2)
-	fn := huiCommands[cmdLineParts[0]]
-	if fn != nil {
-		return fn(cmdLineParts[1], rt)
-	}
-
-	switch rt.CmdLine {
-	case "q":
-		fallthrough
-	case "quit":
-		fallthrough
-	case "exit":
-		rt.Active = false
-
-	default:
-		num, err = strconv.ParseUint(rt.CmdLine, 10, 32)
-
-		if err != nil {
-			ret = fmt.Sprintf("Command \"%v\" not recognised",
-				rt.CmdLine)
-		} else {
-			if int(num) < contentLineCount {
-				rt.Cursor = int(num)
-			} else {
-				rt.Cursor = contentLineCount
-			}
-		}
-	}
-
-	for i := 0; i < len(rt.CmdLineRows)-1; i++ {
-		rt.CmdLineRows[len(rt.CmdLineRows)-1-i] =
-			rt.CmdLineRows[len(rt.CmdLineRows)-1-i-1]
-	}
-	rt.CmdLineRows[0] = rt.CmdLine
-	return ret
-}
-
-func handleInput(contentHeight int, rt *huiRuntime) {
-	var canonicalState *term.State
-	var err error
-	var input string
-	var rawInput = make([]byte, 4)
-	var rawInputLen int
+func handleInput(contentHeight int,
+	cmdMap common.ScriptCmdMap,
+	fnMap common.ScriptFnMap,
+	rt *huiRuntime) {
+	var (
+		canonicalState *term.State
+		err error
+		input string
+		rawInput = make([]byte, 4)
+		rawInputLen int
+	)
 
 	if rt.AcceptInput == false {
 		return
@@ -268,15 +232,21 @@ func handleInput(contentHeight int, rt *huiRuntime) {
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), contentHeight, rt)
+	handleKey(string(input), cmdMap, contentHeight, fnMap, rt)
 }
 
-func handleKey(key string, contentHeight int, rt *huiRuntime) {
-	var curMenu = rt.Huicfg.Menus[rt.Menupath.curMenu()]
-	var curEntry = &curMenu.Entries[rt.Cursor]
+func handleKey(key string,
+	cmdMap common.ScriptCmdMap,
+	contentHeight int,
+	fnMap common.ScriptFnMap,
+	rt *huiRuntime) {
+	var (
+		curMenu = rt.Huicfg.Menus[rt.Menupath.curMenu()]
+		curEntry = &curMenu.Entries[rt.Cursor]
+	)
 
 	if rt.CmdMode {
-		handleKeyCmdline(key, len(curMenu.Entries), rt)
+		handleKeyCmdline(key, cmdMap, len(curMenu.Entries), rt)
 		return
 	}
 
@@ -320,7 +290,7 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 		} else if curEntry.ShellSession != "" {
 			rt.Feedback = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
-			huiFuncs[curEntry.Go](rt)
+			fnMap[curEntry.Go]()
 		}
 
 	case rt.Comcfg.Keys.Cmdmode:
@@ -354,10 +324,19 @@ func handleKey(key string, contentHeight int, rt *huiRuntime) {
 	}
 }
 
-func handleKeyCmdline(key string, contentLineCount int, rt *huiRuntime) {
+func handleKeyCmdline(key string,
+	cmdMap common.ScriptCmdMap,
+	contentLineCount int,
+	rt *huiRuntime) {
+
 	switch key {
 	case rt.Comcfg.Keys.Cmdenter:
-		rt.Feedback = handleCommand(contentLineCount, rt)
+		rt.Feedback = common.HandleCommand(&rt.Active,
+			rt.CmdLine,
+			rt.CmdLineRows[:],
+			contentLineCount,
+			&rt.Cursor,
+			cmdMap)
 		fallthrough
 	case csi.SIGINT:
 		fallthrough
@@ -437,7 +416,7 @@ func handleKeyCmdline(key string, contentLineCount int, rt *huiRuntime) {
 	}
 }
 
-func tick(rt *huiRuntime) {
+func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) {
 	var contentHeight int
 	var curMenu menu
 	var err error
@@ -476,11 +455,17 @@ func tick(rt *huiRuntime) {
 	csi.SetCursor((len(rt.Comcfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
 		termH)
 
-	handleInput(contentHeight, rt)
+	handleInput(contentHeight, cmdMap, fnMap, rt)
 }
 
 func main() {
-	var rt = newHuiRuntime()
+	var cmdMap common.ScriptCmdMap
+	var fnMap common.ScriptFnMap
+	var rt huiRuntime
+
+	cmdMap = getCmdMap(&rt)
+	fnMap = getFnMap(&rt)
+	rt = newHuiRuntime(fnMap)
 
 	_, mainMenuExists := rt.Huicfg.Menus["main"]
 
@@ -499,15 +484,15 @@ func main() {
 	defer fmt.Printf("%v%v\n", csi.FG_DEFAULT, csi.BG_DEFAULT)
 
 	if rt.Huicfg.Events.Start != "" {
-		huiFuncs[rt.Huicfg.Events.Start](&rt)
+		fnMap[rt.Huicfg.Events.Start]()
 	}
 
 	for rt.Active {
-		tick(&rt)
+		tick(cmdMap, fnMap, &rt)
 	}
 
 	if rt.Huicfg.Events.Quit != "" {
-		huiFuncs[rt.Huicfg.Events.Quit](&rt)
-		tick(&rt)
+		fnMap[rt.Huicfg.Events.Quit]()
+		tick(cmdMap, fnMap, &rt)
 	}
 }

@@ -10,8 +10,14 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
+
+type ScriptCmd    func(cmd string) string
+type ScriptFn     func()
+type ScriptCmdMap map[string]ScriptCmd
+type ScriptFnMap  map[string]ScriptFn
 
 const (
 	CmdlineMaxRows = 10
@@ -106,6 +112,57 @@ func GenerateLower(cmdline string,
 			ret)
 	}
 
+	return ret
+}
+
+func HandleCommand(active *bool,
+	cmdLine           string,
+	cmdLineRows       []string,
+	contentLineCount  int,
+	cursor            *int,
+	customCmds        map[string]ScriptCmd) string {
+	var (
+		cmdLineParts []string
+		err          error
+		fn           ScriptCmd
+		num          uint64
+		ret          string = ""
+	)
+
+	cmdLineParts = strings.SplitN(cmdLine, " ", 2)
+	fn = customCmds[cmdLineParts[0]]
+	if fn != nil {
+		return fn(cmdLineParts[1])
+	}
+
+	switch cmdLine {
+	case "q":
+		fallthrough
+	case "quit":
+		fallthrough
+	case "exit":
+		*active = false
+
+	default:
+		num, err = strconv.ParseUint(cmdLine, 10, 32)
+
+		if err != nil {
+			ret = fmt.Sprintf("Command \"%v\" not recognised",
+				cmdLine)
+		} else {
+			if int(num) < contentLineCount {
+				*cursor = int(num)
+			} else {
+				*cursor = contentLineCount
+			}
+		}
+	}
+
+	for i := 0; i < len(cmdLineRows)-1; i++ {
+		cmdLineRows[len(cmdLineRows)-1-i] =
+			cmdLineRows[len(cmdLineRows)-1-i-1]
+	}
+	cmdLineRows[0] = cmdLine
 	return ret
 }
 

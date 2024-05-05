@@ -7,43 +7,47 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-var huiCommands = map[string]func(string, *huiRuntime) string{
-	"sh":  shCommand,
-	"shs": shsCommand,
+func getCmdMap(rt *huiRuntime) common.ScriptCmdMap {
+	sh := func(cmd string) string {
+		return common.HandleShell(cmd)
+	}
+
+	shs := func(cmd string) string {
+		return common.HandleShellSession(cmd)
+	}
+
+	return common.ScriptCmdMap{
+		"sh":  sh,
+		"shs": shs,
+	}
 }
 
-func shCommand(cmd string, _ *huiRuntime) string {
-	return common.HandleShell(cmd)
-}
+func getFnMap(rt *huiRuntime) common.ScriptFnMap {
+	goodbye := func() {
+		rt.AcceptInput = false
+		rt.Feedback = "HUI End Feedback Msg"
+	}
 
-func shsCommand(cmd string, _ *huiRuntime) string {
-	return common.HandleShellSession(cmd)
-}
+	putWordsIntoMyMouth := func() {
+		rt.CmdMode = true
+		rt.CmdLineRowIdx = -1
+		rt.CmdLine = "Surprise"
+	}
 
-var huiFuncs = map[string]func(*huiRuntime){
-	"Goodbye":             huiGoodbye,
-	"PutWordsIntoMyMouth": putWordsIntoMyMouth,
-	"Quit":                quit,
-	"Welcome":             huiWelcome,
-}
+	quit := func() {
+		rt.Active = false
+	}
 
-func huiGoodbye(runtime *huiRuntime) {
-	runtime.AcceptInput = false
-	runtime.Feedback = "HUI End Feedback Msg"
-}
-
-func putWordsIntoMyMouth(runtime *huiRuntime) {
-	runtime.CmdMode = true
-	runtime.CmdLineRowIdx = -1
-	runtime.CmdLine = "Surprise"
-}
-
-func quit(runtime *huiRuntime) {
-	runtime.Active = false
-}
-
-func huiWelcome(runtime *huiRuntime) {
-	runtime.Feedback = `Welcome, welcome to HUI.
+	welcome := func() {
+		rt.Feedback = `Welcome, welcome to HUI.
 You have chosen or been chosen to use one of our finest actively developed apps.
 I have thought so much of HUI that i elected to pin it on Github.`
+	}
+
+	return common.ScriptFnMap{
+		"Goodbye":             goodbye,
+		"PutWordsIntoMyMouth": putWordsIntoMyMouth,
+		"Quit":                quit,
+		"Welcome":             welcome,
+	}
 }

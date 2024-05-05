@@ -61,6 +61,10 @@ Also fix unsupported csi's being added to cmdline as input.
 
 Also make hui's and courier's cmdline stuff more alike.
 
+- unify cmdLine logic
+  (only difference is that custom commands should be able to alter the different
+   runtime structs, which is no worry anymore thanks to closures)
+
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
 entry
@@ -74,15 +78,6 @@ This is for colorless environments.
 - add cursor for each menu in menu_path
 
 Thus a "left" key press would send you to the menu entry that you entered.
-
-- unify cmdLine logic
-  (only difference is that custom commands should be able to alter the different
-   runtime structs)
-  Doesn't work, depends on individual handleCommand's.
-  Unifying these means unifying Runtime types.
-  Unifying these means moving the specific configs into common.
-  I will not let my skill issues ruin the workspace architecture again!
-  I should read the Go book before proceeding!
 
 - cmdline: don't handleCommand on empty cmdline
 - cmdline: don't go back in cmdLineHistory when there is nothing yet

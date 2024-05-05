@@ -18,7 +18,7 @@ type entry struct {
 	Go           string
 }
 
-func (e entry) validate() {
+func (e entry) validate(fnMap common.ScriptFnMap) {
 	var numContent = 0
 
 	if e.Shell != "" {
@@ -34,7 +34,7 @@ func (e entry) validate() {
 	}
 
 	if e.Go != "" {
-		validateGo(e.Go)
+		validateGo(e.Go, fnMap)
 		numContent++
 	}
 
@@ -56,13 +56,13 @@ type menu struct {
 	Entries []entry
 }
 
-func (m menu) validate(menuIndex string) {
+func (m menu) validate(fnMap common.ScriptFnMap, menuIndex string) {
 	if len(m.Entries) <= 0 {
 		panic(fmt.Sprintf(`Menu "%v" has no entries.`, menuIndex))
 	}
 
 	for _, e := range m.Entries {
-		e.validate()
+		e.validate(fnMap)
 	}
 }
 
@@ -104,18 +104,18 @@ type huiConfig struct {
 	Menus  map[string]menu
 }
 
-func huiConfigFromFile() huiConfig {
+func huiConfigFromFile(fnMap common.ScriptFnMap, rt *huiRuntime) huiConfig {
 	var ret huiConfig
 
 	common.AnyConfigFromFile(&ret, "hui.toml")
 
 	ret.validateAlignments()
-	ret.validateMenus()
+	ret.validateMenus(fnMap)
 	if ret.Events.Start != "" {
-		validateGo(ret.Events.Start)
+		validateGo(ret.Events.Start, fnMap)
 	}
 	if ret.Events.Quit != "" {
-		validateGo(ret.Events.Quit)
+		validateGo(ret.Events.Quit, fnMap)
 	}
 
 	return ret
@@ -125,14 +125,14 @@ func (c huiConfig) validateAlignments() {
 	common.ValidateAlignment(c.Entry.Alignment)
 }
 
-func (c huiConfig) validateMenus() {
+func (c huiConfig) validateMenus(fnMap common.ScriptFnMap) {
 	for i, m := range c.Menus {
-		m.validate(i)
+		m.validate(fnMap, i)
 	}
 }
 
-func validateGo(fnName string) {
-	_, fnExists := huiFuncs[fnName]
+func validateGo(fnName string, fnMap common.ScriptFnMap) {
+	_, fnExists := fnMap[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Hui Go function "%v" could not be found.`,
 			fnName))

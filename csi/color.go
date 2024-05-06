@@ -16,7 +16,7 @@ func (c FgColor) String() string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[38;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
-		return FG_DEFAULT
+		return FgDefault
 	}
 }
 
@@ -29,6 +29,6 @@ func (c BgColor) String() string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[48;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
-		return BG_DEFAULT
+		return BgDefault
 	}
 }

@@ -67,7 +67,7 @@ Also make hui's and courier's cmdline stuff more alike.
    Seriously they came in clutch, as I tried for weeks to elegantly solve this
    without butchering the workspace.)
 
-- fix const names
++ fix const and var names
 - other unifications feasible?
 - cmdline: cursor is bugged when alignment is not left
 

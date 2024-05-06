@@ -74,7 +74,7 @@ func Csprintf(fg csi.FgColor, bg csi.BgColor, format string, a ...any) string {
 
 	ret = fmt.Sprintf(format, a...)
 	ret = fmt.Sprintf("%v%v%v%v%v",
-		fg, bg, ret, csi.FG_DEFAULT, csi.BG_DEFAULT)
+		fg, bg, ret, csi.FgDefault, csi.BgDefault)
 
 	return ret
 }

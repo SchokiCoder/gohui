@@ -8,26 +8,26 @@ import (
 )
 
 const (
-	SIGINT  = "\003"
-	SIGTSTP = "\004"
+	SigInt  = "\003"
+	SigTstp = "\004"
 
-	BACKSPACE = "\x7f"
+	Backspace = "\x7f"
 
-	CLEAR = "\033[H\033[2J"
-	CURSOR_HIDE  = "\033[?25l"
-	CURSOR_SHOW  = "\033[?25h"
-	CURSOR_UP = "\033[A"
-	CURSOR_DOWN = "\033[B"
-	CURSOR_RIGHT = "\033[C"
-	CURSOR_LEFT = "\033[D"
-	HOME = "\x1b[H"
-	INSERT = "\033[2~"
-	DELETE = "\033[3~"
-	PGUP = "\033[5~"
-	PGDOWN = "\033[6~"
-	END = "\x1b[F"
-	FG_DEFAULT = "\033[39m"
-	BG_DEFAULT = "\033[49m"
+	Clear = "\033[H\033[2J"
+	CursorHide  = "\033[?25l"
+	CursorShow  = "\033[?25h"
+	CursorUp = "\033[A"
+	CursorDown = "\033[B"
+	CursorRight = "\033[C"
+	CursorLeft = "\033[D"
+	Home = "\x1b[H"
+	Insert = "\033[2~"
+	Delete = "\033[3~"
+	PgUp = "\033[5~"
+	PgDown = "\033[6~"
+	End = "\x1b[F"
+	FgDefault = "\033[39m"
+	BgDefault = "\033[49m"
 )
 
 func SetCursor(x, y int) {

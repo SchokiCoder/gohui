@@ -243,7 +243,7 @@ func HandleShellSession(shell string) string {
 		return fmt.Sprintf("Child error: %s", err)
 	}
 
-	fmt.Printf("%v", csi.CLEAR)
+	fmt.Printf("%v", csi.Clear)
 
 	if len(strerr) > 0 {
 		return string(strerr)

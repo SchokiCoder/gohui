@@ -68,7 +68,9 @@ Also make hui's and courier's cmdline stuff more alike.
    without butchering the workspace.)
 
 + fix const and var names
-- other unifications feasible?
+
++ unify HandleKeyCmdLine functions
+
 - cmdline: cursor is bugged when alignment is not left
 
 - add specific feedback color for errors

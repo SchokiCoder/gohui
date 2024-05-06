@@ -232,7 +232,19 @@ func handleKey(key string,
 	rt *couRuntime) {
 
 	if rt.CmdMode {
-		handleKeyCmdline(key, cmdMap, contentLineCount, rt)
+		common.HandleKeyCmdline(key,
+			&rt.Active,
+			&rt.CmdLine,
+			&rt.CmdLineCursor,
+			&rt.CmdLineInsert,
+			&rt.CmdLineRowIdx,
+			rt.CmdLineRows[:],
+			cmdMap,
+			&rt.CmdMode,
+			&rt.ComCfg,
+			contentLineCount,
+			&rt.Scroll,
+			&rt.Feedback)
 		return
 	}
 
@@ -285,98 +297,6 @@ func handleKey(key string,
 		fallthrough
 	case csi.SigTstp:
 		rt.Active = false
-	}
-}
-
-func handleKeyCmdline(key string,
-	cmdMap common.ScriptCmdMap,
-	contentLineCount int,
-	rt *couRuntime) {
-
-	switch key {
-	case rt.ComCfg.Keys.Cmdenter:
-		rt.Feedback = common.HandleCommand(&rt.Active,
-			rt.CmdLine,
-			rt.CmdLineRows[:],
-			contentLineCount,
-			&rt.Scroll,
-			cmdMap)
-		fallthrough
-	case csi.SigInt:
-		fallthrough
-	case csi.SigTstp:
-		rt.CmdLine = ""
-		rt.CmdLineCursor = 0
-		rt.CmdLineInsert = false
-		rt.CmdLineRowIdx = -1
-		rt.CmdMode = false
-		fmt.Printf(csi.CursorHide)
-
-	case csi.Backspace:
-		if rt.CmdLineCursor > 0 {
-			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor-1] +
-				rt.CmdLine[rt.CmdLineCursor:]
-			rt.CmdLineCursor--
-		}
-
-	case csi.CursorRight:
-		if rt.CmdLineCursor < len(rt.CmdLine) {
-			rt.CmdLineCursor++
-		}
-
-	case csi.CursorUp:
-		if rt.CmdLineRowIdx < len(rt.CmdLineRows)-1 {
-			rt.CmdLineRowIdx++
-			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
-			rt.CmdLineCursor = len(rt.CmdLine)
-		}
-
-	case csi.CursorLeft:
-		if rt.CmdLineCursor > 0 {
-			rt.CmdLineCursor--
-		}
-
-	case csi.CursorDown:
-		if rt.CmdLineRowIdx >= 0 {
-			rt.CmdLineRowIdx--
-		}
-		if rt.CmdLineRowIdx >= 0 {
-			rt.CmdLine = rt.CmdLineRows[rt.CmdLineRowIdx]
-		} else {
-			rt.CmdLine = ""
-		}
-		rt.CmdLineCursor = len(rt.CmdLine)
-
-	case csi.Home:
-		rt.CmdLineCursor = 0
-
-	case csi.Insert:
-		rt.CmdLineInsert = !rt.CmdLineInsert
-
-	case csi.Delete:
-		if rt.CmdLineCursor < len(rt.CmdLine) {
-			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-				rt.CmdLine[rt.CmdLineCursor+1:]
-		}
-
-	case csi.End:
-		rt.CmdLineCursor = len(rt.CmdLine)
-
-	default:
-		if len(key) == 1 {
-			var insertReplace = 0
-
-			if rt.CmdLineInsert == true &&
-				rt.CmdLineCursor < len(rt.CmdLine) {
-				insertReplace = 1
-			}
-
-			rt.CmdLine = rt.CmdLine[:rt.CmdLineCursor] +
-				key +
-				rt.CmdLine[rt.CmdLineCursor+
-					insertReplace:]
-			rt.CmdLineCursor++
-		}
 	}
 }
 

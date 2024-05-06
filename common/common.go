@@ -115,7 +115,7 @@ func GenerateLower(cmdline string,
 	return ret
 }
 
-func HandleCommand(active *bool,
+func handleCommand(active *bool,
 	cmdLine           string,
 	cmdLineRows       []string,
 	contentLineCount  int,
@@ -164,6 +164,106 @@ func HandleCommand(active *bool,
 	}
 	cmdLineRows[0] = cmdLine
 	return ret
+}
+
+func HandleKeyCmdline(key string,
+	active *bool,
+	cmdLine *string,
+	cmdLineCursor *int,
+	cmdLineInsert *bool,
+	cmdLineRowIdx *int,
+	cmdLineRows []string,
+	cmdMap ScriptCmdMap,
+	cmdMode *bool,
+	comCfg *ComConfig,
+	contentLineCount int,
+	cursor *int,
+	feedback *string) {
+
+	switch key {
+	case comCfg.Keys.Cmdenter:
+		*feedback = handleCommand(active,
+			*cmdLine,
+			cmdLineRows,
+			contentLineCount,
+			cursor,
+			cmdMap)
+		fallthrough
+	case csi.SigInt:
+		fallthrough
+	case csi.SigTstp:
+		*cmdLine = ""
+		*cmdLineCursor = 0
+		*cmdLineInsert = false
+		*cmdLineRowIdx = -1
+		*cmdMode = false
+		fmt.Printf(csi.CursorHide)
+
+	case csi.Backspace:
+		if *cmdLineCursor > 0 {
+			*cmdLine = (*cmdLine)[:*cmdLineCursor-1] +
+				(*cmdLine)[*cmdLineCursor:]
+			*cmdLineCursor--
+		}
+
+	case csi.CursorRight:
+		if *cmdLineCursor < len(*cmdLine) {
+			*cmdLineCursor++
+		}
+
+	case csi.CursorUp:
+		if *cmdLineRowIdx < len(cmdLineRows)-1 {
+			*cmdLineRowIdx++
+			*cmdLine = cmdLineRows[*cmdLineRowIdx]
+			*cmdLineCursor = len(*cmdLine)
+		}
+
+	case csi.CursorLeft:
+		if *cmdLineCursor > 0 {
+			*cmdLineCursor--
+		}
+
+	case csi.CursorDown:
+		if *cmdLineRowIdx >= 0 {
+			*cmdLineRowIdx--
+		}
+		if *cmdLineRowIdx >= 0 {
+			*cmdLine = cmdLineRows[*cmdLineRowIdx]
+		} else {
+			*cmdLine = ""
+		}
+		*cmdLineCursor = len(*cmdLine)
+
+	case csi.Home:
+		*cmdLineCursor = 0
+
+	case csi.Insert:
+		*cmdLineInsert = !(*cmdLineInsert)
+
+	case csi.Delete:
+		if *cmdLineCursor < len(*cmdLine) {
+			*cmdLine = (*cmdLine)[:*cmdLineCursor] +
+				(*cmdLine)[*cmdLineCursor+1:]
+		}
+
+	case csi.End:
+		*cmdLineCursor = len(*cmdLine)
+
+	default:
+		if len(key) == 1 {
+			var insertReplace = 0
+
+			if *cmdLineInsert == true &&
+				*cmdLineCursor < len(*cmdLine) {
+				insertReplace = 1
+			}
+
+			*cmdLine = (*cmdLine)[:*cmdLineCursor] +
+				key +
+				(*cmdLine)[*cmdLineCursor+insertReplace:]
+			*cmdLineCursor++
+		}
+	}
 }
 
 func HandleShell(shell string) string {

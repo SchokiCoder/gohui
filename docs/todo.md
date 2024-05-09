@@ -12,6 +12,9 @@
   I dislike this operator even more now.
   Ban?
 
+- add numerical modificator for key commands?
+  ("2j" goes down twice)
+
 - add configurable padding
   (lPadding and rPadding)
 	- how does padding interact with alignment?
@@ -71,7 +74,13 @@ Also make hui's and courier's cmdline stuff more alike.
 
 + unify HandleKeyCmdLine functions
 
-- cmdline: cursor is bugged when alignment is not left
++ fix cmdline cursor ignoring any alignment that is not left
+
+There is still some weirdness about right alignment in the cmdline.
+I would need to add an artificial space to the end of the cmdline, to properly
+set the cursor after the last character.
+
+- fix cursor not being hidden on startup
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
@@ -91,9 +100,6 @@ Thus a "left" key press would send you to the menu entry that you entered.
 - cmdline: don't go back in cmdLineHistory when there is nothing yet
 
 - add csi 4 bit colors?
-
-- add numerical modificator for key commands?
-  ("2j" goes down twice)
 
 - TTY tests, BSD tests
 

@@ -43,7 +43,7 @@ G = 50
 B = 50
 
 [CmdLine]
-Alignment = "right"
+Alignment = "left"
 Prefix = ":"
 
 [CmdLine.Fg]

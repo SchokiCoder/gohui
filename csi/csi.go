@@ -31,5 +31,25 @@ const (
 )
 
 func SetCursor(x, y int) {
-	fmt.Printf("\033[%v;%vH", y, x);
+	fmt.Printf("\033[%v;%vH", y, x)
+}
+
+func SetCursorAligned(alignment string, rowLen, termW, x, y int) {
+	switch alignment {
+	case "left":
+		// nothing
+
+	case "center":
+		fallthrough
+	case "centered":
+		x = (termW - rowLen) / 2 + x
+
+	case "right":
+		x = termW - rowLen + x
+
+	default:
+		panic(fmt.Sprintf(`Unknown alignment "%v".`, alignment))
+	}
+
+	SetCursor(x, y)
 }

@@ -337,7 +337,10 @@ func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
-	csi.SetCursor((len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
+	csi.SetCursorAligned(rt.ComCfg.CmdLine.Alignment,
+		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine)),
+		termW,
+		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
 		termH)
 
 	handleInput(cmdMap, contentHeight, len(contentLines), rt)

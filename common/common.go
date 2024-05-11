@@ -282,12 +282,15 @@ func HandleShellSession(shell string) string {
 		return fmt.Sprintf("Could not read stderr: %s", err)
 	}
 
+	fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
+	fmt.Printf(csi.CursorShow)
+	defer fmt.Printf(csi.CursorHide)
+	defer fmt.Printf("%v", csi.Clear)
+
 	err = cmd.Wait()
 	if err != nil {
 		return fmt.Sprintf("Child error: %s", err)
 	}
-
-	fmt.Printf("%v", csi.Clear)
 
 	if len(strerr) > 0 {
 		return string(strerr)

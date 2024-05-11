@@ -80,7 +80,8 @@ There is still some weirdness about right alignment in the cmdline.
 I would need to add an artificial space to the end of the cmdline, to properly
 set the cursor after the last character.
 
-- fix cursor not being hidden on startup
++ fix cursor may not being hidden after child invocation
+- fix courier header and title breaking when aligned to the right
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu

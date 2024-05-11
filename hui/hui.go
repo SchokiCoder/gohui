@@ -402,13 +402,13 @@ func main() {
 		return
 	}
 
-	fmt.Printf(csi.CursorHide)
-	defer fmt.Printf(csi.CursorShow)
-	defer fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
-
 	if rt.HuiCfg.Events.Start != "" {
 		fnMap[rt.HuiCfg.Events.Start]()
 	}
+
+	fmt.Printf(csi.CursorHide)
+	defer fmt.Printf(csi.CursorShow)
+	defer fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
 
 	for rt.Active {
 		tick(cmdMap, fnMap, &rt)

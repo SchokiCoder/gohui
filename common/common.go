@@ -73,6 +73,10 @@ func handleCommand(active *bool,
 		ret          string = ""
 	)
 
+	if cmdLine == "" {
+		return ""
+	}
+
 	cmdLineParts = strings.SplitN(cmdLine, " ", 2)
 	fn = customCmds[cmdLineParts[0]]
 	if fn != nil {

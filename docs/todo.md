@@ -81,6 +81,8 @@ I would need to add an artificial space to the end of the cmdline, to properly
 set the cursor after the last character.
 
 + fix cursor may not being hidden after child invocation
++ fix cmdline handling running with empty input
+- fix cmdLineHistory going back when there is nothing yet
 - fix courier header and title breaking when aligned to the right
 
 - add specific feedback color for errors
@@ -96,9 +98,6 @@ This is for colorless environments.
 - add cursor for each menu in menu_path
 
 Thus a "left" key press would send you to the menu entry that you entered.
-
-- cmdline: don't handleCommand on empty cmdline
-- cmdline: don't go back in cmdLineHistory when there is nothing yet
 
 - add csi 4 bit colors?
 

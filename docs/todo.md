@@ -82,8 +82,9 @@ set the cursor after the last character.
 
 + fix cursor may not being hidden after child invocation
 + fix cmdline handling running with empty input
-- fix cmdLineHistory going back when there is nothing yet
++ fix cmdLineHistory going back even when there is nothing yet
 - fix courier header and title breaking when aligned to the right
+- fix cmdline int as cmd stepping out of range
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu

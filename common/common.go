@@ -161,9 +161,11 @@ func HandleKeyCmdline(key string,
 
 	case csi.CursorUp:
 		if *cmdLineRowIdx < len(cmdLineRows)-1 {
-			*cmdLineRowIdx++
-			*cmdLine = cmdLineRows[*cmdLineRowIdx]
-			*cmdLineCursor = len(*cmdLine)
+			if cmdLineRows[*cmdLineRowIdx+1] != "" {
+				*cmdLineRowIdx++
+				*cmdLine = cmdLineRows[*cmdLineRowIdx]
+				*cmdLineCursor = len(*cmdLine)
+			}
 		}
 
 	case csi.CursorLeft:

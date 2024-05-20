@@ -101,7 +101,7 @@ func handleCommand(active *bool,
 			if int(num) < contentLineCount {
 				*cursor = int(num)
 			} else {
-				*cursor = contentLineCount
+				*cursor = contentLineCount - 1
 			}
 		}
 	}

@@ -28,7 +28,7 @@
 - update demo config
 - set version
 
-# niceties
+# The Nice Update
 
 + update README and add comments to help with config customization
 + hui: add arrow key support for navigation
@@ -83,8 +83,13 @@ set the cursor after the last character.
 + fix cursor may not being hidden after child invocation
 + fix cmdline handling running with empty input
 + fix cmdLineHistory going back even when there is nothing yet
++ fix cmdline int as cmd stepping out of range
+
+This reveals a weird courier inconsistency,
+which also caused it to be unaffected.
+There is likely some other courier bug with how the Scroll value is being used.
+
 - fix courier header and title breaking when aligned to the right
-- fix cmdline int as cmd stepping out of range
 
 - add specific feedback color for errors
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
@@ -101,6 +106,9 @@ This is for colorless environments.
 Thus a "left" key press would send you to the menu entry that you entered.
 
 - add csi 4 bit colors?
+
+- make runtime changing functions more idiomatic
+  (pass by value, methods?)
 
 - TTY tests, BSD tests
 

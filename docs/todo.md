@@ -89,21 +89,32 @@ This reveals a weird courier inconsistency,
 which also caused it to be unaffected.
 There is likely some other courier bug with how the Scroll value is being used.
 
-- fix courier header and title breaking when aligned to the right
++ UNNECESSARY: fix courier header and title breaking when aligned to the right
+  Gone.
+  What did you say?
+  Gone.
+  Are you telling me there is no bug?
+  Yes.
+  Oh.
 
-- add specific feedback color for errors
++ hui: add cursor for each menu in menuPath
+
+Thus leaving a menu brings you back to where the cursor was before.
+
 - add feedback for when hitting "right" on a shell entry or "execute" on a menu
 entry
   "Entry type is \"menu\", cannot execute."
   "Entry type is \"shell\", cannot enter."
 
 - hui: add entry prefix and postfix variations for on cursor hover
+  as OnHover variations like "MenuPrefixOnHover", which sucks to configure?
+  or
+  as additional PrefixPrefix and PostfixPostfix,
+  in which case what about a PrefixPostfix and a PostfixPrefix?
 
 This is for colorless environments.
 
-- add cursor for each menu in menu_path
-
-Thus a "left" key press would send you to the menu entry that you entered.
+- add specific feedback color for errors
 
 - add csi 4 bit colors?
 

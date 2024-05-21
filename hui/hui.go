@@ -13,10 +13,19 @@ import (
 	"os"
 )
 
-type menuPath []string
+type menuPathNode struct {
+	Cursor int
+	Menu string
+}
+
+type menuPath []menuPathNode
+
+func (mp menuPath) curCursor() *int {
+	return &mp[len(mp) - 1].Cursor
+}
 
 func (mp menuPath) curMenu() string {
-	return mp[len(mp)-1]
+	return mp[len(mp)-1].Menu
 }
 
 type huiRuntime struct {
@@ -29,10 +38,9 @@ type huiRuntime struct {
 	CmdLineRows   [common.CmdlineMaxRows]string
 	CmdMode       bool
 	ComCfg        common.ComConfig
-	Cursor        int
 	Feedback      string
 	HuiCfg        huiConfig
-	Menupath      menuPath
+	MPath         menuPath
 }
 
 func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
@@ -45,9 +53,8 @@ func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
 		CmdLineRowIdx: -1,
 		CmdMode:       false,
 		ComCfg:        common.ComConfigFromFile(),
-		Cursor:        0,
 		Feedback:      "",
-		Menupath:      make(menuPath, 1, 8),
+		MPath:         make(menuPath, 1, 8),
 	}
 
 	ret.HuiCfg = huiConfigFromFile(fnMap, &ret)
@@ -241,8 +248,9 @@ func handleKey(key string,
 	fnMap common.ScriptFnMap,
 	rt *huiRuntime) {
 	var (
-		curMenu = rt.HuiCfg.Menus[rt.Menupath.curMenu()]
-		curEntry = &curMenu.Entries[rt.Cursor]
+		curCursor = rt.MPath.curCursor()
+		curMenu = rt.HuiCfg.Menus[rt.MPath.curMenu()]
+		curEntry = &curMenu.Entries[*curCursor]
 	)
 
 	if rt.CmdMode {
@@ -257,7 +265,7 @@ func handleKey(key string,
 			&rt.CmdMode,
 			&rt.ComCfg,
 			len(curMenu.Entries),
-			&rt.Cursor,
+			curCursor,
 			&rt.Feedback)
 		return
 	}
@@ -269,31 +277,29 @@ func handleKey(key string,
 	case csi.CursorLeft:
 		fallthrough
 	case rt.ComCfg.Keys.Left:
-		if len(rt.Menupath) > 1 {
-			rt.Menupath = rt.Menupath[:len(rt.Menupath)-1]
-			rt.Cursor = 0
+		if len(rt.MPath) > 1 {
+			rt.MPath = rt.MPath[:len(rt.MPath)-1]
 		}
 
 	case csi.CursorDown:
 		fallthrough
 	case rt.ComCfg.Keys.Down:
-		if rt.Cursor < len(curMenu.Entries)-1 {
-			rt.Cursor++
+		if *curCursor < len(curMenu.Entries)-1 {
+			*curCursor++
 		}
 
 	case csi.CursorUp:
 		fallthrough
 	case rt.ComCfg.Keys.Up:
-		if rt.Cursor > 0 {
-			rt.Cursor--
+		if *curCursor > 0 {
+			*curCursor--
 		}
 
 	case csi.CursorRight:
 		fallthrough
 	case rt.ComCfg.Keys.Right:
 		if curEntry.Menu != "" {
-			rt.Menupath = append(rt.Menupath, curEntry.Menu)
-			rt.Cursor = 0
+			rt.MPath = append(rt.MPath, menuPathNode{0, curEntry.Menu})
 		}
 
 	case rt.HuiCfg.Keys.Execute:
@@ -310,24 +316,24 @@ func handleKey(key string,
 		fmt.Printf(csi.CursorShow)
 
 	case csi.PgUp:
-		if rt.Cursor-contentHeight < 0 {
-			rt.Cursor = 0
+		if *curCursor - contentHeight < 0 {
+			*curCursor = 0
 		} else {
-			rt.Cursor -= contentHeight
+			*curCursor -= contentHeight
 		}
 
 	case csi.PgDown:
-		if rt.Cursor+contentHeight >= len(curMenu.Entries) {
-			rt.Cursor = len(curMenu.Entries) - 1
+		if *curCursor + contentHeight >= len(curMenu.Entries) {
+			*curCursor = len(curMenu.Entries) - 1
 		} else {
-			rt.Cursor += contentHeight
+			*curCursor += contentHeight
 		}
 
 	case csi.Home:
-		rt.Cursor = 0
+		*curCursor = 0
 
 	case csi.End:
-		rt.Cursor = len(curMenu.Entries) - 1
+		*curCursor = len(curMenu.Entries) - 1
 
 	case csi.SigInt:
 		fallthrough
@@ -337,20 +343,22 @@ func handleKey(key string,
 }
 
 func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) {
-	var contentHeight int
-	var curMenu menu
-	var err error
-	var headerLines []string
-	var lower string
-	var termH, termW int
-	var titleLines []string
+	var (
+		contentHeight int
+		curMenu menu
+		err error
+		headerLines []string
+		lower string
+		termH, termW int
+		titleLines []string
+	)
 
 	fmt.Print(csi.Clear)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
-	curMenu = rt.HuiCfg.Menus[rt.Menupath.curMenu()]
+	curMenu = rt.HuiCfg.Menus[rt.MPath.curMenu()]
 
 	headerLines = common.SplitByLines(termW, rt.HuiCfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
@@ -368,7 +376,7 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) 
 		1 -
 		len(common.SplitByLines(termW, curMenu.Title)) -
 		1
-	drawMenu(contentHeight, curMenu, rt.Cursor, rt.HuiCfg, termW)
+	drawMenu(contentHeight, curMenu, *rt.MPath.curCursor(), rt.HuiCfg, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
@@ -395,7 +403,7 @@ func main() {
 	if mainMenuExists == false {
 		panic("\"main\" menu not found in config.")
 	}
-	rt.Menupath[0] = "main"
+	rt.MPath[0] = menuPathNode{0, "main"}
 
 	rt.Active = handleArgs()
 	if rt.Active == false {

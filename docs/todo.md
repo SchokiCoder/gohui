@@ -101,10 +101,9 @@ There is likely some other courier bug with how the Scroll value is being used.
 
 Thus leaving a menu brings you back to where the cursor was before.
 
-- add feedback for when hitting "right" on a shell entry or "execute" on a menu
-entry
-  "Entry type is \"menu\", cannot execute."
-  "Entry type is \"shell\", cannot enter."
++ hui: add feedback for useless interactions
+
+Such as trying to open a go/shell entry or executing a menu entry.
 
 - hui: add entry prefix and postfix variations for on cursor hover
   as OnHover variations like "MenuPrefixOnHover", which sucks to configure?

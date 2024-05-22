@@ -300,6 +300,8 @@ func handleKey(key string,
 	case rt.ComCfg.Keys.Right:
 		if curEntry.Menu != "" {
 			rt.MPath = append(rt.MPath, menuPathNode{0, curEntry.Menu})
+		} else {
+			rt.Feedback = "Entry has no menu, can't open."
 		}
 
 	case rt.HuiCfg.Keys.Execute:
@@ -309,6 +311,8 @@ func handleKey(key string,
 			rt.Feedback = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
 			fnMap[curEntry.Go]()
+		} else {
+			rt.Feedback = "Entry has no shell or go, can't execute."
 		}
 
 	case rt.ComCfg.Keys.Cmdmode:

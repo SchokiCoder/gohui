@@ -115,6 +115,8 @@ Such as trying to open a go/shell entry or executing a menu entry.
 
 This is for colorless environments.
 
++ add chmod to install for configs to make them explicitly readable for users
+
 - TTY tests, BSD tests
 
 - check pkg tomls

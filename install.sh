@@ -14,6 +14,8 @@ for BINARY in $BINARIES; do
 	chmod 755 "$BIN_DESTDIR/$BINARY"
 
 	cp "$PKG_DIR/$BINARY.toml" "$CFG_DESTDIR/$BINARY.toml"
+	chmod 644 "$CFG_DESTDIR/$BINARY.toml"
 done
 
 cp "$PKG_DIR/common.toml" "$CFG_DESTDIR"
+chmod 644 "$CFG_DESTDIR/common.toml"

@@ -12,6 +12,12 @@
   I dislike this operator even more now.
   Ban?
 
+- make runtime changing functions more idiomatic
+  (pass by value, methods?)
+
+- add csi 4 bit colors?
+- add specific feedback color for errors
+
 - add numerical modificator for key commands?
   ("2j" goes down twice)
 
@@ -105,22 +111,13 @@ Thus leaving a menu brings you back to where the cursor was before.
 
 Such as trying to open a go/shell entry or executing a menu entry.
 
-- hui: add entry prefix and postfix variations for on cursor hover
-  as OnHover variations like "MenuPrefixOnHover", which sucks to configure?
-  or
-  as additional PrefixPrefix and PostfixPostfix,
-  in which case what about a PrefixPostfix and a PostfixPrefix?
++ hui: add entry prefix and postfix variations for on cursor hover
 
 This is for colorless environments.
 
-- add specific feedback color for errors
-
-- add csi 4 bit colors?
-
-- make runtime changing functions more idiomatic
-  (pass by value, methods?)
-
 - TTY tests, BSD tests
+
+- check pkg tomls
 
 - set version to 1.4.
 

@@ -72,19 +72,27 @@ type eventsConfig struct {
 }
 
 type entryConfig struct {
-	Alignment           string
-	MenuPrefix          string
-	MenuPostfix         string
-	ShellPrefix         string
-	ShellPostfix        string
-	ShellSessionPrefix  string
-	ShellSessionPostfix string
-	GoPrefix            string
-	GoPostfix           string
-	Fg                  csi.FgColor
-	Bg                  csi.BgColor
-	HoverFg             csi.FgColor
-	HoverBg             csi.BgColor
+	Alignment                string
+	MenuPrefix               string
+	MenuPostfix              string
+	MenuHoverPrefix          string
+	MenuHoverPostfix         string
+	ShellPrefix              string
+	ShellPostfix             string
+	ShellHoverPrefix         string
+	ShellHoverPostfix        string
+	ShellSessionPrefix       string
+	ShellSessionPostfix      string
+	ShellSessionHoverPrefix  string
+	ShellSessionHoverPostfix string
+	GoPrefix                 string
+	GoPostfix                string
+	GoHoverPrefix            string
+	GoHoverPostfix           string
+	Fg                       csi.FgColor
+	Bg                       csi.BgColor
+	HoverFg                  csi.FgColor
+	HoverBg                  csi.BgColor
 }
 
 type keysConfig struct {

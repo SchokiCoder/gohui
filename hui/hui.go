@@ -143,21 +143,43 @@ func drawMenu(contentHeight int,
 	}
 
 	for i := drawBegin; i < len(curMenu.Entries) && i < drawEnd; i++ {
+		hover := i == cursor
+
 		if curMenu.Entries[i].Shell != "" {
-			prefix = huicfg.Entry.ShellPrefix
-			postfix = huicfg.Entry.ShellPostfix
+			if hover {
+				prefix = huicfg.Entry.ShellHoverPrefix
+				postfix = huicfg.Entry.ShellHoverPostfix
+			} else {
+				prefix = huicfg.Entry.ShellPrefix
+				postfix = huicfg.Entry.ShellPostfix
+			}
 		} else if curMenu.Entries[i].ShellSession != "" {
-			prefix = huicfg.Entry.ShellSessionPrefix
-			postfix = huicfg.Entry.ShellSessionPostfix
+			if hover {
+				prefix = huicfg.Entry.ShellSessionHoverPrefix
+				postfix = huicfg.Entry.ShellSessionHoverPostfix
+			} else {
+				prefix = huicfg.Entry.ShellSessionPrefix
+				postfix = huicfg.Entry.ShellSessionPostfix
+			}
 		} else if curMenu.Entries[i].Go != "" {
-			prefix = huicfg.Entry.GoPrefix
-			postfix = huicfg.Entry.GoPostfix
+			if hover {
+				prefix = huicfg.Entry.GoHoverPrefix
+				postfix = huicfg.Entry.GoHoverPostfix
+			} else {
+				prefix = huicfg.Entry.GoPrefix
+				postfix = huicfg.Entry.GoPostfix
+			}
 		} else {
-			prefix = huicfg.Entry.MenuPrefix
-			postfix = huicfg.Entry.MenuPostfix
+			if hover {
+				prefix = huicfg.Entry.MenuHoverPrefix
+				postfix = huicfg.Entry.MenuHoverPostfix
+			} else {
+				prefix = huicfg.Entry.MenuPrefix
+				postfix = huicfg.Entry.MenuPostfix
+			}
 		}
 
-		if i == cursor {
+		if hover {
 			fg = huicfg.Entry.HoverFg
 			bg = huicfg.Entry.HoverBg
 		} else {

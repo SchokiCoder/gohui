@@ -9,15 +9,23 @@ Title = 'HUI - Feedback'
 Execute = "L"
 
 [Entry]
-Alignment = "center"
+Alignment = "left"
 MenuPrefix = "> ["
 MenuPostfix = "]"
+MenuHoverPrefix = "-> ["
+MenuHoverPostfix = "]"
 ShellPrefix = "> "
 ShellPostfix = ""
+ShellHoverPrefix = "-> "
+ShellHoverPostfix = ""
 ShellSessionPrefix = "> <"
 ShellSessionPostfix = ">"
+ShellSessionHoverPrefix = "-> <"
+ShellSessionHoverPostfix = ">"
 GoPrefix = "> !"
 GoPostfix = ""
+GoHoverPrefix = "-> !"
+GoHoverPostfix = ""
 
 [Entry.Fg]
 Active = false

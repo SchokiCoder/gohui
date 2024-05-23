@@ -34,6 +34,8 @@
 - update demo config
 - set version
 
+-----
+
 # The Nice Update
 
 + update README and add comments to help with config customization
@@ -123,11 +125,7 @@ This also caused the scroll vs int-cmd inconsistency.
 
 + hui: add config validation against entries that lead to non-existent menus
 
-- TTY tests, BSD tests
-
-- set version to 1.4.
-
------
++ set version to 1.4
 
 # The White Magic Update
 

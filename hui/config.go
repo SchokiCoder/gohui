@@ -18,7 +18,7 @@ type entry struct {
 	Go           string
 }
 
-func (e entry) validate(fnMap common.ScriptFnMap) {
+func (e entry) validate(fnMap common.ScriptFnMap, menus map[string]menu) {
 	var numContent = 0
 
 	if e.Shell != "" {
@@ -30,6 +30,13 @@ func (e entry) validate(fnMap common.ScriptFnMap) {
 	}
 
 	if e.Menu != "" {
+		_, ok := menus[e.Menu]
+		if !ok {
+			panic(fmt.Sprintf(
+				`Entry "%v" points to non-existent menu "%v".`,
+				e.Caption,
+				e.Menu))
+		}
 		numContent++
 	}
 
@@ -56,13 +63,17 @@ type menu struct {
 	Entries []entry
 }
 
-func (m menu) validate(fnMap common.ScriptFnMap, menuIndex string) {
+func (m menu) validate(
+	fnMap common.ScriptFnMap,
+	menuIndex string,
+	menus map[string]menu) {
+
 	if len(m.Entries) <= 0 {
 		panic(fmt.Sprintf(`Menu "%v" has no entries.`, menuIndex))
 	}
 
 	for _, e := range m.Entries {
-		e.validate(fnMap)
+		e.validate(fnMap, menus)
 	}
 }
 
@@ -135,7 +146,7 @@ func (c huiConfig) validateAlignments() {
 
 func (c huiConfig) validateMenus(fnMap common.ScriptFnMap) {
 	for i, m := range c.Menus {
-		m.validate(fnMap, i)
+		m.validate(fnMap, i, c.Menus)
 	}
 }
 

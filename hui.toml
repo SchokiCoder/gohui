@@ -95,9 +95,39 @@ Caption = 'print too long'
 Shell = 'echo looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong'
 
 [[Menus.submenu.Entries]]
+Caption = '1'
+Menu = 'm1'
+
+[[Menus.submenu.Entries]]
+Caption = '2'
+Menu = 'm2'
+
+[[Menus.submenu.Entries]]
 Caption = 'Quit'
 Go = 'Quit'
 
 [[Menus.submenu.Entries]]
 Caption = 'I feel lucky'
 Go = 'PutWordsIntoMyMouth'
+
+[Menus.m1]
+Title = "m1\n--"
+
+[[Menus.m1.Entries]]
+Caption = '-'
+Shell = 'echo'
+
+[[Menus.m1.Entries]]
+Caption = '-'
+Shell = 'echo'
+
+[Menus.m2]
+Title = "m2\n--"
+
+[[Menus.m2.Entries]]
+Caption = '-'
+Shell = 'echo'
+
+[[Menus.m2.Entries]]
+Caption = '-'
+Shell = 'echo'

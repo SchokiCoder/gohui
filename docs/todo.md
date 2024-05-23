@@ -121,6 +121,8 @@ This is for colorless environments.
 
 This also caused the scroll vs int-cmd inconsistency.
 
++ hui: add config validation against entries that lead to non-existent menus
+
 - TTY tests, BSD tests
 
 - set version to 1.4.

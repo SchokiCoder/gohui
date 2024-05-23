@@ -259,7 +259,7 @@ func handleKey(key string,
 	case csi.CursorDown:
 		fallthrough
 	case rt.ComCfg.Keys.Down:
-		if rt.Scroll < contentLineCount {
+		if (rt.Scroll + 1) < contentLineCount {
 			rt.Scroll++
 		}
 

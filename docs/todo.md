@@ -117,9 +117,11 @@ This is for colorless environments.
 
 + add chmod to install for configs to make them explicitly readable for users
 
-- TTY tests, BSD tests
++ courier: fix scrolling going past the last line
 
-- check pkg tomls
+This also caused the scroll vs int-cmd inconsistency.
+
+- TTY tests, BSD tests
 
 - set version to 1.4.
 

@@ -8,13 +8,6 @@
 
 # later
 
-- just learned of shadowing via `:=`
-  I dislike this operator even more now.
-  Ban?
-
-- make runtime changing functions more idiomatic
-  (pass by value, methods?)
-
 - add csi 4 bit colors?
 - add specific feedback color for errors
 
@@ -33,6 +26,30 @@
 
 - update demo config
 - set version
+
+# The Idiomatic Update ?
+
++ make Feedback its own type
+
+Why Feedback?
+Because it's often returned by functions.
+Why at all?
+The book told me to do so.
+
+- "Use embedding for composition", page 154
+  on runtime structs
+
+- make runtime changing functions more idiomatic
+  (pass by value, methods?)
+
+- shadowing via `:=` is a thing
+  Ban?
+
+- drop build via Shell for Makefile ?
+
+- finish the book !
+
+- set version to 1.5
 
 -----
 

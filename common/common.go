@@ -14,16 +14,19 @@ import (
 	"strings"
 )
 
-type ScriptCmd    func(cmd string) string
-type ScriptFn     func()
-type ScriptCmdMap map[string]ScriptCmd
-type ScriptFnMap  map[string]ScriptFn
+type (
+	Feedback     string
+	ScriptCmd    func(cmd string) Feedback
+	ScriptFn     func()
+	ScriptCmdMap map[string]ScriptCmd
+	ScriptFnMap  map[string]ScriptFn
+)
 
 const (
 	CmdlineMaxRows = 10
 )
 
-func callPager(feedback string, pager string, pagerTitle string) string {
+func callPager(fb Feedback, pager string, pagerTitle string) Feedback {
 	var err error
 	var shCall string
 	var tempFile *os.File
@@ -37,7 +40,7 @@ func callPager(feedback string, pager string, pagerTitle string) string {
 	defer os.Remove(tempFile.Name())
 	tempFilePath = tempFile.Name()
 
-	tempFileContent = feedback
+	tempFileContent = string(fb)
 	if tempFileContent[len(tempFileContent)-1] != '\n' {
 		tempFileContent = fmt.Sprintf("%v\n", tempFileContent)
 	}
@@ -64,7 +67,7 @@ func handleCommand(active *bool,
 	cmdLineRows       []string,
 	contentLineCount  int,
 	cursor            *int,
-	customCmds        map[string]ScriptCmd) string {
+	customCmds        map[string]ScriptCmd) Feedback {
 	var (
 		cmdLineParts []string
 		err          error
@@ -111,7 +114,7 @@ func handleCommand(active *bool,
 			cmdLineRows[len(cmdLineRows)-1-i-1]
 	}
 	cmdLineRows[0] = cmdLine
-	return ret
+	return Feedback(ret)
 }
 
 func HandleKeyCmdline(key string,
@@ -126,11 +129,11 @@ func HandleKeyCmdline(key string,
 	comCfg *ComConfig,
 	contentLineCount int,
 	cursor *int,
-	feedback *string) {
+	fb *Feedback) {
 
 	switch key {
 	case comCfg.Keys.Cmdenter:
-		*feedback = handleCommand(active,
+		*fb = handleCommand(active,
 			*cmdLine,
 			cmdLineRows,
 			contentLineCount,
@@ -216,7 +219,7 @@ func HandleKeyCmdline(key string,
 	}
 }
 
-func HandleShell(shell string) string {
+func HandleShell(shell string) Feedback {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser
 	var cmdout io.ReadCloser
@@ -228,42 +231,43 @@ func HandleShell(shell string) string {
 
 	cmderr, err = cmd.StderrPipe()
 	if err != nil {
-		return fmt.Sprintf("Could not get stderr: %s", err)
+		return Feedback(fmt.Sprintf("Could not get stderr: %s", err))
 	}
 
 	cmdout, err = cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Sprintf("Could not get stdout: %s", err)
+		return Feedback(fmt.Sprintf("Could not get stdout: %s", err))
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return fmt.Sprintf("Could not start child process: %s", err)
+		return Feedback(
+			fmt.Sprintf("Could not start child process: %s", err))
 	}
 
 	strerr, err = io.ReadAll(cmderr)
 	if err != nil {
-		return fmt.Sprintf("Could not read stderr: %s", err)
+		return Feedback(fmt.Sprintf("Could not read stderr: %s", err))
 	}
 
 	strout, err = io.ReadAll(cmdout)
 	if err != nil {
-		return fmt.Sprintf("Could not read stdout: %s", err)
+		return Feedback(fmt.Sprintf("Could not read stdout: %s", err))
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return fmt.Sprintf("Child error: %s", err)
+		return Feedback(fmt.Sprintf("Child error: %s", err))
 	}
 
 	if len(strerr) > 0 {
-		return string(strerr)
+		return Feedback(strerr)
 	} else {
-		return string(strout)
+		return Feedback(strout)
 	}
 }
 
-func HandleShellSession(shell string) string {
+func HandleShellSession(shell string) Feedback {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser
 	var err error
@@ -275,17 +279,18 @@ func HandleShellSession(shell string) string {
 
 	cmderr, err = cmd.StderrPipe()
 	if err != nil {
-		return fmt.Sprintf("Could not get stderr: %s", err)
+		return Feedback(fmt.Sprintf("Could not get stderr: %s", err))
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return fmt.Sprintf("Could not start child process: %s", err)
+		return Feedback(
+			fmt.Sprintf("Could not start child process: %s", err))
 	}
 
 	strerr, err = io.ReadAll(cmderr)
 	if err != nil {
-		return fmt.Sprintf("Could not read stderr: %s", err)
+		return Feedback(fmt.Sprintf("Could not read stderr: %s", err))
 	}
 
 	fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
@@ -295,11 +300,11 @@ func HandleShellSession(shell string) string {
 
 	err = cmd.Wait()
 	if err != nil {
-		return fmt.Sprintf("Child error: %s", err)
+		return Feedback(fmt.Sprintf("Child error: %s", err))
 	}
 
 	if len(strerr) > 0 {
-		return string(strerr)
+		return Feedback(strerr)
 	}
 
 	return ""

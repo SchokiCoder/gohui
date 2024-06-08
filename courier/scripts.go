@@ -16,11 +16,11 @@ import (
  */
 
 func getCmdMap(rt *couRuntime) common.ScriptCmdMap {
-	sh := func(cmd string) string {
+	sh := func(cmd string) common.Feedback {
 		return common.HandleShell(cmd)
 	}
 
-	shs := func(cmd string) string {
+	shs := func(cmd string) common.Feedback {
 		return common.HandleShellSession(cmd)
 	}
 

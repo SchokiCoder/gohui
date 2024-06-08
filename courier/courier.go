@@ -28,7 +28,7 @@ type couRuntime struct {
 	Content       string
 	CouCfg        couConfig
 	Scroll        int
-	Feedback      string
+	Fb            common.Feedback
 	Title         string
 }
 
@@ -45,7 +45,7 @@ func newCouRuntime(fnMap common.ScriptFnMap) couRuntime {
 		Content:       "",
 		CouCfg:        couConfigFromFile(fnMap),
 		Scroll:        0,
-		Feedback:      "",
+		Fb:            "",
 		Title:         "",
 	}
 }
@@ -244,7 +244,7 @@ func handleKey(key string,
 			&rt.ComCfg,
 			contentLineCount,
 			&rt.Scroll,
-			&rt.Feedback)
+			&rt.Fb)
 		return
 	}
 
@@ -321,7 +321,7 @@ func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 	lower = common.GenerateLower(rt.CmdLine,
 		rt.CmdMode,
 		rt.ComCfg,
-		&rt.Feedback,
+		&rt.Fb,
 		rt.CouCfg.Pager.Title,
 		termW)
 

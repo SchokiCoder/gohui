@@ -8,11 +8,11 @@ import (
 )
 
 func getCmdMap(rt *huiRuntime) common.ScriptCmdMap {
-	sh := func(cmd string) string {
+	sh := func(cmd string) common.Feedback {
 		return common.HandleShell(cmd)
 	}
 
-	shs := func(cmd string) string {
+	shs := func(cmd string) common.Feedback {
 		return common.HandleShellSession(cmd)
 	}
 
@@ -25,7 +25,7 @@ func getCmdMap(rt *huiRuntime) common.ScriptCmdMap {
 func getFnMap(rt *huiRuntime) common.ScriptFnMap {
 	goodbye := func() {
 		rt.AcceptInput = false
-		rt.Feedback = "HUI End Feedback Msg"
+		rt.Fb = "HUI End Feedback Msg"
 	}
 
 	putWordsIntoMyMouth := func() {
@@ -39,7 +39,7 @@ func getFnMap(rt *huiRuntime) common.ScriptFnMap {
 	}
 
 	welcome := func() {
-		rt.Feedback = `Welcome, welcome to HUI.
+		rt.Fb = `Welcome, welcome to HUI.
 You have chosen or been chosen to use one of our finest actively developed apps.
 I have thought so much of HUI that i elected to pin it on Github.`
 	}

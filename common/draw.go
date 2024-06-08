@@ -29,7 +29,7 @@ func DrawUpper(comCfg ComConfig, header []string, termW int, title []string) {
 func GenerateLower(cmdline string,
 	cmdMode bool,
 	comCfg ComConfig,
-	feedback *string,
+	fb *Feedback,
 	pagerTitle string,
 	termW int) string {
 	var (
@@ -46,11 +46,14 @@ func GenerateLower(cmdline string,
 			comCfg.CmdLine.Prefix,
 			cmdline)
 	} else {
-		ret, fits = tryFitFeedback(*feedback, comCfg.Feedback.Prefix, termW)
+		ret, fits = tryFitFeedback(*fb, comCfg.Feedback.Prefix, termW)
 		if fits == false {
-			ret = callPager(*feedback, comCfg.Pager.Name, pagerTitle)
-			*feedback = ""
-			ret, _ = tryFitFeedback(ret, comCfg.Feedback.Prefix, termW)
+			ret = string(callPager(*fb, comCfg.Pager.Name, pagerTitle))
+			*fb = ""
+			ret, _ = tryFitFeedback(
+				Feedback(ret),
+				comCfg.Feedback.Prefix,
+				termW)
 		}
 
 		ret = Csprintfa(comCfg.Feedback.Alignment,
@@ -110,19 +113,19 @@ func SplitByLines(maxLineLen int, str string) []string {
 	return step2
 }
 
-func tryFitFeedback(feedback string,
-	feedbackPrefix string,
+func tryFitFeedback(fb Feedback,
+	fbPrefix string,
 	termW int) (string, bool) {
 	var (
 		retStr  string
 		retFits bool
 	)
 
-	retStr = strings.TrimSpace(feedback)
-	retStr = fmt.Sprintf("%v%v", feedbackPrefix, retStr)
+	retStr = strings.TrimSpace(string(fb))
+	retStr = fmt.Sprintf("%v%v", fbPrefix, retStr)
 
 	if len(SplitByLines(termW, retStr)) > 1 {
-		retStr = feedbackPrefix
+		retStr = fbPrefix
 		retFits = false
 	} else {
 		retFits = true

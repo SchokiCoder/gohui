@@ -38,7 +38,7 @@ type huiRuntime struct {
 	CmdLineRows   [common.CmdlineMaxRows]string
 	CmdMode       bool
 	ComCfg        common.ComConfig
-	Feedback      string
+	Fb            common.Feedback
 	HuiCfg        huiConfig
 	MPath         menuPath
 }
@@ -53,7 +53,7 @@ func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
 		CmdLineRowIdx: -1,
 		CmdMode:       false,
 		ComCfg:        common.ComConfigFromFile(),
-		Feedback:      "",
+		Fb:            "",
 		MPath:         make(menuPath, 1, 8),
 	}
 
@@ -288,7 +288,7 @@ func handleKey(key string,
 			&rt.ComCfg,
 			len(curMenu.Entries),
 			curCursor,
-			&rt.Feedback)
+			&rt.Fb)
 		return
 	}
 
@@ -323,18 +323,18 @@ func handleKey(key string,
 		if curEntry.Menu != "" {
 			rt.MPath = append(rt.MPath, menuPathNode{0, curEntry.Menu})
 		} else {
-			rt.Feedback = "Entry has no menu, can't open."
+			rt.Fb = "Entry has no menu, can't open."
 		}
 
 	case rt.HuiCfg.Keys.Execute:
 		if curEntry.Shell != "" {
-			rt.Feedback = common.HandleShell(curEntry.Shell)
+			rt.Fb = common.HandleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
-			rt.Feedback = common.HandleShellSession(curEntry.ShellSession)
+			rt.Fb = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
 			fnMap[curEntry.Go]()
 		} else {
-			rt.Feedback = "Entry has no shell or go, can't execute."
+			rt.Fb = "Entry has no shell or go, can't execute."
 		}
 
 	case rt.ComCfg.Keys.Cmdmode:
@@ -391,7 +391,7 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) 
 	lower = common.GenerateLower(rt.CmdLine,
 		rt.CmdMode,
 		rt.ComCfg,
-		&rt.Feedback,
+		&rt.Fb,
 		rt.HuiCfg.Pager.Title,
 		termW)
 

@@ -7,7 +7,7 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-func getCmdMap(rt *huiRuntime) common.ScriptCmdMap {
+func getCmdMap(ad *appData) common.ScriptCmdMap {
 	sh := func(cmd string) common.Feedback {
 		return common.HandleShell(cmd)
 	}
@@ -22,24 +22,24 @@ func getCmdMap(rt *huiRuntime) common.ScriptCmdMap {
 	}
 }
 
-func getFnMap(rt *huiRuntime) common.ScriptFnMap {
+func getFnMap(ad *appData) common.ScriptFnMap {
 	goodbye := func() {
-		rt.AcceptInput = false
-		rt.Fb = "HUI End Feedback Msg"
+		ad.AcceptInput = false
+		ad.Fb = "HUI End Feedback Msg"
 	}
 
 	putWordsIntoMyMouth := func() {
-		rt.CmdLine.Active = true
-		rt.CmdLine.RowIdx = -1
-		rt.CmdLine.Content = "Surprise"
+		ad.CmdLine.Active = true
+		ad.CmdLine.RowIdx = -1
+		ad.CmdLine.Content = "Surprise"
 	}
 
 	quit := func() {
-		rt.Active = false
+		ad.Active = false
 	}
 
 	welcome := func() {
-		rt.Fb = `Welcome, welcome to HUI.
+		ad.Fb = `Welcome, welcome to HUI.
 You have chosen or been chosen to use one of our finest actively developed apps.
 I have thought so much of HUI that i elected to pin it on Github.`
 	}

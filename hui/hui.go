@@ -28,14 +28,14 @@ func (mp menuPath) curMenu() string {
 	return mp[len(mp)-1].Menu
 }
 
-type huiRuntime struct {
+type appData struct {
 	common.ComAppData
 	HuiCfg            huiConfig
 	MPath             menuPath
 }
 
-func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
-	var ret = huiRuntime{
+func newAppData(fnMap common.ScriptFnMap) appData {
+	var ret = appData {
 		ComAppData: common.NewComAppData(),
 		MPath:      make(menuPath, 1, 8),
 	}
@@ -218,7 +218,7 @@ func handleArgs() bool {
 func handleInput(contentHeight int,
 	cmdMap common.ScriptCmdMap,
 	fnMap common.ScriptFnMap,
-	rt *huiRuntime) {
+	ad *appData) {
 	var (
 		canonicalState *term.State
 		err error
@@ -227,7 +227,7 @@ func handleInput(contentHeight int,
 		rawInputLen int
 	)
 
-	if rt.AcceptInput == false {
+	if ad.AcceptInput == false {
 		return
 	}
 
@@ -244,79 +244,79 @@ func handleInput(contentHeight int,
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), cmdMap, contentHeight, fnMap, rt)
+	handleKey(string(input), cmdMap, contentHeight, fnMap, ad)
 }
 
 func handleKey(key string,
 	cmdMap common.ScriptCmdMap,
 	contentHeight int,
 	fnMap common.ScriptFnMap,
-	rt *huiRuntime) {
+	ad *appData) {
 	var (
-		curCursor = rt.MPath.curCursor()
-		curMenu = rt.HuiCfg.Menus[rt.MPath.curMenu()]
+		curCursor = ad.MPath.curCursor()
+		curMenu = ad.HuiCfg.Menus[ad.MPath.curMenu()]
 		curEntry = &curMenu.Entries[*curCursor]
 	)
 
-	if rt.CmdLine.Active {
+	if ad.CmdLine.Active {
 		common.HandleKeyCmdline(key,
-			&rt.Active,
-			&rt.CmdLine,
+			&ad.Active,
+			&ad.CmdLine,
 			cmdMap,
-			&rt.ComCfg,
+			&ad.ComCfg,
 			len(curMenu.Entries),
 			curCursor,
-			&rt.Fb)
+			&ad.Fb)
 		return
 	}
 
 	switch key {
-	case rt.ComCfg.Keys.Quit:
-		rt.Active = false
+	case ad.ComCfg.Keys.Quit:
+		ad.Active = false
 
 	case csi.CursorLeft:
 		fallthrough
-	case rt.ComCfg.Keys.Left:
-		if len(rt.MPath) > 1 {
-			rt.MPath = rt.MPath[:len(rt.MPath)-1]
+	case ad.ComCfg.Keys.Left:
+		if len(ad.MPath) > 1 {
+			ad.MPath = ad.MPath[:len(ad.MPath)-1]
 		}
 
 	case csi.CursorDown:
 		fallthrough
-	case rt.ComCfg.Keys.Down:
+	case ad.ComCfg.Keys.Down:
 		if *curCursor < len(curMenu.Entries)-1 {
 			*curCursor++
 		}
 
 	case csi.CursorUp:
 		fallthrough
-	case rt.ComCfg.Keys.Up:
+	case ad.ComCfg.Keys.Up:
 		if *curCursor > 0 {
 			*curCursor--
 		}
 
 	case csi.CursorRight:
 		fallthrough
-	case rt.ComCfg.Keys.Right:
+	case ad.ComCfg.Keys.Right:
 		if curEntry.Menu != "" {
-			rt.MPath = append(rt.MPath, menuPathNode{0, curEntry.Menu})
+			ad.MPath = append(ad.MPath, menuPathNode{0, curEntry.Menu})
 		} else {
-			rt.Fb = "Entry has no menu, can't open."
+			ad.Fb = "Entry has no menu, can't open."
 		}
 
-	case rt.HuiCfg.Keys.Execute:
+	case ad.HuiCfg.Keys.Execute:
 		if curEntry.Shell != "" {
-			rt.Fb = common.HandleShell(curEntry.Shell)
+			ad.Fb = common.HandleShell(curEntry.Shell)
 		} else if curEntry.ShellSession != "" {
-			rt.Fb = common.HandleShellSession(curEntry.ShellSession)
+			ad.Fb = common.HandleShellSession(curEntry.ShellSession)
 		} else if curEntry.Go != "" {
 			fnMap[curEntry.Go]()
 		} else {
-			rt.Fb = "Entry has no shell or go, can't execute."
+			ad.Fb = "Entry has no shell or go, can't execute."
 		}
 
-	case rt.ComCfg.Keys.Cmdmode:
-		rt.CmdLine.Active = true
+	case ad.ComCfg.Keys.Cmdmode:
+		ad.CmdLine.Active = true
 		fmt.Printf(csi.CursorShow)
 
 	case csi.PgUp:
@@ -342,11 +342,11 @@ func handleKey(key string,
 	case csi.SigInt:
 		fallthrough
 	case csi.SigTstp:
-		rt.Active = false
+		ad.Active = false
 	}
 }
 
-func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) {
+func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, ad *appData) {
 	var (
 		contentHeight int
 		curMenu menu
@@ -362,72 +362,72 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) 
 	if err != nil {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
-	curMenu = rt.HuiCfg.Menus[rt.MPath.curMenu()]
+	curMenu = ad.HuiCfg.Menus[ad.MPath.curMenu()]
 
-	headerLines = common.SplitByLines(termW, rt.HuiCfg.Header)
+	headerLines = common.SplitByLines(termW, ad.HuiCfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
-	lower = common.GenerateLower(rt.CmdLine.Content,
-		rt.CmdLine.Active,
-		rt.ComCfg,
-		&rt.Fb,
-		rt.HuiCfg.Pager.Title,
+	lower = common.GenerateLower(ad.CmdLine.Content,
+		ad.CmdLine.Active,
+		ad.ComCfg,
+		&ad.Fb,
+		ad.HuiCfg.Pager.Title,
 		termW)
 
-	common.DrawUpper(rt.ComCfg, headerLines, termW, titleLines)
+	common.DrawUpper(ad.ComCfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-		len(common.SplitByLines(termW, rt.HuiCfg.Header)) -
+		len(common.SplitByLines(termW, ad.HuiCfg.Header)) -
 		1 -
 		len(common.SplitByLines(termW, curMenu.Title)) -
 		1
-	drawMenu(contentHeight, curMenu, *rt.MPath.curCursor(), rt.HuiCfg, termW)
+	drawMenu(contentHeight, curMenu, *ad.MPath.curCursor(), ad.HuiCfg, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
-	csi.SetCursorAligned(rt.ComCfg.CmdLine.Alignment,
-		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine.Content)),
+	csi.SetCursorAligned(ad.ComCfg.CmdLine.Alignment,
+		(len(ad.ComCfg.CmdLine.Prefix) + len(ad.CmdLine.Content)),
 		termW,
-		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLine.Cursor + 1),
+		(len(ad.ComCfg.CmdLine.Prefix) + ad.CmdLine.Cursor + 1),
 		termH)
 
-	handleInput(contentHeight, cmdMap, fnMap, rt)
+	handleInput(contentHeight, cmdMap, fnMap, ad)
 }
 
 func main() {
 	var cmdMap common.ScriptCmdMap
 	var fnMap common.ScriptFnMap
-	var rt huiRuntime
+	var ad appData
 
-	cmdMap = getCmdMap(&rt)
-	fnMap = getFnMap(&rt)
-	rt = newHuiRuntime(fnMap)
+	cmdMap = getCmdMap(&ad)
+	fnMap = getFnMap(&ad)
+	ad = newAppData(fnMap)
 
-	_, mainMenuExists := rt.HuiCfg.Menus["main"]
+	_, mainMenuExists := ad.HuiCfg.Menus["main"]
 
 	if mainMenuExists == false {
 		panic("\"main\" menu not found in config.")
 	}
-	rt.MPath[0] = menuPathNode{0, "main"}
+	ad.MPath[0] = menuPathNode{0, "main"}
 
-	rt.Active = handleArgs()
-	if rt.Active == false {
+	ad.Active = handleArgs()
+	if ad.Active == false {
 		return
 	}
 
-	if rt.HuiCfg.Events.Start != "" {
-		fnMap[rt.HuiCfg.Events.Start]()
+	if ad.HuiCfg.Events.Start != "" {
+		fnMap[ad.HuiCfg.Events.Start]()
 	}
 
 	fmt.Printf(csi.CursorHide)
 	defer fmt.Printf(csi.CursorShow)
 	defer fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
 
-	for rt.Active {
-		tick(cmdMap, fnMap, &rt)
+	for ad.Active {
+		tick(cmdMap, fnMap, &ad)
 	}
 
-	if rt.HuiCfg.Events.Quit != "" {
-		fnMap[rt.HuiCfg.Events.Quit]()
-		tick(cmdMap, fnMap, &rt)
+	if ad.HuiCfg.Events.Quit != "" {
+		fnMap[ad.HuiCfg.Events.Quit]()
+		tick(cmdMap, fnMap, &ad)
 	}
 }

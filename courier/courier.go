@@ -15,7 +15,7 @@ import (
 	"os"
 )
 
-type couRuntime struct {
+type appData struct {
 	common.ComAppData
 	Content           string
 	CouCfg            couConfig
@@ -23,8 +23,8 @@ type couRuntime struct {
 	Title             string
 }
 
-func newCouRuntime(fnMap common.ScriptFnMap) couRuntime {
-	return couRuntime{
+func newAppData(fnMap common.ScriptFnMap) appData {
+	return appData {
 		ComAppData: common.NewComAppData(),
 		Content:    "",
 		CouCfg:     couConfigFromFile(fnMap),
@@ -85,20 +85,20 @@ Internal commands:
 
 func drawContent(contentLines []string,
 	contentHeight int,
-	rt couRuntime,
+	ad appData,
 	termW int) {
 	var (
-		drawRange int = rt.Scroll + contentHeight
+		drawRange int = ad.Scroll + contentHeight
 	)
 
 	if drawRange > len(contentLines) {
 		drawRange = len(contentLines)
 	}
 
-	for _, v := range contentLines[rt.Scroll:drawRange] {
-		common.Cprinta(rt.CouCfg.Content.Alignment,
-			rt.CouCfg.Content.Fg,
-			rt.CouCfg.Content.Bg,
+	for _, v := range contentLines[ad.Scroll:drawRange] {
+		common.Cprinta(ad.CouCfg.Content.Alignment,
+			ad.CouCfg.Content.Fg,
+			ad.CouCfg.Content.Bg,
 			termW,
 			v)
 	}
@@ -180,7 +180,7 @@ func handleArgs(title *string) (string, bool) {
 func handleInput(cmdMap common.ScriptCmdMap,
 	contentHeight int,
 	contentLineCount int,
-	rt *couRuntime) {
+	ad *appData) {
 	var (
 		canonicalState *term.State
 		err error
@@ -189,7 +189,7 @@ func handleInput(cmdMap common.ScriptCmdMap,
 		rawInputLen int
 	)
 
-	if rt.AcceptInput == false {
+	if ad.AcceptInput == false {
 		return
 	}
 
@@ -206,79 +206,79 @@ func handleInput(cmdMap common.ScriptCmdMap,
 
 	term.Restore(int(os.Stdin.Fd()), canonicalState)
 
-	handleKey(string(input), cmdMap, contentHeight, contentLineCount, rt)
+	handleKey(string(input), cmdMap, contentHeight, contentLineCount, ad)
 }
 
 func handleKey(key string,
 	cmdMap common.ScriptCmdMap,
 	contentHeight, contentLineCount int,
-	rt *couRuntime) {
+	ad *appData) {
 
-	if rt.CmdLine.Active {
+	if ad.CmdLine.Active {
 		common.HandleKeyCmdline(key,
-			&rt.Active,
-			&rt.CmdLine,
+			&ad.Active,
+			&ad.CmdLine,
 			cmdMap,
-			&rt.ComCfg,
+			&ad.ComCfg,
 			contentLineCount,
-			&rt.Scroll,
-			&rt.Fb)
+			&ad.Scroll,
+			&ad.Fb)
 		return
 	}
 
 	switch key {
 	case csi.CursorUp:
 		fallthrough
-	case rt.ComCfg.Keys.Up:
-		if rt.Scroll > 0 {
-			rt.Scroll--
+	case ad.ComCfg.Keys.Up:
+		if ad.Scroll > 0 {
+			ad.Scroll--
 		}
 
 	case csi.CursorDown:
 		fallthrough
-	case rt.ComCfg.Keys.Down:
-		if (rt.Scroll + 1) < contentLineCount {
-			rt.Scroll++
+	case ad.ComCfg.Keys.Down:
+		if (ad.Scroll + 1) < contentLineCount {
+			ad.Scroll++
 		}
 
-	case rt.ComCfg.Keys.Cmdmode:
-		rt.CmdLine.Active = true
+	case ad.ComCfg.Keys.Cmdmode:
+		ad.CmdLine.Active = true
 		fmt.Printf(csi.CursorShow)
 
 	case csi.PgUp:
-		if rt.Scroll-contentHeight < 0 {
-			rt.Scroll = 0
+		if ad.Scroll-contentHeight < 0 {
+			ad.Scroll = 0
 		} else {
-			rt.Scroll -= contentHeight
+			ad.Scroll -= contentHeight
 		}
 
 	case csi.PgDown:
-		if rt.Scroll+contentHeight >= contentLineCount {
-			rt.Scroll = contentLineCount - 1
+		if ad.Scroll+contentHeight >= contentLineCount {
+			ad.Scroll = contentLineCount - 1
 		} else {
-			rt.Scroll += contentHeight
+			ad.Scroll += contentHeight
 		}
 
 	case csi.Home:
-		rt.Scroll = 0
+		ad.Scroll = 0
 
 	case csi.End:
-		rt.Scroll = contentLineCount - 1
+		ad.Scroll = contentLineCount - 1
 
-	case rt.ComCfg.Keys.Quit:
+	case ad.ComCfg.Keys.Quit:
 		fallthrough
 	case csi.CursorLeft:
 		fallthrough
-	case rt.ComCfg.Keys.Left:
+	case ad.ComCfg.Keys.Left:
 		fallthrough
 	case csi.SigInt:
 		fallthrough
 	case csi.SigTstp:
-		rt.Active = false
+		ad.Active = false
 	}
 }
 
-func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
+func tick(cmdMap common.ScriptCmdMap, ad *appData) {
 	var contentLines []string
 	var contentHeight int
 	var err error
@@ -293,65 +293,65 @@ func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 		panic(fmt.Sprintf("Could not get term size: %v", err))
 	}
 
-	headerLines = common.SplitByLines(termW, rt.CouCfg.Header)
-	titleLines = common.SplitByLines(termW, rt.Title)
-	contentLines = common.SplitByLines(termW, rt.Content)
-	lower = common.GenerateLower(rt.CmdLine.Content,
-		rt.CmdLine.Active,
-		rt.ComCfg,
-		&rt.Fb,
-		rt.CouCfg.Pager.Title,
+	headerLines = common.SplitByLines(termW, ad.CouCfg.Header)
+	titleLines = common.SplitByLines(termW, ad.Title)
+	contentLines = common.SplitByLines(termW, ad.Content)
+	lower = common.GenerateLower(ad.CmdLine.Content,
+		ad.CmdLine.Active,
+		ad.ComCfg,
+		&ad.Fb,
+		ad.CouCfg.Pager.Title,
 		termW)
 
-	common.DrawUpper(rt.ComCfg, headerLines, termW, titleLines)
+	common.DrawUpper(ad.ComCfg, headerLines, termW, titleLines)
 
 	contentHeight = termH -
-		len(common.SplitByLines(termW, rt.CouCfg.Header)) -
+		len(common.SplitByLines(termW, ad.CouCfg.Header)) -
 		1 -
-		len(common.SplitByLines(termW, rt.Title)) -
+		len(common.SplitByLines(termW, ad.Title)) -
 		1
 
-	drawContent(contentLines, contentHeight, *rt, termW)
+	drawContent(contentLines, contentHeight, *ad, termW)
 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
-	csi.SetCursorAligned(rt.ComCfg.CmdLine.Alignment,
-		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine.Content)),
+	csi.SetCursorAligned(ad.ComCfg.CmdLine.Alignment,
+		(len(ad.ComCfg.CmdLine.Prefix) + len(ad.CmdLine.Content)),
 		termW,
-		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLine.Cursor + 1),
+		(len(ad.ComCfg.CmdLine.Prefix) + ad.CmdLine.Cursor + 1),
 		termH)
 
-	handleInput(cmdMap, contentHeight, len(contentLines), rt)
+	handleInput(cmdMap, contentHeight, len(contentLines), ad)
 }
 
 func main() {
 	var cmdMap common.ScriptCmdMap
 	var fnMap common.ScriptFnMap
-	var rt couRuntime
+	var ad appData
 
-	cmdMap = getCmdMap(&rt)
-	fnMap = getFnMap(&rt)
-	rt = newCouRuntime(fnMap)
+	cmdMap = getCmdMap(&ad)
+	fnMap = getFnMap(&ad)
+	ad = newAppData(fnMap)
 
-	rt.Content, rt.Active = handleArgs(&rt.Title)
-	if rt.Active == false {
+	ad.Content, ad.Active = handleArgs(&ad.Title)
+	if ad.Active == false {
 		return
 	}
 
-	if rt.CouCfg.Events.Start != "" {
-		fnMap[rt.CouCfg.Events.Start]()
+	if ad.CouCfg.Events.Start != "" {
+		fnMap[ad.CouCfg.Events.Start]()
 	}
 
 	fmt.Printf(csi.CursorHide)
 	defer fmt.Printf(csi.CursorShow)
 	defer fmt.Printf("%v%v\n", csi.FgDefault, csi.BgDefault)
 
-	for rt.Active {
-		tick(cmdMap, &rt)
+	for ad.Active {
+		tick(cmdMap, &ad)
 	}
 
-	if rt.CouCfg.Events.Quit != "" {
-		fnMap[rt.CouCfg.Events.Quit]()
-		tick(cmdMap, &rt)
+	if ad.CouCfg.Events.Quit != "" {
+		fnMap[ad.CouCfg.Events.Quit]()
+		tick(cmdMap, &ad)
 	}
 }

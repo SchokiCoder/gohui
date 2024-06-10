@@ -123,7 +123,7 @@ type huiConfig struct {
 	Menus  map[string]menu
 }
 
-func huiConfigFromFile(fnMap common.ScriptFnMap, rt *huiRuntime) huiConfig {
+func huiConfigFromFile(fnMap common.ScriptFnMap, ad *appData) huiConfig {
 	var ret huiConfig
 
 	common.AnyConfigFromFile(&ret, "hui.toml")

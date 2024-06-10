@@ -44,7 +44,7 @@ This simplifies things a bit.
 
 Said common appData struct is then embedded into the specific runtime structs.
 
-- rename "runtime" structs into "appData"
++ rename "runtime" structs into "appData"
 
 Done to differentiate from the golang runtime.
 

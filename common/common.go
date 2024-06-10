@@ -14,6 +14,24 @@ import (
 	"strings"
 )
 
+type ComAppData struct {
+	AcceptInput bool
+	Active      bool
+	CmdLine     CmdLine
+	ComCfg      ComConfig
+	Fb          Feedback
+}
+
+func NewComAppData() ComAppData {
+	return ComAppData {
+		AcceptInput:   true,
+		Active:        true,
+		CmdLine:       NewCmdLine(),
+		ComCfg:        ComConfigFromFile(),
+		Fb:            "",
+	}
+}
+
 type CmdLine struct {
 	Active  bool
 	Content string

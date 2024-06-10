@@ -40,10 +40,16 @@ The book told me to do so.
 
 This simplifies things a bit.
 
++ move common runtime variables into a common appData struct
+
+Said common appData struct is then embedded into the specific runtime structs.
+
+- rename "runtime" structs into "appData"
+
+Done to differentiate from the golang runtime.
+
 - make runtime changing functions more idiomatic
   (pass by value, methods?)
-
-- is App a better name for (hui/cou)Runtime ?
 
 - shadowing via `:=` is a thing
   Ban?

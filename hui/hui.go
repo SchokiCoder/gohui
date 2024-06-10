@@ -29,23 +29,15 @@ func (mp menuPath) curMenu() string {
 }
 
 type huiRuntime struct {
-	AcceptInput bool
-	Active      bool
-	CmdLine     common.CmdLine
-	ComCfg      common.ComConfig
-	Fb          common.Feedback
-	HuiCfg      huiConfig
-	MPath       menuPath
+	common.ComAppData
+	HuiCfg            huiConfig
+	MPath             menuPath
 }
 
 func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
 	var ret = huiRuntime{
-		AcceptInput:   true,
-		Active:        true,
-		CmdLine:       common.NewCmdLine(),
-		ComCfg:        common.ComConfigFromFile(),
-		Fb:            "",
-		MPath:         make(menuPath, 1, 8),
+		ComAppData: common.NewComAppData(),
+		MPath:      make(menuPath, 1, 8),
 	}
 
 	ret.HuiCfg = huiConfigFromFile(fnMap, &ret)

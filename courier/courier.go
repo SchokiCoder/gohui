@@ -16,28 +16,20 @@ import (
 )
 
 type couRuntime struct {
-	AcceptInput   bool
-	Active        bool
-	CmdLine       common.CmdLine
-	ComCfg        common.ComConfig
-	Content       string
-	CouCfg        couConfig
-	Scroll        int
-	Fb            common.Feedback
-	Title         string
+	common.ComAppData
+	Content           string
+	CouCfg            couConfig
+	Scroll            int
+	Title             string
 }
 
 func newCouRuntime(fnMap common.ScriptFnMap) couRuntime {
 	return couRuntime{
-		AcceptInput:   true,
-		Active:        true,
-		CmdLine:       common.NewCmdLine(),
-		ComCfg:        common.ComConfigFromFile(),
-		Content:       "",
-		CouCfg:        couConfigFromFile(fnMap),
-		Scroll:        0,
-		Fb:            "",
-		Title:         "",
+		ComAppData: common.NewComAppData(),
+		Content:    "",
+		CouCfg:     couConfigFromFile(fnMap),
+		Scroll:     0,
+		Title:      "",
 	}
 }
 

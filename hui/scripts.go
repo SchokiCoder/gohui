@@ -29,9 +29,9 @@ func getFnMap(rt *huiRuntime) common.ScriptFnMap {
 	}
 
 	putWordsIntoMyMouth := func() {
-		rt.CmdMode = true
-		rt.CmdLineRowIdx = -1
-		rt.CmdLine = "Surprise"
+		rt.CmdLine.Active = true
+		rt.CmdLine.RowIdx = -1
+		rt.CmdLine.Content = "Surprise"
 	}
 
 	quit := func() {

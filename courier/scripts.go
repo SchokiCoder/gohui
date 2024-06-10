@@ -32,12 +32,12 @@ func getCmdMap(rt *couRuntime) common.ScriptCmdMap {
 
 func getFnMap(rt *couRuntime) common.ScriptFnMap {
 	goodbye := func() {
-		rt.CmdMode = true
-		rt.CmdLine = "Courier End CmdLine Msg"
+		rt.CmdLine.Active = true
+		rt.CmdLine.Content = "Courier End CmdLine Msg"
 	}
 
 	welcome := func() {
-		rt.CmdLine = "Eesterexs"
+		rt.CmdLine.Content = "Eesterexs"
 	}
 
 	return common.ScriptFnMap{

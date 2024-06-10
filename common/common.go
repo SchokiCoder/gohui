@@ -14,6 +14,25 @@ import (
 	"strings"
 )
 
+type CmdLine struct {
+	Active  bool
+	Content string
+	Cursor  int
+	Insert  bool
+	RowIdx  int
+	Rows    [CmdlineMaxRows]string
+}
+
+func NewCmdLine() CmdLine {
+	return CmdLine {
+		Active:  false,
+		Content: "",
+		Cursor:  0,
+		Insert:  false,
+		RowIdx:  -1,
+	}
+}
+
 type (
 	Feedback     string
 	ScriptCmd    func(cmd string) Feedback
@@ -63,8 +82,7 @@ func callPager(fb Feedback, pager string, pagerTitle string) Feedback {
 }
 
 func handleCommand(active *bool,
-	cmdLine           string,
-	cmdLineRows       []string,
+	cmdLine           CmdLine,
 	contentLineCount  int,
 	cursor            *int,
 	customCmds        map[string]ScriptCmd) Feedback {
@@ -76,17 +94,17 @@ func handleCommand(active *bool,
 		ret          string = ""
 	)
 
-	if cmdLine == "" {
+	if cmdLine.Content == "" {
 		return ""
 	}
 
-	cmdLineParts = strings.SplitN(cmdLine, " ", 2)
+	cmdLineParts = strings.SplitN(cmdLine.Content, " ", 2)
 	fn = customCmds[cmdLineParts[0]]
 	if fn != nil {
 		return fn(cmdLineParts[1])
 	}
 
-	switch cmdLine {
+	switch cmdLine.Content {
 	case "q":
 		fallthrough
 	case "quit":
@@ -95,11 +113,11 @@ func handleCommand(active *bool,
 		*active = false
 
 	default:
-		num, err = strconv.ParseUint(cmdLine, 10, 32)
+		num, err = strconv.ParseUint(cmdLine.Content, 10, 32)
 
 		if err != nil {
 			ret = fmt.Sprintf("Command \"%v\" not recognised",
-				cmdLine)
+				cmdLine.Content)
 		} else {
 			if int(num) < contentLineCount {
 				*cursor = int(num)
@@ -109,23 +127,18 @@ func handleCommand(active *bool,
 		}
 	}
 
-	for i := 0; i < len(cmdLineRows)-1; i++ {
-		cmdLineRows[len(cmdLineRows)-1-i] =
-			cmdLineRows[len(cmdLineRows)-1-i-1]
+	for i := 0; i < len(cmdLine.Rows)-1; i++ {
+		cmdLine.Rows[len(cmdLine.Rows)-1-i] =
+			cmdLine.Rows[len(cmdLine.Rows)-1-i-1]
 	}
-	cmdLineRows[0] = cmdLine
+	cmdLine.Rows[0] = cmdLine.Content
 	return Feedback(ret)
 }
 
 func HandleKeyCmdline(key string,
 	active *bool,
-	cmdLine *string,
-	cmdLineCursor *int,
-	cmdLineInsert *bool,
-	cmdLineRowIdx *int,
-	cmdLineRows []string,
+	cmdLine *CmdLine,
 	cmdMap ScriptCmdMap,
-	cmdMode *bool,
 	comCfg *ComConfig,
 	contentLineCount int,
 	cursor *int,
@@ -135,7 +148,6 @@ func HandleKeyCmdline(key string,
 	case comCfg.Keys.Cmdenter:
 		*fb = handleCommand(active,
 			*cmdLine,
-			cmdLineRows,
 			contentLineCount,
 			cursor,
 			cmdMap)
@@ -143,78 +155,76 @@ func HandleKeyCmdline(key string,
 	case csi.SigInt:
 		fallthrough
 	case csi.SigTstp:
-		*cmdLine = ""
-		*cmdLineCursor = 0
-		*cmdLineInsert = false
-		*cmdLineRowIdx = -1
-		*cmdMode = false
+		*cmdLine = NewCmdLine()
 		fmt.Printf(csi.CursorHide)
 
 	case csi.Backspace:
-		if *cmdLineCursor > 0 {
-			*cmdLine = (*cmdLine)[:*cmdLineCursor-1] +
-				(*cmdLine)[*cmdLineCursor:]
-			*cmdLineCursor--
+		if cmdLine.Cursor > 0 {
+			cmdLine.Content =
+				(cmdLine.Content)[:cmdLine.Cursor-1] +
+				(cmdLine.Content)[cmdLine.Cursor:]
+			cmdLine.Cursor--
 		}
 
 	case csi.CursorRight:
-		if *cmdLineCursor < len(*cmdLine) {
-			*cmdLineCursor++
+		if cmdLine.Cursor < len(cmdLine.Content) {
+			cmdLine.Cursor++
 		}
 
 	case csi.CursorUp:
-		if *cmdLineRowIdx < len(cmdLineRows)-1 {
-			if cmdLineRows[*cmdLineRowIdx+1] != "" {
-				*cmdLineRowIdx++
-				*cmdLine = cmdLineRows[*cmdLineRowIdx]
-				*cmdLineCursor = len(*cmdLine)
+		if cmdLine.RowIdx < len(cmdLine.Rows)-1 {
+			if cmdLine.Rows[cmdLine.RowIdx+1] != "" {
+				cmdLine.RowIdx++
+				cmdLine.Content = cmdLine.Rows[cmdLine.RowIdx]
+				cmdLine.Cursor = len(cmdLine.Content)
 			}
 		}
 
 	case csi.CursorLeft:
-		if *cmdLineCursor > 0 {
-			*cmdLineCursor--
+		if cmdLine.Cursor > 0 {
+			cmdLine.Cursor--
 		}
 
 	case csi.CursorDown:
-		if *cmdLineRowIdx >= 0 {
-			*cmdLineRowIdx--
+		if cmdLine.RowIdx >= 0 {
+			cmdLine.RowIdx--
 		}
-		if *cmdLineRowIdx >= 0 {
-			*cmdLine = cmdLineRows[*cmdLineRowIdx]
+		if cmdLine.RowIdx >= 0 {
+			cmdLine.Content = cmdLine.Rows[cmdLine.RowIdx]
 		} else {
-			*cmdLine = ""
+			cmdLine.Content = ""
 		}
-		*cmdLineCursor = len(*cmdLine)
+		cmdLine.Cursor = len(cmdLine.Content)
 
 	case csi.Home:
-		*cmdLineCursor = 0
+		cmdLine.Cursor = 0
 
 	case csi.Insert:
-		*cmdLineInsert = !(*cmdLineInsert)
+		cmdLine.Insert = !(cmdLine.Insert)
 
 	case csi.Delete:
-		if *cmdLineCursor < len(*cmdLine) {
-			*cmdLine = (*cmdLine)[:*cmdLineCursor] +
-				(*cmdLine)[*cmdLineCursor+1:]
+		if cmdLine.Cursor < len(cmdLine.Content) {
+			cmdLine.Content =
+				(cmdLine.Content)[:cmdLine.Cursor] +
+				(cmdLine.Content)[cmdLine.Cursor+1:]
 		}
 
 	case csi.End:
-		*cmdLineCursor = len(*cmdLine)
+		cmdLine.Cursor = len(cmdLine.Content)
 
 	default:
 		if len(key) == 1 {
 			var insertReplace = 0
 
-			if *cmdLineInsert == true &&
-				*cmdLineCursor < len(*cmdLine) {
+			if cmdLine.Insert == true &&
+				cmdLine.Cursor < len(cmdLine.Content) {
 				insertReplace = 1
 			}
 
-			*cmdLine = (*cmdLine)[:*cmdLineCursor] +
+			cmdLine.Content = (cmdLine.Content)[:cmdLine.Cursor] +
 				key +
-				(*cmdLine)[*cmdLineCursor+insertReplace:]
-			*cmdLineCursor++
+				(cmdLine.Content)[cmdLine.Cursor+insertReplace:]
+			cmdLine.Cursor++
 		}
 	}
 }

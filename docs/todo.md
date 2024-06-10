@@ -36,11 +36,14 @@ Because it's often returned by functions.
 Why at all?
 The book told me to do so.
 
-- "Use embedding for composition", page 154
-  on runtime structs
++ move cmdline data to common into its own struct
+
+This simplifies things a bit.
 
 - make runtime changing functions more idiomatic
   (pass by value, methods?)
+
+- is App a better name for (hui/cou)Runtime ?
 
 - shadowing via `:=` is a thing
   Ban?

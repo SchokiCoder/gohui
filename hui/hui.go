@@ -29,29 +29,20 @@ func (mp menuPath) curMenu() string {
 }
 
 type huiRuntime struct {
-	AcceptInput   bool
-	Active        bool
-	CmdLine       string
-	CmdLineCursor int
-	CmdLineInsert bool
-	CmdLineRowIdx int
-	CmdLineRows   [common.CmdlineMaxRows]string
-	CmdMode       bool
-	ComCfg        common.ComConfig
-	Fb            common.Feedback
-	HuiCfg        huiConfig
-	MPath         menuPath
+	AcceptInput bool
+	Active      bool
+	CmdLine     common.CmdLine
+	ComCfg      common.ComConfig
+	Fb          common.Feedback
+	HuiCfg      huiConfig
+	MPath       menuPath
 }
 
 func newHuiRuntime(fnMap common.ScriptFnMap) huiRuntime {
 	var ret = huiRuntime{
 		AcceptInput:   true,
 		Active:        true,
-		CmdLine:       "",
-		CmdLineCursor: 0,
-		CmdLineInsert: false,
-		CmdLineRowIdx: -1,
-		CmdMode:       false,
+		CmdLine:       common.NewCmdLine(),
 		ComCfg:        common.ComConfigFromFile(),
 		Fb:            "",
 		MPath:         make(menuPath, 1, 8),
@@ -275,16 +266,11 @@ func handleKey(key string,
 		curEntry = &curMenu.Entries[*curCursor]
 	)
 
-	if rt.CmdMode {
+	if rt.CmdLine.Active {
 		common.HandleKeyCmdline(key,
 			&rt.Active,
 			&rt.CmdLine,
-			&rt.CmdLineCursor,
-			&rt.CmdLineInsert,
-			&rt.CmdLineRowIdx,
-			rt.CmdLineRows[:],
 			cmdMap,
-			&rt.CmdMode,
 			&rt.ComCfg,
 			len(curMenu.Entries),
 			curCursor,
@@ -338,7 +324,7 @@ func handleKey(key string,
 		}
 
 	case rt.ComCfg.Keys.Cmdmode:
-		rt.CmdMode = true
+		rt.CmdLine.Active = true
 		fmt.Printf(csi.CursorShow)
 
 	case csi.PgUp:
@@ -388,8 +374,8 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) 
 
 	headerLines = common.SplitByLines(termW, rt.HuiCfg.Header)
 	titleLines = common.SplitByLines(termW, curMenu.Title)
-	lower = common.GenerateLower(rt.CmdLine,
-		rt.CmdMode,
+	lower = common.GenerateLower(rt.CmdLine.Content,
+		rt.CmdLine.Active,
 		rt.ComCfg,
 		&rt.Fb,
 		rt.HuiCfg.Pager.Title,
@@ -407,9 +393,9 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, rt *huiRuntime) 
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 	csi.SetCursorAligned(rt.ComCfg.CmdLine.Alignment,
-		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine)),
+		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine.Content)),
 		termW,
-		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
+		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLine.Cursor + 1),
 		termH)
 
 	handleInput(contentHeight, cmdMap, fnMap, rt)

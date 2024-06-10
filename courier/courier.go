@@ -18,12 +18,7 @@ import (
 type couRuntime struct {
 	AcceptInput   bool
 	Active        bool
-	CmdLine       string
-	CmdLineCursor int
-	CmdLineInsert bool
-	CmdLineRowIdx int
-	CmdLineRows   [common.CmdlineMaxRows]string
-	CmdMode       bool
+	CmdLine       common.CmdLine
 	ComCfg        common.ComConfig
 	Content       string
 	CouCfg        couConfig
@@ -36,11 +31,7 @@ func newCouRuntime(fnMap common.ScriptFnMap) couRuntime {
 	return couRuntime{
 		AcceptInput:   true,
 		Active:        true,
-		CmdLine:       "",
-		CmdLineCursor: 0,
-		CmdLineInsert: false,
-		CmdLineRowIdx: -1,
-		CmdMode:       false,
+		CmdLine:       common.NewCmdLine(),
 		ComCfg:        common.ComConfigFromFile(),
 		Content:       "",
 		CouCfg:        couConfigFromFile(fnMap),
@@ -231,16 +222,11 @@ func handleKey(key string,
 	contentHeight, contentLineCount int,
 	rt *couRuntime) {
 
-	if rt.CmdMode {
+	if rt.CmdLine.Active {
 		common.HandleKeyCmdline(key,
 			&rt.Active,
 			&rt.CmdLine,
-			&rt.CmdLineCursor,
-			&rt.CmdLineInsert,
-			&rt.CmdLineRowIdx,
-			rt.CmdLineRows[:],
 			cmdMap,
-			&rt.CmdMode,
 			&rt.ComCfg,
 			contentLineCount,
 			&rt.Scroll,
@@ -264,7 +250,7 @@ func handleKey(key string,
 		}
 
 	case rt.ComCfg.Keys.Cmdmode:
-		rt.CmdMode = true
+		rt.CmdLine.Active = true
 		fmt.Printf(csi.CursorShow)
 
 	case csi.PgUp:
@@ -318,8 +304,8 @@ func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 	headerLines = common.SplitByLines(termW, rt.CouCfg.Header)
 	titleLines = common.SplitByLines(termW, rt.Title)
 	contentLines = common.SplitByLines(termW, rt.Content)
-	lower = common.GenerateLower(rt.CmdLine,
-		rt.CmdMode,
+	lower = common.GenerateLower(rt.CmdLine.Content,
+		rt.CmdLine.Active,
 		rt.ComCfg,
 		&rt.Fb,
 		rt.CouCfg.Pager.Title,
@@ -338,9 +324,9 @@ func tick(cmdMap common.ScriptCmdMap, rt *couRuntime) {
 	csi.SetCursor(1, termH)
 	fmt.Printf("%v", lower)
 	csi.SetCursorAligned(rt.ComCfg.CmdLine.Alignment,
-		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine)),
+		(len(rt.ComCfg.CmdLine.Prefix) + len(rt.CmdLine.Content)),
 		termW,
-		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLineCursor + 1),
+		(len(rt.ComCfg.CmdLine.Prefix) + rt.CmdLine.Cursor + 1),
 		termH)
 
 	handleInput(cmdMap, contentHeight, len(contentLines), rt)

@@ -1,6 +1,4 @@
 gohui
 genversion.go
-go.sum
-go.work.sum
 pkg/hui
 pkg/courier

@@ -1,6 +1,6 @@
 module github.com/SchokiCoder/gohui/hui
 
-go 1.21
+go 1.18
 
 require golang.org/x/term v0.16.0
 

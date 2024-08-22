@@ -83,10 +83,12 @@ Internal commands:
         when given a positive number, it is used as a line number to scroll to
 `
 
-func drawContent(contentLines []string,
+func drawContent(
+	contentLines []string,
 	contentHeight int,
 	ad appData,
-	termW int) {
+	termW int,
+) {
 	var (
 		drawRange int = ad.Scroll + contentHeight
 	)
@@ -177,10 +179,12 @@ func handleArgs(title *string) (string, bool) {
 	return string(ret), true
 }
 
-func handleInput(cmdMap common.ScriptCmdMap,
+func handleInput(
+	cmdMap common.ScriptCmdMap,
 	contentHeight int,
 	contentLineCount int,
-	ad *appData) {
+	ad *appData,
+) {
 	var (
 		canonicalState *term.State
 		err error
@@ -209,11 +213,12 @@ func handleInput(cmdMap common.ScriptCmdMap,
 	handleKey(string(input), cmdMap, contentHeight, contentLineCount, ad)
 }
 
-func handleKey(key string,
+func handleKey(
+	key string,
 	cmdMap common.ScriptCmdMap,
 	contentHeight, contentLineCount int,
-	ad *appData) {
-
+	ad *appData,
+) {
 	if ad.CmdLine.Active {
 		common.HandleKeyCmdline(key,
 			&ad.Active,

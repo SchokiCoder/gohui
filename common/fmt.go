@@ -10,18 +10,22 @@ import (
 	"strings"
 )
 
-func Cprinta(alignment string,
-	fg csi.FgColor,
-	bg csi.BgColor,
-	termW int,
-	str string) (n int, err error) {
+func Cprinta(
+	alignment string,
+	fg        csi.FgColor,
+	bg        csi.BgColor,
+	termW     int,
+	str       string,
+) (n int, err error) {
 	return fmt.Printf("%v", Csprinta(alignment, fg, bg, termW, str))
 }
 
-func Cprintf(fg csi.FgColor,
-	bg csi.BgColor,
+func Cprintf(
+	fg     csi.FgColor,
+	bg     csi.BgColor,
 	format string,
-	a ...any) (n int, err error) {
+	a      ...any,
+) (n int, err error) {
 	var (
 		output string
 	)
@@ -31,23 +35,27 @@ func Cprintf(fg csi.FgColor,
 	return fmt.Printf(output)
 }
 
-func Cprintfa(alignment string,
-	fg csi.FgColor,
-	bg csi.BgColor,
-	termW int,
-	format string,
-	a ...any) (n int, err error) {
+func Cprintfa(
+	alignment string,
+	fg        csi.FgColor,
+	bg        csi.BgColor,
+	termW     int,
+	format    string,
+	a         ...any,
+) (n int, err error) {
 	var (
 		str = Csprintfa(alignment, fg, bg, termW, format, a...)
 	)
 	return fmt.Printf("%v", str)
 }
 
-func Csprinta(alignment string,
-	fg csi.FgColor,
-	bg csi.BgColor,
-	termW int,
-	str string) string {
+func Csprinta(
+	alignment string,
+	fg        csi.FgColor,
+	bg        csi.BgColor,
+	termW     int,
+	str       string,
+) string {
 	var (
 		ret = Csprintfa(alignment, fg, bg, termW, "%v", str)
 	)
@@ -79,12 +87,14 @@ func Csprintf(fg csi.FgColor, bg csi.BgColor, format string, a ...any) string {
 	return ret
 }
 
-func Csprintfa(alignment string,
-	fg csi.FgColor,
-	bg csi.BgColor,
-	termW int,
-	format string,
-	a ...any) string {
+func Csprintfa(
+	alignment string,
+	fg        csi.FgColor,
+	bg        csi.BgColor,
+	termW     int,
+	format    string,
+	a         ...any,
+) string {
 	var (
 		str    string
 		strlen int

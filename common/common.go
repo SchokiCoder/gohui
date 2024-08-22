@@ -99,11 +99,13 @@ func callPager(fb Feedback, pager string, pagerTitle string) Feedback {
 	return HandleShellSession(shCall)
 }
 
-func handleCommand(active *bool,
-	cmdLine           CmdLine,
-	contentLineCount  int,
-	cursor            *int,
-	customCmds        map[string]ScriptCmd) Feedback {
+func handleCommand(
+	active           *bool,
+	cmdLine          CmdLine,
+	contentLineCount int,
+	cursor           *int,
+	customCmds       map[string]ScriptCmd,
+) Feedback {
 	var (
 		cmdLineParts []string
 		err          error
@@ -153,15 +155,16 @@ func handleCommand(active *bool,
 	return Feedback(ret)
 }
 
-func HandleKeyCmdline(key string,
-	active *bool,
-	cmdLine *CmdLine,
-	cmdMap ScriptCmdMap,
-	comCfg *ComConfig,
+func HandleKeyCmdline(
+	key              string,
+	active           *bool,
+	cmdLine          *CmdLine,
+	cmdMap           ScriptCmdMap,
+	comCfg           *ComConfig,
 	contentLineCount int,
-	cursor *int,
-	fb *Feedback) {
-
+	cursor           *int,
+	fb               *Feedback,
+) {
 	switch key {
 	case comCfg.Keys.Cmdenter:
 		*fb = handleCommand(active,

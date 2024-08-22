@@ -101,11 +101,13 @@ var (
 	AppVersion    string
 )
 
-func drawMenu(contentHeight int,
+func drawMenu(
+	contentHeight int,
 	curMenu menu,
 	cursor int,
 	huicfg huiConfig,
-	termW int) {
+	termW int,
+) {
 	var (
 		drawBegin       int
 		drawEnd         int
@@ -215,10 +217,12 @@ func handleArgs() bool {
 	return true
 }
 
-func handleInput(contentHeight int,
+func handleInput(
+	contentHeight int,
 	cmdMap common.ScriptCmdMap,
 	fnMap common.ScriptFnMap,
-	ad *appData) {
+	ad *appData,
+) {
 	var (
 		canonicalState *term.State
 		err error
@@ -247,11 +251,13 @@ func handleInput(contentHeight int,
 	handleKey(string(input), cmdMap, contentHeight, fnMap, ad)
 }
 
-func handleKey(key string,
+func handleKey(
+	key string,
 	cmdMap common.ScriptCmdMap,
 	contentHeight int,
 	fnMap common.ScriptFnMap,
-	ad *appData) {
+	ad *appData,
+) {
 	var (
 		curCursor = ad.MPath.curCursor()
 		curMenu = ad.HuiCfg.Menus[ad.MPath.curMenu()]

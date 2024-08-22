@@ -26,12 +26,14 @@ func DrawUpper(comCfg ComConfig, header []string, termW int, title []string) {
 	}
 }
 
-func GenerateLower(cmdline string,
-	cmdMode bool,
-	comCfg ComConfig,
-	fb *Feedback,
+func GenerateLower(
+	cmdline    string,
+	cmdMode    bool,
+	comCfg     ComConfig,
+	fb         *Feedback,
 	pagerTitle string,
-	termW int) string {
+	termW      int,
+) string {
 	var (
 		fits bool
 		ret  string
@@ -67,12 +69,14 @@ func GenerateLower(cmdline string,
 	return ret
 }
 
-func PrintAbout(appLicense,
+func PrintAbout(
+	appLicense,
 	appLicenseUrl,
 	appName,
 	appNameFormal,
 	appRepo,
-	appVersion string) {
+	appVersion string,
+) {
 	fmt.Printf("The source code of \"%v\" aka %v %v is available, "+
 		`licensed under the %v at:
 %v
@@ -113,9 +117,11 @@ func SplitByLines(maxLineLen int, str string) []string {
 	return step2
 }
 
-func tryFitFeedback(fb Feedback,
+func tryFitFeedback(
+	fb       Feedback,
 	fbPrefix string,
-	termW int) (string, bool) {
+	termW    int,
+) (string, bool) {
 	var (
 		retStr  string
 		retFits bool

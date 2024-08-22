@@ -66,8 +66,8 @@ type menu struct {
 func (m menu) validate(
 	fnMap common.ScriptFnMap,
 	menuIndex string,
-	menus map[string]menu) {
-
+	menus map[string]menu,
+) {
 	if len(m.Entries) <= 0 {
 		panic(fmt.Sprintf(`Menu "%v" has no entries.`, menuIndex))
 	}

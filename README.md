@@ -20,6 +20,8 @@ Then set hui as their default shell, to chain them into specific tasks :D
 or just install it for yourself by having the configs within your home
 directory.  
 
+![example of a gohui install](demo.gif)
+
 # Install
 
 By default, the following steps will install two binaries "hui" and "courier".  

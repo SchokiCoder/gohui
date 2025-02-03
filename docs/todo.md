@@ -29,26 +29,26 @@
 
 # The Idiomatic Update ?
 
-+ make Feedback its own type
+- [x] make Feedback its own type
 
 Why Feedback?
 Because it's often returned by functions.
 Why at all?
 The book told me to do so.
 
-+ move cmdline data to common into its own struct
+- [x] move cmdline data to common into its own struct
 
 This simplifies things a bit.
 
-+ move common runtime variables into a common appData struct
+- [x] move common runtime variables into a common appData struct
 
 Said common appData struct is then embedded into the specific runtime structs.
 
-+ rename "runtime" structs into "appData"
+- [x] rename "runtime" structs into "appData"
 
 Done to differentiate from the golang runtime.
 
-+ enforce new formatting for function declarations
+- [x] enforce new formatting for function declarations
 
 Putting the first parameter already on a new line,
 and the closing parenthesis with return type and opening bracket on a
@@ -57,17 +57,13 @@ There is a clear cut between params and function start,
 which often is var declarations.
 No more weird alignment because of first param vs the other.
 
-- make runtime changing functions more idiomatic
-  (pass by value, methods?)
-
-- shadowing via `:=` is a thing
-  Ban?
-
-- drop build via Shell for Makefile ?
+- [x] remove unused go:generate comments
 
 - finish the book !
 
-- set version to 1.5
+- [ ] go fmt
+
+- [ ] set version to 1.5
 
 -----
 

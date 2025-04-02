@@ -123,10 +123,14 @@ type huiConfig struct {
 	Menus  map[string]menu
 }
 
-func huiConfigFromFile(fnMap common.ScriptFnMap, ad *appData) huiConfig {
+func huiConfigFromFile(
+	ad *appData,
+	cfgPath string,
+	fnMap common.ScriptFnMap,
+) huiConfig {
 	var ret huiConfig
 
-	common.AnyConfigFromFile(&ret, "hui.toml")
+	common.AnyConfigFromFile(&ret, "hui.toml", cfgPath)
 
 	ret.validateAlignments()
 	ret.validateMenus(fnMap)

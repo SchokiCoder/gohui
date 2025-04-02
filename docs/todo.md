@@ -59,9 +59,11 @@ No more weird alignment because of first param vs the other.
 
 - [x] remove unused go:generate comments
 
-- finish the book !
+- [x] add flag for config dir path
 
-- [ ] go fmt
+- [ ] update copyright
+
+- finish the book !
 
 - [ ] set version to 1.5
 

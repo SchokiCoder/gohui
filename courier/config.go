@@ -32,10 +32,13 @@ type couConfig struct {
 	Events  eventsConfig
 }
 
-func couConfigFromFile(fnMap common.ScriptFnMap) couConfig {
+func couConfigFromFile(
+	cfgPath string,
+	fnMap common.ScriptFnMap,
+) couConfig {
 	var ret couConfig
 
-	common.AnyConfigFromFile(&ret, "courier.toml")
+	common.AnyConfigFromFile(&ret, "courier.toml", cfgPath)
 	ret.validateAlignments()
 	if ret.Events.Start != "" {
 		validateGo(fnMap, ret.Events.Start)

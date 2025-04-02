@@ -22,16 +22,6 @@ type appData struct {
 	Title             string
 }
 
-func newAppData(fnMap common.ScriptFnMap) appData {
-	return appData {
-		ComAppData: common.NewComAppData(),
-		Content:    "",
-		CouCfg:     couConfigFromFile(fnMap),
-		Scroll:     0,
-		Title:      "",
-	}
-}
-
 var (
 	AppLicense    string
 	AppLicenseUrl string
@@ -49,6 +39,9 @@ Options:
 
     -a --about
         prints program name, version, license and repository information then exits
+
+    -c --config
+        takes an argument as additional path for config dir search
 
     -h --help
         prints this message then exits
@@ -105,24 +98,20 @@ func drawContent(
 	}
 }
 
-func handleArgs(title *string) (string, bool) {
+func handleArgs(
+	cfgPath *string,
+	title *string,
+) (string, bool) {
 	var err error
 	var f *os.File
-	var nextIsTitle = false
 	var path string
 
 	if len(os.Args) < 2 {
 		panic("Not enough arguments given.")
 	}
 
-	for _, v := range os.Args[1:] {
-		switch v {
-		case "-v":
-			fallthrough
-		case "--version":
-			common.PrintVersion(AppName, AppVersion)
-			return "", false
-
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
 		case "-a":
 			fallthrough
 		case "--about":
@@ -134,6 +123,12 @@ func handleArgs(title *string) (string, bool) {
 				AppVersion)
 			return "", false
 
+		case "-c":
+			fallthrough
+		case "--config":
+			*cfgPath = os.Args[i + 1]
+			i++
+
 		case "-h":
 			fallthrough
 		case "--help":
@@ -143,15 +138,17 @@ func handleArgs(title *string) (string, bool) {
 		case "-t":
 			fallthrough
 		case "--title":
-			nextIsTitle = true
+			*title = os.Args[i + 1]
+			i++
+
+		case "-v":
+			fallthrough
+		case "--version":
+			common.PrintVersion(AppName, AppVersion)
+			return "", false
 
 		default:
-			if nextIsTitle {
-				*title = v
-				nextIsTitle = false
-			} else {
-				path = v
-			}
+			path = os.Args[i]
 		}
 	}
 
@@ -328,19 +325,24 @@ func tick(cmdMap common.ScriptCmdMap, ad *appData) {
 	handleInput(cmdMap, contentHeight, len(contentLines), ad)
 }
 
-func main() {
-	var cmdMap common.ScriptCmdMap
-	var fnMap common.ScriptFnMap
-	var ad appData
+func main(
+) {
+	var (
+		ad      appData
+		cfgPath string
+		cmdMap  common.ScriptCmdMap
+		fnMap   common.ScriptFnMap
+	)
 
-	cmdMap = getCmdMap(&ad)
-	fnMap = getFnMap(&ad)
-	ad = newAppData(fnMap)
-
-	ad.Content, ad.Active = handleArgs(&ad.Title)
+	ad.Content, ad.Active = handleArgs(&cfgPath, &ad.Title)
 	if ad.Active == false {
 		return
 	}
+
+	cmdMap = getCmdMap(&ad)
+	fnMap = getFnMap(&ad)
+	ad.ComAppData = common.NewComAppData(cfgPath)
+	ad.CouCfg = couConfigFromFile(cfgPath, fnMap)
 
 	if ad.CouCfg.Events.Start != "" {
 		fnMap[ad.CouCfg.Events.Start]()

@@ -63,7 +63,11 @@ type ComConfig struct {
 	Feedback feedbackConfig
 }
 
-func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
+func AnyConfigFromFile(
+	cfg interface{},
+	cfgFileName string,
+	customPath string,
+) {
 	type path struct {
 		EnvVar string
 		Core   string
@@ -75,6 +79,7 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 	var f *os.File
 	var found bool = false
 	var paths = []path{
+		path{"", customPath},
 		path{"", "/etc/hui/"},
 		path{"XDG_CONFIG_HOME", "/hui/"},
 		path{"HOME", "/.config/hui/"},
@@ -82,6 +87,10 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 		path{"", ""},
 	}
 	var prefix string
+
+	if len(customPath) == 0 {
+		paths = paths[1:]
+	}
 
 	for _, v := range paths {
 		if v.EnvVar != "" {
@@ -127,10 +136,12 @@ func AnyConfigFromFile(cfg interface{}, cfgFileName string) {
 	}
 }
 
-func ComConfigFromFile() ComConfig {
+func ComConfigFromFile(
+	customPath string,
+) ComConfig {
 	var ret ComConfig
 
-	AnyConfigFromFile(&ret, "common.toml")
+	AnyConfigFromFile(&ret, "common.toml", customPath)
 	ret.validateAlignments()
 	ret.validatePager()
 

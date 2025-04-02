@@ -33,17 +33,6 @@ type appData struct {
 	MPath             menuPath
 }
 
-func newAppData(fnMap common.ScriptFnMap) appData {
-	var ret = appData {
-		ComAppData: common.NewComAppData(),
-		MPath:      make(menuPath, 1, 8),
-	}
-
-	ret.HuiCfg = huiConfigFromFile(fnMap, &ret)
-
-	return ret
-}
-
 const HELP = `Usage: hui [OPTIONS]
 
 Customizable terminal based user-interface for common tasks and personal tastes.
@@ -52,6 +41,9 @@ Options:
 
     -a --about
         prints program name, version, license and repository information then exits
+
+    -c --config
+        takes an argument as additional path for config dir search
 
     -h --help
         prints this message then exits
@@ -182,15 +174,11 @@ func drawMenu(
 	}
 }
 
-func handleArgs() bool {
-	for _, v := range os.Args[1:] {
-		switch v {
-		case "-v":
-			fallthrough
-		case "--version":
-			common.PrintVersion(AppName, AppVersion)
-			return false
-
+func handleArgs(
+	cfgPath *string,
+) bool {
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
 		case "-a":
 			fallthrough
 		case "--about":
@@ -202,14 +190,26 @@ func handleArgs() bool {
 				AppVersion)
 			return false
 
+		case "-c":
+			fallthrough
+		case "--config":
+			*cfgPath = os.Args[i + 1]
+			i++
+
 		case "-h":
 			fallthrough
 		case "--help":
 			fmt.Printf(HELP)
 			return false
 
+		case "-v":
+			fallthrough
+		case "--version":
+			common.PrintVersion(AppName, AppVersion)
+			return false
+
 		default:
-			fmt.Fprintf(os.Stderr, "Unknown argument: %v", v)
+			fmt.Fprintf(os.Stderr, "Unknown argument: %v", os.Args[i])
 		}
 	}
 
@@ -398,14 +398,25 @@ func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, ad *appData) {
 	handleInput(contentHeight, cmdMap, fnMap, ad)
 }
 
-func main() {
-	var cmdMap common.ScriptCmdMap
-	var fnMap common.ScriptFnMap
-	var ad appData
+func main(
+) {
+	var (
+		ad      appData
+		cfgPath string
+		cmdMap  common.ScriptCmdMap
+		fnMap   common.ScriptFnMap
+	)
+
+	ad.Active = handleArgs(&cfgPath)
+	if ad.Active == false {
+		return
+	}
 
 	cmdMap = getCmdMap(&ad)
 	fnMap = getFnMap(&ad)
-	ad = newAppData(fnMap)
+	ad.ComAppData = common.NewComAppData(cfgPath)
+	ad.MPath = make(menuPath, 1, 8)
+	ad.HuiCfg = huiConfigFromFile(&ad, cfgPath, fnMap)
 
 	_, mainMenuExists := ad.HuiCfg.Menus["main"]
 
@@ -413,11 +424,6 @@ func main() {
 		panic("\"main\" menu not found in config.")
 	}
 	ad.MPath[0] = menuPathNode{0, "main"}
-
-	ad.Active = handleArgs()
-	if ad.Active == false {
-		return
-	}
 
 	if ad.HuiCfg.Events.Start != "" {
 		fnMap[ad.HuiCfg.Events.Start]()

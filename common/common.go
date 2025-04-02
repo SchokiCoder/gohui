@@ -22,12 +22,14 @@ type ComAppData struct {
 	Fb          Feedback
 }
 
-func NewComAppData() ComAppData {
+func NewComAppData(
+	customPath string,
+) ComAppData {
 	return ComAppData {
 		AcceptInput:   true,
 		Active:        true,
 		CmdLine:       NewCmdLine(),
-		ComCfg:        ComConfigFromFile(),
+		ComCfg:        ComConfigFromFile(customPath),
 		Fb:            "",
 	}
 }

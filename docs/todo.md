@@ -61,7 +61,7 @@ No more weird alignment because of first param vs the other.
 
 - [x] add flag for config dir path
 
-- [ ] update copyright
+- [x] update copyright
 
 - finish the book !
 

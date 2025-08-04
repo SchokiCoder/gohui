@@ -63,6 +63,13 @@ No more weird alignment because of first param vs the other.
 
 - [x] update copyright
 
+- [x] rework pager trials and add respect for pager env var
+
+- [ ] replace TOML cfg file fmt with std lib file fmt
+
+- [ ] replace shell build scripts with Makefile?
+see why I initiall dropped it
+
 - finish the book !
 
 - [ ] set version to 1.5

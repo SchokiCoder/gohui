@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -35,7 +36,8 @@ type headerConfig struct {
 }
 
 type pagerConfig struct {
-	Name string
+	Fallback string
+	Name     string `toml:"IWillBeOverwrittenAnyway"`
 }
 
 type keysConfig struct {
@@ -167,25 +169,35 @@ func (c ComConfig) validateAlignments() {
 	ValidateAlignment(c.Feedback.Alignment)
 }
 
-func (c ComConfig) validatePager() {
-	var pagerExists = false
-	var path = os.Getenv("PATH")
+func (c *ComConfig) validatePager() {
+	var (
+		pagers = [...]string{
+			os.Getenv("PAGER"),
+			c.Pager.Fallback,
+			"less",
+			"more",
+		}
+		path = os.Getenv("PATH")
+		paths = strings.Split(path, ":")
+	)
 
-	_, err := os.Stat(c.Pager.Name)
-	if errors.Is(err, os.ErrNotExist) == false {
-		return
-	}
+	// In case the fallback needs no prepend to be there
+	paths = append(paths, "")
 
-	for _, v := range strings.Split(path, ":") {
-		_, err := os.Stat(fmt.Sprintf("%v/%v", v, c.Pager.Name))
-		if errors.Is(err, os.ErrNotExist) == false {
-			pagerExists = true
-			break
+	for i := 0; i < len(pagers); i++ {
+		if len(pagers[i]) <= 0 {
+			continue
+		}
+
+		for j := 0; j < len(paths); j++ {
+			_, err := os.Stat(filepath.Join(paths[j], pagers[i]))
+
+			if errors.Is(err, os.ErrNotExist) == false {
+				c.Pager.Name = pagers[i]
+				return
+			}
 		}
 	}
 
-	if pagerExists == false {
-		panic(fmt.Sprintf(`The configured pager "%v" can not be found.`,
-			c.Pager.Name))
-	}
+	panic(`No pager could not be found.`)
 }

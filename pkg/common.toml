@@ -1,5 +1,5 @@
 [Pager]
-Name = "courier"
+Fallback = "courier"
 
 [Keys]
 Left = "h"

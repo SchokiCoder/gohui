@@ -1,7 +1,7 @@
 # Dev test config
 
 [Pager]
-Fallback = "./pkg/courier"
+Fallback = "./courier"
 
 [Keys]
 Left = "h"

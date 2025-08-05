@@ -1,6 +1,6 @@
 go 1.18
 
 use common
-use courier
+use pager
 use csi
-use hui
+use main

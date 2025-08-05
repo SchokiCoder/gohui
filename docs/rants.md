@@ -12,7 +12,7 @@ when writing.
 So what is this? Why is this a thing? And why is io.ReadAll()'s error message so
 useless?  
 
-# go-toml v2
+## go-toml v2
 
 Plus "go-toml/v2"'s Decode() just returned the "invalid argument" error of the
 io.Reader it itself used, which at first gaslit me into thinking some toml

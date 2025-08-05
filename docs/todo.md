@@ -65,10 +65,18 @@ No more weird alignment because of first param vs the other.
 
 - [x] rework pager trials and add respect for pager env var
 
-- [ ] replace TOML cfg file fmt with std lib file fmt
+- [x] replace shell build scripts with Makefile
+My rationale back then, being pro shell-build-scripts,
+was probably that a system more likely has sh than make,
+which is true, but any system that should build anything *will* have make...
+like seriously.
+Plus having to chmod is annoying,
+having git wanting to add filemode by default is annoying,
+having the build not stop upon an error is annoying,
+and having many tiny sh files is annoying.
+Shell build scripts are dead. Long live Makefile.
 
-- [ ] replace shell build scripts with Makefile?
-see why I initiall dropped it
+- [ ] replace TOML cfg file fmt with std lib file fmt
 
 - finish the book !
 

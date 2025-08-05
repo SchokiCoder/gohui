@@ -2,3 +2,5 @@ gohui
 genversion.go
 pkg/hui
 pkg/courier
+hui
+courier

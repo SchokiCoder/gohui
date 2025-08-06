@@ -76,7 +76,17 @@ having the build not stop upon an error is annoying,
 and having many tiny sh files is annoying.
 Shell build scripts are dead. Long live Makefile.
 
-- [ ] replace TOML cfg file fmt with std lib file fmt
+- [x] replace TOML fmt with JSON fmt for configs
+Everyone loves JSON, right?
+I didn't do it because TOML isn't the right tool for the job, oh no no.
+I did it to cut down on 3rd party deps. That's all.
+Also, let's rant about JSON:
+No comments. Documentation? What's that?
+Nesting gets super ugly with hui menus, yay.
+No trailing comma allowed. You serious?
+Makes me consider code config à la suckless again. I am not joking.
+
+- [ ] split make uninstall into remove (only binaries), and purge (also removes the cfg files)
 
 - finish the book !
 

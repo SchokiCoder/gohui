@@ -130,7 +130,7 @@ func huiConfigFromFile(
 ) huiConfig {
 	var ret huiConfig
 
-	common.AnyConfigFromFile(&ret, "hui.toml", cfgPath)
+	common.AnyConfigFromFile(&ret, "hui.json", cfgPath)
 
 	ret.validateAlignments()
 	ret.validateMenus(fnMap)

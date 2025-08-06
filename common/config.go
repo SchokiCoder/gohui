@@ -4,9 +4,9 @@
 package common
 
 import (
-	"github.com/BurntSushi/toml"
 	"github.com/SchokiCoder/gohui/csi"
 
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -37,7 +37,7 @@ type headerConfig struct {
 
 type pagerConfig struct {
 	Fallback string
-	Name     string `toml:"IWillBeOverwrittenAnyway"`
+	Name     string `json:"IWillBeOverwrittenAnyway"`
 }
 
 type keysConfig struct {
@@ -132,7 +132,7 @@ func AnyConfigFromFile(
 			paths[i], err))
 	}
 
-	err = toml.Unmarshal(str, cfg)
+	err = json.Unmarshal(str, cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -143,7 +143,7 @@ func ComConfigFromFile(
 ) ComConfig {
 	var ret ComConfig
 
-	AnyConfigFromFile(&ret, "common.toml", customPath)
+	AnyConfigFromFile(&ret, "common.json", customPath)
 	ret.validateAlignments()
 	ret.validatePager()
 

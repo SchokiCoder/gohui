@@ -1,0 +1,88 @@
+{
+	"Pager": {
+	    "Fallback": "./courier"
+	},
+
+	"Keys": {
+		"Left": "h",
+		"Down": "j",
+		"Up": "k",
+		"Right": "l",
+		"Quit": "q",
+		"Cmdmode": ":",
+		"Cmdenter": "\r"
+	},
+
+	"Header": {
+		"Alignment": "right",
+		"Fg": {
+			"Active": false,
+			"R": 230,
+			"G": 230,
+			"B": 230
+		},
+
+		"Bg": {
+			"Active": false,
+			"R": 20,
+			"G": 50,
+			"B": 20
+		}
+	},
+
+	"Title": {
+		"Alignment": "left",
+
+		"Fg": {
+			"Active": false,
+			"R": 230,
+			"G": 230,
+			"B": 230
+		},
+
+		"Bg": {
+			"Active": false,
+			"R": 20,
+			"G": 50,
+			"B": 50
+		}
+	},
+
+	"CmdLine": {
+		"Alignment": "left",
+		"Prefix": ":",
+
+		"Fg": {
+			"Active": false,
+			"R": 200,
+			"G": 255,
+			"B": 200
+		},
+
+		"Bg": {
+			"Active": false,
+			"R": 20,
+			"G": 20,
+			"B": 20
+		}
+	},
+
+	"Feedback": {
+		"Alignment": "center",
+		"Prefix": "<",
+
+		"Fg": {
+			"Active": true,
+			"R": 175,
+			"G": 175,
+			"B": 175
+		},
+
+		"Bg": {
+			"Active": false,
+			"R": 0,
+			"G": 0,
+			"B": 0
+		}
+	}
+}

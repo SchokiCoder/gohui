@@ -38,7 +38,7 @@ func couConfigFromFile(
 ) couConfig {
 	var ret couConfig
 
-	common.AnyConfigFromFile(&ret, "courier.toml", cfgPath)
+	common.AnyConfigFromFile(&ret, "courier.json", cfgPath)
 	ret.validateAlignments()
 	if ret.Events.Start != "" {
 		validateGo(fnMap, ret.Events.Start)

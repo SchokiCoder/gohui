@@ -12,8 +12,8 @@ BIN_DESTDIR:="/usr/local/bin"
 CFG_DESTDIR:="/etc/hui"
 
 # uncomment below to install for only current user instead
-#BIN_DESTDIR:="$(HOME)/.local/bin"
-#CFG_DESTDIR:="$(HOME)/.config/hui"
+BIN_DESTDIR:="$(HOME)/.local/bin"
+CFG_DESTDIR:="$(HOME)/.config/hui"
 
 .PHONY: all build clean install vet
 
@@ -39,10 +39,10 @@ install: build
 	cp courier $(BIN_DESTDIR)
 	cp hui $(BIN_DESTDIR)
 	mkdir -p $(CFG_DESTDIR)
-	cp pkg/common.toml $(CFG_DESTDIR)
-	cp pkg/courier.toml $(CFG_DESTDIR)
-	cp pkg/hui.toml $(CFG_DESTDIR)
+	cp pkg/common.json $(CFG_DESTDIR)
+	cp pkg/courier.json $(CFG_DESTDIR)
+	cp pkg/hui.json $(CFG_DESTDIR)
 
 uninstall:
-	rm -f $(BIN_DESTDIR)/courier $(BIN_DESTDIR)/hui $(CFG_DESTDIR)/*.toml
+	rm -f $(BIN_DESTDIR)/courier $(BIN_DESTDIR)/hui $(CFG_DESTDIR)/*.json
 	rmdir $(CFG_DESTDIR)

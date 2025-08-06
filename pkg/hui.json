@@ -1,0 +1,116 @@
+{
+	"Header": "House User Interface - Demo Config\n",
+
+	"Pager": {
+		"Title": "HUI - Feedback"
+	},
+
+	"Keys": {
+		"Execute": "L"
+	},
+
+	"Entry": {
+		"Alignment": "left",
+		"MenuPrefix": "> [",
+		"MenuPostfix": "]",
+		"MenuHoverPrefix": "-> [",
+		"MenuHoverPostfix": "]",
+		"ShellPrefix": "> ",
+		"ShellPostfix": "",
+		"ShellHoverPrefix": "-> ",
+		"ShellHoverPostfix": "",
+		"ShellSessionPrefix": "> <",
+		"ShellSessionPostfix": ">",
+		"ShellSessionHoverPrefix": "-> <",
+		"ShellSessionHoverPostfix": ">",
+		"GoPrefix": "> !",
+		"GoPostfix": "",
+		"GoHoverPrefix": "-> !",
+		"GoHoverPostfix": ""
+	},
+
+	"Fg": {
+		"Active": true,
+		"R": 255,
+		"G": 255,
+		"B": 255
+	},
+
+	"Bg": {
+		"Active": false,
+		"R": 0,
+		"G": 0,
+		"B": 0
+	},
+
+	"HoverFg": {
+		"Active": true,
+		"R": 0,
+		"G": 0,
+		"B": 0
+	},
+
+	"HoverBg": {
+		"Active": true,
+		"R": 255,
+		"G": 255,
+		"B": 255
+	},
+
+	"Events": {
+		"Start": "",
+		"Quit": ""
+	},
+
+	"Menus": {
+		"main": {
+			"Title": "Main Menu\n---------",
+
+			"Entries": [
+				{
+				"Caption": "whoami",
+				"Shell": "echo \"$USER\""
+				},
+				{
+				"Caption": "Take notes in \"~/temp\"",
+				"ShellSession": "vi \"$HOME/temp\""
+				},
+				{
+				"Caption": "Device",
+				"Menu": "device"
+				}
+			]
+		},
+
+		"device": {
+			"Title": "Device\n------",
+
+			"Entries": [
+				{
+				"Caption": "Show device info",
+				"Shell": "neofetch --off --color_blocks off"
+				},
+				{
+				"Caption": "Show hostname",
+				"Shell": "hostname"
+				},
+				{
+				"Caption": "Logout",
+				"Go": "Quit"
+				},
+				{
+				"Caption": "Suspend",
+				"Shell": "suspend"
+				},
+				{
+				"Caption": "Poweroff",
+				"Shell": "poweroff"
+				},
+				{
+				"Caption": "Reboot",
+				"Shell": "reboot"
+				}
+			]
+		}
+	}
+}

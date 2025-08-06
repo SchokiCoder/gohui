@@ -1,0 +1,30 @@
+{
+	"Header": "Dev courier test\n",
+
+	"Pager": {
+		"Title": "Courier - Feedback"
+	},
+
+	"Content": {
+		"Alignment": "center",
+
+		"Fg": {
+			"Active": false,
+			"R": 0,
+			"G": 0,
+			"B": 0
+		},
+
+		"Bg": {
+			"Active": false,
+			"R": 0,
+			"G": 0,
+			"B": 0
+		}
+	},
+
+	"Events": {
+		"Start": "Welcome",
+		"Quit": "Goodbye"
+	}
+}

@@ -28,15 +28,14 @@ By default, the following steps will install two binaries "hui" and "courier".
 Courier is the pager that also lives here, because they share a lot of code so
 they can look and feel similar.  
 If you don't wish to have "courier", edit
-[cfg_install.sh](https://github.com/SchokiCoder/gohui/blob/main/cfg_install.sh).  
+[Makefile][Makefile].  
 
 Follow these steps:  
 
 - `git clone https://github.com/SchokiCoder/gohui`
 - `cd gohui`
-- _optionally: check out cfg_install.sh_
-- `chmod u+x *.sh`
-- `sudo ./install.sh` (`sudo` or `doas` may needed)
+- _optionally: check out the [Makefile][Makefile] for customization (like setting up user install)_
+- `make install` (`sudo` or `doas` may needed)
 
 # Contributing
 
@@ -57,3 +56,7 @@ This will reimplement all of the original features plus a config file system,
 so you don't have to recompile the source every time you want to change the
 config.  
 Some minor implementation details may vary, hopefully for the better.  
+
+
+
+[Makefile]: <https://github.com/SchokiCoder/gohui/blob/main/Makefile>

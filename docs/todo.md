@@ -86,7 +86,9 @@ Nesting gets super ugly with hui menus, yay.
 No trailing comma allowed. You serious?
 Makes me consider code config à la suckless again. I am not joking.
 
-- [ ] split make uninstall into remove (only binaries), and purge (also removes the cfg files)
+- [x] split make uninstall into remove and purge
+This is inspired by and works similar to apt,
+where purge removes the configs too.
 
 - [ ] implicit fallback to hardcoded less is not quite there (exit status 1)
 

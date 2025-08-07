@@ -27,8 +27,7 @@ directory.
 By default, the following steps will install two binaries "hui" and "courier".  
 Courier is the pager that also lives here, because they share a lot of code so
 they can look and feel similar.  
-If you don't wish to have "courier", edit
-[Makefile][Makefile].  
+If you don't wish to have "courier", edit [Makefile][Makefile].  
 
 Follow these steps:  
 
@@ -36,6 +35,9 @@ Follow these steps:
 - `cd gohui`
 - _optionally: check out the [Makefile][Makefile] for customization (like setting up user install)_
 - `make install` (`sudo` or `doas` may needed)
+
+The install can be undone by that Makefile's `make remove`.  
+`make purge` will additionally remove all config files.  
 
 # Contributing
 

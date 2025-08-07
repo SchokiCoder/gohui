@@ -88,6 +88,8 @@ Makes me consider code config à la suckless again. I am not joking.
 
 - [ ] split make uninstall into remove (only binaries), and purge (also removes the cfg files)
 
+- [ ] implicit fallback to hardcoded less is not quite there (exit status 1)
+
 - finish the book !
 
 - [ ] set version to 1.5

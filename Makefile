@@ -46,8 +46,8 @@ vet:
 	go vet ./pager
 	go vet ./main
 
-courier:
+courier: common/* pager/*
 	go build -ldflags "-X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppName=$@' -X 'main.AppNameFormal=$(PAGER_NAME_FORMAL)' -X 'main.AppRepo=$(REPO)' -X 'main.AppVersion=$(VERSION)'" ./pager
 
-hui:
+hui: common/* main/*
 	go build -ldflags "-X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppName=$@' -X 'main.AppNameFormal=$(APP_NAME_FORMAL)' -X 'main.AppRepo=$(REPO)' -X 'main.AppVersion=$(VERSION)'" ./main

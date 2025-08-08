@@ -46,9 +46,6 @@ Options:
     -h --help
         prints this message then exits
 
-    -t --title TITLE
-        takes an argument and prints given string as title below the header
-
     -v --version
         prints version information then exits
 
@@ -100,7 +97,6 @@ func drawContent(
 
 func handleArgs(
 	cfgPath *string,
-	title *string,
 ) (string, bool) {
 	var err error
 	var f *os.File
@@ -134,12 +130,6 @@ func handleArgs(
 		case "--help":
 			fmt.Printf(HELP)
 			return "", false
-
-		case "-t":
-			fallthrough
-		case "--title":
-			*title = os.Args[i + 1]
-			i++
 
 		case "-v":
 			fallthrough
@@ -334,10 +324,12 @@ func main(
 		fnMap   common.ScriptFnMap
 	)
 
-	ad.Content, ad.Active = handleArgs(&cfgPath, &ad.Title)
+	ad.Content, ad.Active = handleArgs(&cfgPath)
 	if ad.Active == false {
 		return
 	}
+
+	ad.Title = os.Getenv("PAGERTITLE")
 
 	cmdMap = getCmdMap(&ad)
 	fnMap = getFnMap(&ad)

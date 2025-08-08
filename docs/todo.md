@@ -90,7 +90,15 @@ Makes me consider code config à la suckless again. I am not joking.
 This is inspired by and works similar to apt,
 where purge removes the configs too.
 
-- [ ] implicit fallback to hardcoded less is not quite there (exit status 1)
+- [x] change courier title flag to be an envvar
+This simplifies code, removes some dumb hardcoded strings,
+and technically broadens compatibility.
+That is if any other pagers would recognize any kind of title envvar.
+I looked at the less and more manpages, and there was nothing of that kind.
+
+- [ ] add recognized envvars to help texts
+
+- [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 
 - finish the book !
 

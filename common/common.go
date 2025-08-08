@@ -89,14 +89,8 @@ func callPager(fb Feedback, pager string, pagerTitle string) Feedback {
 		panic("Could not write feedback to temp file.")
 	}
 
-	if pager == "./pkg/courier" || pager == "courier" {
-		shCall = fmt.Sprintf(`%v %v -t "%v"`,
-			pager,
-			tempFilePath,
-			pagerTitle)
-	} else {
-		shCall = fmt.Sprintf("%v %v", pager, tempFilePath)
-	}
+	pagerTitle = strings.ReplaceAll(pagerTitle, "\"", "\\\"")
+	shCall = fmt.Sprintf("PAGERTITLE=\"%v\" %v %v", pagerTitle, pager, tempFilePath)
 
 	return HandleShellSession(shCall)
 }

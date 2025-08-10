@@ -96,7 +96,7 @@ and technically broadens compatibility.
 That is if any other pagers would recognize any kind of title envvar.
 I looked at the less and more manpages, and there was nothing of that kind.
 
-- [ ] add recognized envvars to help texts
+- [x] add recognized envvars to help texts
 
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 

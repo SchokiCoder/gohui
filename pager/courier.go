@@ -70,6 +70,14 @@ Internal commands:
 
     *number*
         when given a positive number, it is used as a line number to scroll to
+
+Environmental variables:
+
+    PAGER
+        sets the used pager, in case feedback exceeds one line of length
+
+    PAGERTITLE
+        sets the title
 `
 
 func drawContent(

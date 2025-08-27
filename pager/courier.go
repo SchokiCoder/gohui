@@ -146,6 +146,13 @@ func handleArgs(
 			return "", false
 
 		default:
+			if os.Args[i][0] == '-' {
+				fmt.Fprintf(os.Stderr,
+					"Unknown argument: \"%v\"\n",
+					os.Args[i])
+				return "", false
+			}
+
 			path = os.Args[i]
 		}
 	}

@@ -98,6 +98,13 @@ I looked at the less and more manpages, and there was nothing of that kind.
 
 - [x] add recognized envvars to help texts
 
+- [x] fix unknown flags not preventing execution
+
+- [ ] move courier's file reading out of argParsing
+
+- [ ] it seems that flag parsing maybe shouldn't intentionally panic
+Go compiler doesn't panic all the time, even when go.mod is mangled or unreadable.
+
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 
 - finish the book !

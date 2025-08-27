@@ -100,7 +100,10 @@ I looked at the less and more manpages, and there was nothing of that kind.
 
 - [x] fix unknown flags not preventing execution
 
-- [ ] move courier's file reading out of argParsing
+- [x] move courier's file reading out of handleArgs
+- [ ] fix some functions still not abiding by the new fmt std
+see `grep -R "func .* {" *`
+- [ ] fix README logo's missing spaces
 
 - [ ] it seems that flag parsing maybe shouldn't intentionally panic
 Go compiler doesn't panic all the time, even when go.mod is mangled or unreadable.

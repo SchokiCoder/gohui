@@ -106,9 +106,7 @@ func drawContent(
 func handleArgs(
 	cfgPath *string,
 ) (string, bool) {
-	var err error
-	var f *os.File
-	var path string
+	var filepath string
 
 	if len(os.Args) < 2 {
 		panic("Not enough arguments given.")
@@ -153,31 +151,11 @@ func handleArgs(
 				return "", false
 			}
 
-			path = os.Args[i]
+			filepath = os.Args[i]
 		}
 	}
 
-	f, err = os.Open(path)
-	defer f.Close()
-
-	if errors.Is(err, os.ErrNotExist) {
-		panic(fmt.Sprintf("File \"%v\" could not be found: %v",
-			path,
-			err))
-	} else if err != nil {
-		panic(fmt.Sprintf("File \"%v\" could not be opened: %v",
-			path,
-			err))
-	}
-
-	ret, err := io.ReadAll(f)
-	if err != nil {
-		panic(fmt.Sprintf("File \"%v\" could not be read: %v",
-			path,
-			err))
-	}
-
-	return string(ret), true
+	return filepath, true
 }
 
 func handleInput(
@@ -284,6 +262,32 @@ func handleKey(
 	}
 }
 
+func readfile(
+	filepath string,
+) string {
+	f, err := os.Open(filepath)
+	defer f.Close()
+
+	if errors.Is(err, os.ErrNotExist) {
+		panic(fmt.Sprintf("File \"%v\" could not be found: %v",
+			filepath,
+			err))
+	} else if err != nil {
+		panic(fmt.Sprintf("File \"%v\" could not be opened: %v",
+			filepath,
+			err))
+	}
+
+	ret, err := io.ReadAll(f)
+	if err != nil {
+		panic(fmt.Sprintf("File \"%v\" could not be read: %v",
+			filepath,
+			err))
+	}
+
+	return string(ret)
+}
+
 func tick(cmdMap common.ScriptCmdMap, ad *appData) {
 	var contentLines []string
 	var contentHeight int
@@ -333,16 +337,19 @@ func tick(cmdMap common.ScriptCmdMap, ad *appData) {
 func main(
 ) {
 	var (
-		ad      appData
-		cfgPath string
-		cmdMap  common.ScriptCmdMap
-		fnMap   common.ScriptFnMap
+		ad       appData
+		cfgPath  string
+		cmdMap   common.ScriptCmdMap
+		filepath string
+		fnMap    common.ScriptFnMap
 	)
 
-	ad.Content, ad.Active = handleArgs(&cfgPath)
+	filepath, ad.Active = handleArgs(&cfgPath)
 	if ad.Active == false {
 		return
 	}
+
+	ad.Content = readfile(filepath)
 
 	ad.Title = os.Getenv("PAGERTITLE")
 

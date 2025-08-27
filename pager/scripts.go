@@ -15,7 +15,9 @@ import (
  * At this point only `pkill courier` may help you.
  */
 
-func getCmdMap(ad *appData) common.ScriptCmdMap {
+func getCmdMap(
+	ad *appData,
+) common.ScriptCmdMap {
 	sh := func(cmd string) common.Feedback {
 		return common.HandleShell(cmd)
 	}
@@ -30,7 +32,9 @@ func getCmdMap(ad *appData) common.ScriptCmdMap {
 	}
 }
 
-func getFnMap(ad *appData) common.ScriptFnMap {
+func getFnMap(
+	ad *appData,
+) common.ScriptFnMap {
 	goodbye := func() {
 		ad.CmdLine.Active = true
 		ad.CmdLine.Content = "Courier End CmdLine Msg"

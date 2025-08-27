@@ -43,7 +43,8 @@ type CmdLine struct {
 	Rows    [CmdlineMaxRows]string
 }
 
-func NewCmdLine() CmdLine {
+func NewCmdLine(
+) CmdLine {
 	return CmdLine {
 		Active:  false,
 		Content: "",
@@ -65,7 +66,11 @@ const (
 	CmdlineMaxRows = 10
 )
 
-func callPager(fb Feedback, pager string, pagerTitle string) Feedback {
+func callPager(
+	fb Feedback,
+	pager string,
+	pagerTitle string,
+) Feedback {
 	var err error
 	var shCall string
 	var tempFile *os.File
@@ -246,7 +251,9 @@ func HandleKeyCmdline(
 	}
 }
 
-func HandleShell(shell string) Feedback {
+func HandleShell(
+	shell string,
+) Feedback {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser
 	var cmdout io.ReadCloser
@@ -294,7 +301,9 @@ func HandleShell(shell string) Feedback {
 	}
 }
 
-func HandleShellSession(shell string) Feedback {
+func HandleShellSession(
+	shell string,
+) Feedback {
 	var cmd *exec.Cmd
 	var cmderr io.ReadCloser
 	var err error

@@ -30,11 +30,20 @@ const (
 	BgDefault = "\033[49m"
 )
 
-func SetCursor(x, y int) {
+func SetCursor(
+	x int,
+	y int,
+) {
 	fmt.Printf("\033[%v;%vH", y, x)
 }
 
-func SetCursorAligned(alignment string, rowLen, termW, x, y int) {
+func SetCursorAligned(
+	alignment string,
+	rowLen int,
+	termW int,
+	x int,
+	y int,
+) {
 	switch alignment {
 	case "left":
 		// nothing

@@ -7,7 +7,9 @@ import (
 	"github.com/SchokiCoder/gohui/common"
 )
 
-func getCmdMap(ad *appData) common.ScriptCmdMap {
+func getCmdMap(
+	ad *appData,
+) common.ScriptCmdMap {
 	sh := func(cmd string) common.Feedback {
 		return common.HandleShell(cmd)
 	}
@@ -22,7 +24,9 @@ func getCmdMap(ad *appData) common.ScriptCmdMap {
 	}
 }
 
-func getFnMap(ad *appData) common.ScriptFnMap {
+func getFnMap(
+	ad *appData,
+) common.ScriptFnMap {
 	goodbye := func() {
 		ad.AcceptInput = false
 		ad.Fb = "HUI End Feedback Msg"

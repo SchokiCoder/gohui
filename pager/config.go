@@ -50,11 +50,15 @@ func couConfigFromFile(
 	return ret
 }
 
-func (c couConfig) validateAlignments() {
+func (c couConfig) validateAlignments(
+) {
 	common.ValidateAlignment(c.Content.Alignment)
 }
 
-func validateGo(fnMap common.ScriptFnMap, fnName string) {
+func validateGo(
+	fnMap common.ScriptFnMap,
+	fnName string,
+) {
 	_, fnExists := fnMap[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Courier Go function "%v" could not be found.`,

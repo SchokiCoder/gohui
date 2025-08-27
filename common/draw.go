@@ -8,7 +8,12 @@ import (
 	"strings"
 )
 
-func DrawUpper(comCfg ComConfig, header []string, termW int, title []string) {
+func DrawUpper(
+	comCfg ComConfig,
+	header []string,
+	termW int,
+	title []string,
+) {
 	for _, v := range header {
 		Cprinta(comCfg.Header.Alignment,
 			comCfg.Header.Fg,
@@ -89,11 +94,17 @@ If you did not receive a copy of the license, see below:
 		appLicenseUrl)
 }
 
-func PrintVersion(appName, appVersion string) {
+func PrintVersion(
+	appName string,
+	appVersion string,
+) {
 	fmt.Printf("%v: version %v\n", appName, appVersion)
 }
 
-func SplitByLines(maxLineLen int, str string) []string {
+func SplitByLines(
+	maxLineLen int,
+	str string,
+) []string {
 	var step1 []string
 	var step2 []string
 	var lastCut int

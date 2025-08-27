@@ -150,7 +150,9 @@ func ComConfigFromFile(
 	return ret
 }
 
-func ValidateAlignment(alignment string) {
+func ValidateAlignment(
+	alignment string,
+) {
 	switch alignment {
 	case "left":
 	case "center":
@@ -162,14 +164,16 @@ func ValidateAlignment(alignment string) {
 	}
 }
 
-func (c ComConfig) validateAlignments() {
+func (c ComConfig) validateAlignments(
+) {
 	ValidateAlignment(c.Header.Alignment)
 	ValidateAlignment(c.Title.Alignment)
 	ValidateAlignment(c.CmdLine.Alignment)
 	ValidateAlignment(c.Feedback.Alignment)
 }
 
-func (c *ComConfig) validatePager() {
+func (c *ComConfig) validatePager(
+) {
 	var (
 		pagers = [...]string{
 			os.Getenv("PAGER"),

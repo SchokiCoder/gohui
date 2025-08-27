@@ -12,7 +12,8 @@ type FgColor struct {
 	R, G, B uint
 }
 
-func (c FgColor) String() string {
+func (c FgColor) String(
+) string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[38;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {
@@ -25,7 +26,8 @@ type BgColor struct {
 	R, G, B uint
 }
 
-func (c BgColor) String() string {
+func (c BgColor) String(
+) string {
 	if c.Active {
 		return fmt.Sprintf("\x1b[48;2;%v;%v;%vm", c.R, c.G, c.B)
 	} else {

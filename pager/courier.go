@@ -288,7 +288,10 @@ func readfile(
 	return string(ret)
 }
 
-func tick(cmdMap common.ScriptCmdMap, ad *appData) {
+func tick(
+	cmdMap common.ScriptCmdMap,
+	ad *appData,
+) {
 	var contentLines []string
 	var contentHeight int
 	var err error

@@ -18,7 +18,10 @@ type entry struct {
 	Go           string
 }
 
-func (e entry) validate(fnMap common.ScriptFnMap, menus map[string]menu) {
+func (e entry) validate(
+	fnMap common.ScriptFnMap,
+	menus map[string]menu,
+) {
 	var numContent = 0
 
 	if e.Shell != "" {
@@ -144,17 +147,23 @@ func huiConfigFromFile(
 	return ret
 }
 
-func (c huiConfig) validateAlignments() {
+func (c huiConfig) validateAlignments(
+) {
 	common.ValidateAlignment(c.Entry.Alignment)
 }
 
-func (c huiConfig) validateMenus(fnMap common.ScriptFnMap) {
+func (c huiConfig) validateMenus(
+	fnMap common.ScriptFnMap,
+) {
 	for i, m := range c.Menus {
 		m.validate(fnMap, i, c.Menus)
 	}
 }
 
-func validateGo(fnName string, fnMap common.ScriptFnMap) {
+func validateGo(
+	fnName string,
+	fnMap common.ScriptFnMap,
+) {
 	_, fnExists := fnMap[fnName]
 	if fnExists == false {
 		panic(fmt.Sprintf(`Hui Go function "%v" could not be found.`,

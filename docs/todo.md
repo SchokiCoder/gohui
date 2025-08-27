@@ -104,8 +104,8 @@ I looked at the less and more manpages, and there was nothing of that kind.
 - [x] fix README logo's missing trailing spaces
 Previously, if the logo is displayed centered somewhere, like courier,
 it got jumbled.
-- [ ] fix some functions still not abiding by the new fmt std
-see `grep -R "func .* {" *`
+- [x] fix some functions still not abiding by the new fmt std
+See `grep -R "func .* {" *`
 
 - [ ] it seems that flag parsing maybe shouldn't intentionally panic
 Go compiler doesn't panic all the time, even when go.mod is mangled or unreadable.

@@ -77,7 +77,12 @@ func Csprinta(
 	}
 }
 
-func Csprintf(fg csi.FgColor, bg csi.BgColor, format string, a ...any) string {
+func Csprintf(
+	fg csi.FgColor,
+	bg csi.BgColor,
+	format string,
+	a ...any,
+) string {
 	var ret string
 
 	ret = fmt.Sprintf(format, a...)

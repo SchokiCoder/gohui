@@ -19,11 +19,13 @@ type menuPathNode struct {
 
 type menuPath []menuPathNode
 
-func (mp menuPath) curCursor() *int {
+func (mp menuPath) curCursor(
+) *int {
 	return &mp[len(mp) - 1].Cursor
 }
 
-func (mp menuPath) curMenu() string {
+func (mp menuPath) curMenu(
+) string {
 	return mp[len(mp)-1].Menu
 }
 
@@ -359,7 +361,11 @@ func handleKey(
 	}
 }
 
-func tick(cmdMap common.ScriptCmdMap, fnMap common.ScriptFnMap, ad *appData) {
+func tick(
+	cmdMap common.ScriptCmdMap,
+	fnMap  common.ScriptFnMap,
+	ad     *appData,
+) {
 	var (
 		contentHeight int
 		curMenu menu

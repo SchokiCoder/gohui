@@ -123,12 +123,12 @@ func AnyConfigFromFile(
 	}
 
 	if found == false {
-		panic("No config file could be found\n")
+		panic("No config file could be found")
 	}
 
 	str, err := io.ReadAll(f)
 	if err != nil {
-		panic(fmt.Sprintf("Config file could not be read: \"%v\", \"%v\"\n",
+		panic(fmt.Sprintf("Config file could not be read: \"%v\", \"%v\"",
 			paths[i], err))
 	}
 

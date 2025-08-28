@@ -115,7 +115,7 @@ func AnyConfigFromFile(
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr,
 				"Config file could not be opened: \"%v\", \"%v\"\n",
-				paths, err)
+				curPath, err)
 		} else {
 			found = true
 			break

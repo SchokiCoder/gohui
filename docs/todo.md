@@ -107,8 +107,9 @@ it got jumbled.
 - [x] fix some functions still not abiding by the new fmt std
 See `grep -R "func .* {" *`
 
-- [ ] it seems that flag parsing maybe shouldn't intentionally panic
-Go compiler doesn't panic all the time, even when go.mod is mangled or unreadable.
+- [x] fix error about a config being unreadable printing all cfg-paths instead
+
+- [ ] if an error stops the app, just panic
 
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 

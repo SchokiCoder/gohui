@@ -432,7 +432,7 @@ func main(
 	_, mainMenuExists := ad.HuiCfg.Menus["main"]
 
 	if mainMenuExists == false {
-		panic("\"main\" menu not found in config.")
+		panic("\"main\" menu not found in config")
 	}
 	ad.MPath[0] = menuPathNode{0, "main"}
 

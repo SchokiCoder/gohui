@@ -79,7 +79,7 @@ func callPager(
 
 	tempFile, err = os.CreateTemp("", "huiFeedback")
 	if err != nil {
-		panic("Could not create a temp file for feedback.")
+		panic("Could not create a temp file for feedback")
 	}
 	defer os.Remove(tempFile.Name())
 	tempFilePath = tempFile.Name()
@@ -91,7 +91,7 @@ func callPager(
 
 	_, err = io.WriteString(tempFile, tempFileContent)
 	if err != nil {
-		panic("Could not write feedback to temp file.")
+		panic("Could not write feedback to temp file")
 	}
 
 	pagerTitle = strings.ReplaceAll(pagerTitle, "\"", "\\\"")

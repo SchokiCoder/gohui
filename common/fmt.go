@@ -73,7 +73,7 @@ func Csprinta(
 		return fmt.Sprintf("%v", ret)
 
 	default:
-		panic(fmt.Sprintf(`Unknown alignment "%v".`, alignment))
+		panic(fmt.Sprintf(`Unknown alignment "%v"`, alignment))
 	}
 }
 
@@ -126,6 +126,6 @@ func Csprintfa(
 			str)
 
 	default:
-		panic(fmt.Sprintf(`Unknown alignment "%v".`, alignment))
+		panic(fmt.Sprintf(`Unknown alignment "%v"`, alignment))
 	}
 }

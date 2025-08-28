@@ -36,7 +36,7 @@ func (e entry) validate(
 		_, ok := menus[e.Menu]
 		if !ok {
 			panic(fmt.Sprintf(
-				`Entry "%v" points to non-existent menu "%v".`,
+				`Entry "%v" points to non-existent menu "%v"`,
 				e.Caption,
 				e.Menu))
 		}
@@ -50,13 +50,13 @@ func (e entry) validate(
 
 	if numContent < 1 {
 		panic(fmt.Sprintf(
-			`Entry "%v" has no content.
-Add a "Shell" value, "ShellSession" value or a "Menu" value.`,
+			`Entry "%v" has no content
+Add a "Shell" value, "ShellSession" value or a "Menu" value`,
 			e.Caption))
 	} else if numContent > 1 {
 		panic(fmt.Sprintf(
-			`Entry "%v" has too much content.
-Use only a "Shell" or a "ShellSession" value or a "Menu" value.`,
+			`Entry "%v" has too much content
+Use only a "Shell" or a "ShellSession" value or a "Menu" value`,
 			e.Caption))
 	}
 }
@@ -72,7 +72,7 @@ func (m menu) validate(
 	menus map[string]menu,
 ) {
 	if len(m.Entries) <= 0 {
-		panic(fmt.Sprintf(`Menu "%v" has no entries.`, menuIndex))
+		panic(fmt.Sprintf(`Menu "%v" has no entries`, menuIndex))
 	}
 
 	for _, e := range m.Entries {
@@ -166,7 +166,7 @@ func validateGo(
 ) {
 	_, fnExists := fnMap[fnName]
 	if fnExists == false {
-		panic(fmt.Sprintf(`Hui Go function "%v" could not be found.`,
+		panic(fmt.Sprintf(`Hui Go function "%v" could not be found`,
 			fnName))
 	}
 }

@@ -109,7 +109,7 @@ func handleArgs(
 	var filepath string
 
 	if len(os.Args) < 2 {
-		panic("Not enough arguments given.")
+		panic("Not enough arguments given")
 	}
 
 	for i := 1; i < len(os.Args); i++ {

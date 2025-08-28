@@ -61,7 +61,7 @@ func validateGo(
 ) {
 	_, fnExists := fnMap[fnName]
 	if fnExists == false {
-		panic(fmt.Sprintf(`Courier Go function "%v" could not be found.`,
+		panic(fmt.Sprintf(`Courier Go function "%v" could not be found`,
 			fnName))
 	}
 }

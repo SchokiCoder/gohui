@@ -160,7 +160,7 @@ func ValidateAlignment(
 	case "right":
 
 	default:
-		panic(fmt.Sprintf(`Unknown alignment "%v" in config.`, alignment))
+		panic(fmt.Sprintf(`Unknown alignment "%v" in config`, alignment))
 	}
 }
 
@@ -203,5 +203,5 @@ func (c *ComConfig) validatePager(
 		}
 	}
 
-	panic(`No pager could not be found.`)
+	panic(`No pager could not be found`)
 }

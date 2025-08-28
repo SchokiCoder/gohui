@@ -57,7 +57,7 @@ func SetCursorAligned(
 		x = termW - rowLen + x
 
 	default:
-		panic(fmt.Sprintf(`Unknown alignment "%v".`, alignment))
+		panic(fmt.Sprintf(`Unknown alignment "%v"`, alignment))
 	}
 
 	SetCursor(x, y)

@@ -111,7 +111,9 @@ See `grep -R "func .* {" *`
 
 - [x] unify critical errors into being panics
 - [x] fix some panic msgs having newlines at the end 
-- [ ] shorten panics by removing Sprintf use
+- [x] unify panics to have no full stops
+- [ ] fix "No pager could not be found"
+- [ ] unify panics quoting errors or not
 
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 

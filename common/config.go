@@ -203,5 +203,5 @@ func (c *ComConfig) validatePager(
 		}
 	}
 
-	panic(`No pager could not be found`)
+	panic(`No pager could be found`)
 }

@@ -109,7 +109,8 @@ See `grep -R "func .* {" *`
 
 - [x] fix error about a config being unreadable printing all cfg-paths instead
 
-- [ ] if an error stops the app, just panic
+- [x] unify critical errors into being panics
+- [ ] remove newlines from end of panic msgs
 
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 

@@ -145,10 +145,7 @@ func handleArgs(
 
 		default:
 			if os.Args[i][0] == '-' {
-				fmt.Fprintf(os.Stderr,
-					"Unknown argument: \"%v\"\n",
-					os.Args[i])
-				return "", false
+				panic("Unknown argument: \"" + os.Args[i] + "\"")
 			}
 
 			filepath = os.Args[i]

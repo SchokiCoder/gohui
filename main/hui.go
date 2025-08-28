@@ -216,10 +216,7 @@ func handleArgs(
 			return false
 
 		default:
-			fmt.Fprintf(os.Stderr,
-				"Unknown argument: \"%v\"\n",
-				os.Args[i])
-			return false
+			panic("Unknown argument: \"" + os.Args[i] + "\"")
 		}
 	}
 

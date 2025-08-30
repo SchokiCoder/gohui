@@ -122,7 +122,15 @@ Embedded errors go to a new line, after a colon.
 This prompt wasn't shown, and resulted in a blank screen.
 Also allow less to print control characters.
 
-- [ ] setting PAGER to more doesn't ever do any pagering
+- [x] add pager fallback list with customizable envvars and flags to config
+
+- [ ] theoretically fix more immediately quitting when displaying short text
+This made it look like more wouldn't even be called in the first place.
+POSIXLY_CORRECT=1 should fix this, but doesn't, in the context of hui specifically.
+
+- [ ] fix more receiving no keyboard input and freezing everything when displaying long text (longer than 1 page)
+You then have to terminate everything down to hui.
+
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 
 - finish the book !

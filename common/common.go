@@ -68,12 +68,12 @@ const (
 
 func callPager(
 	fb Feedback,
-	pager string,
+	pager pagerConfig,
 	pagerTitle string,
 ) Feedback {
 	var (
+		envVars string
 		err error
-		flags string
 		shCall string
 		tempFile *os.File
 		tempFileContent string
@@ -98,11 +98,11 @@ func callPager(
 	}
 
 	pagerTitle = strings.ReplaceAll(pagerTitle, "\"", "\\\"")
-	if pager == "less" {
-		flags = "-fr"
-	}
 
-	shCall = fmt.Sprintf("PAGERTITLE=\"%v\" %v %v %v", pagerTitle, pager, flags, tempFilePath)
+	envVars = pager.EnvVars + ` PAGERTITLE="` + pagerTitle + `"`
+
+	shCall = fmt.Sprintf("%v %v %v %v",
+		envVars, pager.Pager, pager.Flags, tempFilePath)
 
 	return HandleShellSession(shCall)
 }

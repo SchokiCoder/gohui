@@ -55,7 +55,7 @@ func GenerateLower(
 	} else {
 		ret, fits = tryFitFeedback(*fb, comCfg.Feedback.Prefix, termW)
 		if fits == false {
-			ret = string(callPager(*fb, comCfg.Pager.Name, pagerTitle))
+			ret = string(callPager(*fb, comCfg.Pagers[0], pagerTitle))
 			*fb = ""
 			ret, _ = tryFitFeedback(
 				Feedback(ret),

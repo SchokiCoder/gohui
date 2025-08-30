@@ -1,7 +1,21 @@
 {
-	"Pager": {
-	    "Fallback": "./courier"
-	},
+	"Pagers": [
+		{
+		"EnvVars": "",
+		"Pager": "./courier",
+		"Flags": ""
+		},
+		{
+		"EnvVars": "",
+		"Pager": "less",
+		"Flags": "-fr"
+		},
+		{
+		"EnvVars": "",
+		"Pager": "more",
+		"Flags": ""
+		}
+	],
 
 	"Keys": {
 		"Left": "h",

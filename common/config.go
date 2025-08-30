@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -36,8 +37,9 @@ type headerConfig struct {
 }
 
 type pagerConfig struct {
-	Fallback string
-	Name     string `json:"IWillBeOverwrittenAnyway"`
+	EnvVars string
+	Pager   string
+	Flags   string
 }
 
 type keysConfig struct {
@@ -57,7 +59,7 @@ type titleConfig struct {
 }
 
 type ComConfig struct {
-	Pager    pagerConfig
+	Pagers   []pagerConfig
 	Keys     keysConfig
 	Header   headerConfig
 	Title    titleConfig
@@ -145,7 +147,7 @@ func ComConfigFromFile(
 
 	AnyConfigFromFile(&ret, "common.json", customPath)
 	ret.validateAlignments()
-	ret.validatePager()
+	ret.validatePagers()
 
 	return ret
 }
@@ -172,36 +174,41 @@ func (c ComConfig) validateAlignments(
 	ValidateAlignment(c.Feedback.Alignment)
 }
 
-func (c *ComConfig) validatePager(
+func (c *ComConfig) validatePagers(
 ) {
 	var (
-		pagers = [...]string{
-			os.Getenv("PAGER"),
-			c.Pager.Fallback,
-			"less",
-			"more",
-		}
+		pagerFound bool
 		path = os.Getenv("PATH")
 		paths = strings.Split(path, ":")
 	)
 
-	// In case the fallback needs no prepend to be there
-	paths = append(paths, "")
+	paths = append(paths, "") // for local dir
 
-	for i := 0; i < len(pagers); i++ {
-		if len(pagers[i]) <= 0 {
-			continue
-		}
+	c.Pagers = append(c.Pagers,
+		pagerConfig{EnvVars: "", Pager: os.Getenv("PAGER"), Flags: ""})
+
+	for i := 0; i < len(c.Pagers); i++ {
+		pagerFound = false
 
 		for j := 0; j < len(paths); j++ {
-			_, err := os.Stat(filepath.Join(paths[j], pagers[i]))
+			_, err := os.Stat(
+				filepath.Join(
+					paths[j],
+					c.Pagers[i].Pager))
 
 			if errors.Is(err, os.ErrNotExist) == false {
-				c.Pager.Name = pagers[i]
-				return
+				pagerFound = true
+				break
 			}
+		}
+
+		if !pagerFound || c.Pagers[i].Pager == "" {
+			c.Pagers = slices.Delete(c.Pagers, i, i + 1)
+			i--
 		}
 	}
 
-	panic(`No pager could be found`)
+	if len(c.Pagers) <= 0 {
+		panic(`No pager could be found`)
+	}
 }

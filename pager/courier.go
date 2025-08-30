@@ -145,7 +145,7 @@ func handleArgs(
 
 		default:
 			if os.Args[i][0] == '-' {
-				panic("Unknown argument: \"" + os.Args[i] + "\"")
+				panic(`Unknown argument "` + os.Args[i] + `"`)
 			}
 
 			filepath = os.Args[i]
@@ -175,12 +175,12 @@ func handleInput(
 
 	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(fmt.Sprintf("Switching to raw mode failed: %v", err))
+		panic(fmt.Sprintf("Switching to raw mode failed:\n%v", err))
 	}
 
 	rawInputLen, err = os.Stdin.Read(rawInput)
 	if err != nil {
-		panic(fmt.Sprintf("Reading from stdin failed: %v", err))
+		panic(fmt.Sprintf("Reading from stdin failed:\n%v", err))
 	}
 	input = string(rawInput[0:rawInputLen])
 
@@ -266,18 +266,18 @@ func readfile(
 	defer f.Close()
 
 	if errors.Is(err, os.ErrNotExist) {
-		panic(fmt.Sprintf("File \"%v\" could not be found: %v",
+		panic(fmt.Sprintf("File \"%v\" could not be found:\n%v",
 			filepath,
 			err))
 	} else if err != nil {
-		panic(fmt.Sprintf("File \"%v\" could not be opened: %v",
+		panic(fmt.Sprintf("File \"%v\" could not be opened:\n%v",
 			filepath,
 			err))
 	}
 
 	ret, err := io.ReadAll(f)
 	if err != nil {
-		panic(fmt.Sprintf("File \"%v\" could not be read: %v",
+		panic(fmt.Sprintf("File \"%v\" could not be read:\n%v",
 			filepath,
 			err))
 	}
@@ -300,7 +300,7 @@ func tick(
 	fmt.Print(csi.Clear)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(fmt.Sprintf("Could not get term size: %v", err))
+		panic(fmt.Sprintf("Could not get term size:\n%v", err))
 	}
 
 	headerLines = common.SplitByLines(termW, ad.CouCfg.Header)

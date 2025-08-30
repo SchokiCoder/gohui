@@ -216,7 +216,7 @@ func handleArgs(
 			return false
 
 		default:
-			panic("Unknown argument: \"" + os.Args[i] + "\"")
+			panic(`Unknown argument "` + os.Args[i] + `"`)
 		}
 	}
 
@@ -243,12 +243,12 @@ func handleInput(
 
 	canonicalState, err = term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(fmt.Sprintf("Switching to raw mode failed: %v", err))
+		panic(fmt.Sprintf("Switching to raw mode failed:\n%v", err))
 	}
 
 	rawInputLen, err = os.Stdin.Read(rawInput)
 	if err != nil {
-		panic(fmt.Sprintf("Reading from stdin failed: %v", err))
+		panic(fmt.Sprintf("Reading from stdin failed:\n%v", err))
 	}
 	input = string(rawInput[0:rawInputLen])
 
@@ -376,7 +376,7 @@ func tick(
 	fmt.Print(csi.Clear)
 	termW, termH, err = term.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(fmt.Sprintf("Could not get term size: %v", err))
+		panic(fmt.Sprintf("Could not get term size:\n%v", err))
 	}
 	curMenu = ad.HuiCfg.Menus[ad.MPath.curMenu()]
 
@@ -432,7 +432,7 @@ func main(
 	_, mainMenuExists := ad.HuiCfg.Menus["main"]
 
 	if mainMenuExists == false {
-		panic("\"main\" menu not found in config")
+		panic(`"main" menu not found in config`)
 	}
 	ad.MPath[0] = menuPathNode{0, "main"}
 

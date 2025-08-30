@@ -114,7 +114,7 @@ func AnyConfigFromFile(
 			continue
 		} else if err != nil {
 			fmt.Fprintf(os.Stderr,
-				"Config file could not be opened: \"%v\", \"%v\"\n",
+				"Config file \"%v\" could not be opened:\n%v\n",
 				curPath, err)
 		} else {
 			found = true
@@ -128,7 +128,7 @@ func AnyConfigFromFile(
 
 	str, err := io.ReadAll(f)
 	if err != nil {
-		panic(fmt.Sprintf("Config file could not be read: \"%v\", \"%v\"",
+		panic(fmt.Sprintf("Config file \"%v\" could not be read:\n%v",
 			paths[i], err))
 	}
 

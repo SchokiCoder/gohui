@@ -113,7 +113,10 @@ See `grep -R "func .* {" *`
 - [x] fix some panic msgs having newlines at the end 
 - [x] unify panics to have no full stops
 - [x] fix panic message "No pager could not be found"
-- [ ] unify panics quoting errors or not
+- [x] unify error prints and panics quoting behavior
+Relevant files or values are immediately quoted, after being mentioned.
+Eg. "file \"%v\" could not be opened".
+Embedded errors go to a new line, after a colon.
 
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 

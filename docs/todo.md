@@ -118,6 +118,11 @@ Relevant files or values are immediately quoted, after being mentioned.
 Eg. "file \"%v\" could not be opened".
 Embedded errors go to a new line, after a colon.
 
+- [x] fix less trying to prompt for opening binary files
+This prompt wasn't shown, and resulted in a blank screen.
+Also allow less to print control characters.
+
+- [ ] setting PAGER to more doesn't ever do any pagering
 - [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
 
 - finish the book !

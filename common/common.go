@@ -71,11 +71,14 @@ func callPager(
 	pager string,
 	pagerTitle string,
 ) Feedback {
-	var err error
-	var shCall string
-	var tempFile *os.File
-	var tempFileContent string
-	var tempFilePath string
+	var (
+		err error
+		flags string
+		shCall string
+		tempFile *os.File
+		tempFileContent string
+		tempFilePath string
+	)
 
 	tempFile, err = os.CreateTemp("", "huiFeedback")
 	if err != nil {
@@ -95,7 +98,11 @@ func callPager(
 	}
 
 	pagerTitle = strings.ReplaceAll(pagerTitle, "\"", "\\\"")
-	shCall = fmt.Sprintf("PAGERTITLE=\"%v\" %v %v", pagerTitle, pager, tempFilePath)
+	if pager == "less" {
+		flags = "-fr"
+	}
+
+	shCall = fmt.Sprintf("PAGERTITLE=\"%v\" %v %v %v", pagerTitle, pager, flags, tempFilePath)
 
 	return HandleShellSession(shCall)
 }

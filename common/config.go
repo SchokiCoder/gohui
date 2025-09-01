@@ -184,8 +184,14 @@ func (c *ComConfig) validatePagers(
 
 	paths = append(paths, "") // for local dir
 
-	c.Pagers = append(c.Pagers,
-		pagerConfig{EnvVars: "", Pager: os.Getenv("PAGER"), Flags: ""})
+	c.Pagers = append(
+		[]pagerConfig{
+			pagerConfig{
+				EnvVars: "",
+				Pager: os.Getenv("PAGER"),
+				Flags: ""},
+		},
+		c.Pagers...)
 
 	for i := 0; i < len(c.Pagers); i++ {
 		pagerFound = false

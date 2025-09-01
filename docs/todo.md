@@ -1,10 +1,27 @@
 # niche bugs
 
 - courier: issues with neofetch
-  it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
-  Also neofetch does something weird with lines in general; try scrolling down
+it's not cuz: hui:handleShell:ReadAll, SplitByLines:trimming, drawContent
+Also neofetch does something weird with lines in general; try scrolling down
+`less` seems to filter (some) CSI Sequences out, maybe try that
 
-  `less` seems to filter (some) CSI Sequences out, maybe try that
+## util-linux's "more" is generally not usable for hui
+
+It is fantastic on FreeBSD however.
+FreeBSD's more needs NOTHING to immediately work.
+Since less works on Linux, I have at least one fallback.
+
+- [ ] fix more immediately quitting when displaying short text
+This made it look like more wouldn't even be called in the first place.
+POSIXLY_CORRECT=1 should fix this, but doesn't, in the context of hui specifically.
+POSIXLY_CORRECT isn't recognized by FreeBSD's more anyway,
+and for Ubuntu LTS's it makes no difference anyway.
+So setting it brings no value. So I haven't done so already.
+
+- [ ] fix more receiving no keyboard input and freezing everything,
+      when displaying long text (longer than 1 page)
+You then have to terminate everything down to hui.
+This is Linux only.
 
 # later
 
@@ -123,17 +140,10 @@ This prompt wasn't shown, and resulted in a blank screen.
 Also allow less to print control characters.
 
 - [x] add pager fallback list with customizable envvars and flags to config
-
-- [ ] theoretically fix more immediately quitting when displaying short text
-This made it look like more wouldn't even be called in the first place.
-POSIXLY_CORRECT=1 should fix this, but doesn't, in the context of hui specifically.
-
-- [ ] fix more receiving no keyboard input and freezing everything when displaying long text (longer than 1 page)
-You then have to terminate everything down to hui.
-
-- [ ] less and more have various failcases, whether via PAGER envvar or hardcoded fallback
+- [x] fix PAGER envvar priority in customizable pager fallback list
 
 - finish the book !
+- test on FreeBSD
 
 - [ ] set version to 1.5
 

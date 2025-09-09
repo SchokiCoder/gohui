@@ -11,14 +11,14 @@ It is fantastic on FreeBSD however.
 FreeBSD's more needs NOTHING to immediately work.
 Since less works on Linux, I have at least one fallback.
 
-- [ ] fix more immediately quitting when displaying short text
+- [ ] fix `more` immediately quitting when displaying short text
 This made it look like more wouldn't even be called in the first place.
 POSIXLY_CORRECT=1 should fix this, but doesn't, in the context of hui specifically.
 POSIXLY_CORRECT isn't recognized by FreeBSD's more anyway,
 and for Ubuntu LTS's it makes no difference anyway.
 So setting it brings no value. So I haven't done so already.
 
-- [ ] fix more receiving no keyboard input and freezing everything,
+- [ ] fix `more` receiving no keyboard input and freezing everything,
       when displaying long text (longer than 1 page)
 You then have to terminate everything down to hui.
 This is Linux only.
@@ -45,6 +45,8 @@ This is Linux only.
 
 - update demo config
 - set version
+
+-----
 
 # The Idiomatic Update
 
@@ -149,12 +151,7 @@ Also allow less to print control characters.
 - [x] fix `make install` on FreeBSD
 FreeBSD's cp has no -t. So use a loop instead.
 
-- test
-- test on FreeBSD
-
-- [ ] set version to 1.5
-
------
+- [x] set version to 1.5
 
 # The Nice Update
 

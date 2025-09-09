@@ -16,7 +16,7 @@ APP_NAME_FORMAL  :=House User Interface
 LICENSE          :=GPL-2.0-or-later
 LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
 REPO             :=https://github.com/SchokiCoder/gohui
-VERSION          :=v1.4
+VERSION          :=v1.5
 
 .PHONY: all build clean install purge remove vet
 

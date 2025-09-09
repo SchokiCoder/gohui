@@ -145,7 +145,7 @@ Also allow less to print control characters.
 - [x] fix PAGER envvar priority regarding customizable pager fallback list
 
 - [x] courier: add error msg when filepath is not given
-- [ ] add error msg when argument of -c flag is not given
+- [x] add error msg when argument of -c flag is not given
 
 - test
 - test on FreeBSD

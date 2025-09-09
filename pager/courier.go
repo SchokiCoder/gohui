@@ -128,6 +128,10 @@ func handleArgs(
 		case "-c":
 			fallthrough
 		case "--config":
+			if len(os.Args) <= i + 1 {
+				panic("-c requires an argument")
+			}
+
 			*cfgPath = os.Args[i + 1]
 			i++
 

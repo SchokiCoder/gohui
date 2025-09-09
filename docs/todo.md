@@ -146,6 +146,8 @@ Also allow less to print control characters.
 
 - [x] courier: add error msg when filepath is not given
 - [x] add error msg when argument of -c flag is not given
+- [x] fix `make install` on FreeBSD
+FreeBSD's cp has no -t. So use a loop instead.
 
 - test
 - test on FreeBSD

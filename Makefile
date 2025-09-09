@@ -29,7 +29,7 @@ clean:
 
 install: $(INSTALL_BINARIES)
 	mkdir -p $(BIN_DESTDIR)
-	cp -t $(BIN_DESTDIR) $(INSTALL_BINARIES)
+	for i in $(INSTALL_BINARIES); do cp "$$i" $(BIN_DESTDIR); done
 	mkdir -p $(CFG_DESTDIR)
 	cp pkg/common.json $(CFG_DESTDIR)
 	cp pkg/courier.json $(CFG_DESTDIR)

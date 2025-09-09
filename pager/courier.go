@@ -152,6 +152,10 @@ func handleArgs(
 		}
 	}
 
+	if filepath = "" {
+		panic("No filepath has been given")
+	}
+
 	return filepath, true
 }
 

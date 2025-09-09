@@ -25,6 +25,8 @@ This is Linux only.
 
 # later
 
+- --config flag value is not communicated from hui to courier
+
 - add csi 4 bit colors?
 - add specific feedback color for errors
 
@@ -44,7 +46,7 @@ This is Linux only.
 - update demo config
 - set version
 
-# The Idiomatic Update ?
+# The Idiomatic Update
 
 - [x] make Feedback its own type
 
@@ -140,9 +142,12 @@ This prompt wasn't shown, and resulted in a blank screen.
 Also allow less to print control characters.
 
 - [x] add pager fallback list with customizable envvars and flags to config
-- [x] fix PAGER envvar priority in customizable pager fallback list
+- [x] fix PAGER envvar priority regarding customizable pager fallback list
 
-- finish the book !
+- [x] courier: add error msg when filepath is not given
+- [ ] add error msg when argument of -c flag is not given
+
+- test
 - test on FreeBSD
 
 - [ ] set version to 1.5
